@@ -1,5 +1,6 @@
 import HeroText from "./HeroText";
 import HeroImage from "./HeroImage";
+import Container from "@/components/layout/Container";
 
 export default function Hero() {
   return (
@@ -9,13 +10,13 @@ export default function Hero() {
 
       <div className="absolute bottom-[-200px] right-[-150px] h-[500px] w-[500px] rounded-full bg-fuchsia-600/10 blur-[150px]" />
 
-      <div className="relative mx-auto flex min-h-screen max-w-7xl flex-col items-center justify-between gap-16 px-6 pt-32 pb-16 lg:flex-row">
+      <Container className="relative flex min-h-screen flex-col items-center justify-between gap-16 pt-32 pb-16 lg:flex-row">
         {/* Left */}
         <HeroText />
 
         {/* Right */}
         <HeroImage />
-      </div>
+      </Container>
     </section>
   );
 }
