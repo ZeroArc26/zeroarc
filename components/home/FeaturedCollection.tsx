@@ -18,10 +18,11 @@ export default function FeaturedCollection() {
           {FEATURED_PRODUCTS.map((product) => (
             <ProductCard
               key={product.id}
+              slug={product.slug}
               name={product.name}
               price={product.price}
-              image={product.image}
-              tag={product.tag}
+              variants={product.variants}
+              tag={product.tag ?? ""}
             />
           ))}
         </div>
