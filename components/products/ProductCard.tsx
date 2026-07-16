@@ -38,7 +38,7 @@ export default function ProductCard({
             src={previewImage}
             alt={name}
             fill
-            className="object-contain p-8 transition-transform duration-500 group-hover:scale-105"
+            className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
           />
         </div>
 
