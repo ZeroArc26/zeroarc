@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 
 import { Product } from "@/types/product";
 import { useCartStore } from "@/stores/cartStore";
+import { useWishlistStore } from "@/stores/wishlistStore";
 
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import SecondaryButton from "@/components/ui/SecondaryButton";
@@ -36,6 +37,18 @@ export default function ProductInfo({
 
 const addToCart = useCartStore(
   (state) => state.addToCart
+);
+
+const addToWishlist = useWishlistStore(
+  (state) => state.addToWishlist
+);
+
+const removeFromWishlist = useWishlistStore(
+  (state) => state.removeFromWishlist
+);
+
+const isInWishlist = useWishlistStore((state) =>
+  state.isInWishlist(product.id)
 );
 
   return (
@@ -145,9 +158,31 @@ const addToCart = useCartStore(
   Add to Cart
 </PrimaryButton>
 
-        <SecondaryButton>
-          Wishlist
-        </SecondaryButton>
+        <SecondaryButton
+  onClick={() => {
+    if (isInWishlist) {
+      removeFromWishlist(product.id);
+      alert("Removed from Wishlist!");
+      return;
+    }
+
+    if (!selectedVariant) return;
+
+    addToWishlist({
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+      image: selectedVariant.image,
+      price: product.price,
+    });
+
+    alert("Added to Wishlist!");
+  }}
+>
+  {isInWishlist
+    ? "❤️ Remove Wishlist"
+    : "🤍 Add Wishlist"}
+</SecondaryButton>
       </div>
     </div>
   );
