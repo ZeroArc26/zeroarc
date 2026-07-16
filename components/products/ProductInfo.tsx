@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { Product } from "@/types/product";
+import { useCartStore } from "@/stores/cartStore";
 
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import SecondaryButton from "@/components/ui/SecondaryButton";
@@ -28,6 +29,14 @@ export default function ProductInfo({
       ) ?? product.variants[0]
     );
   }, [product.variants, selectedColor]);
+
+  const [selectedSize, setSelectedSize] = useState(
+  product.sizes[0] ?? ""
+);
+
+const addToCart = useCartStore(
+  (state) => state.addToCart
+);
 
   return (
     <div>
@@ -55,7 +64,11 @@ export default function ProductInfo({
         {product.description}
       </p>
 
-      <SizeSelector sizes={product.sizes} />
+      <SizeSelector
+  sizes={product.sizes}
+  selectedSize={selectedSize}
+  onSizeChange={setSelectedSize}
+/>
 
       <ColorSelector
         variants={product.variants}
@@ -102,9 +115,35 @@ export default function ProductInfo({
       </div>
 
       <div className="mt-10 flex gap-4">
-        <PrimaryButton>
-          Add to Cart
-        </PrimaryButton>
+        <PrimaryButton
+  onClick={() => {
+    if (!selectedVariant) return;
+
+    addToCart({
+      productId: product.id,
+      slug: product.slug,
+      name: product.name,
+
+      variantId: selectedVariant.id,
+      sku: selectedVariant.sku,
+      color: selectedVariant.color,
+      size: selectedSize,
+
+      image: selectedVariant.image,
+
+      price: product.price,
+      quantity: 1,
+
+      availableStock: selectedVariant.stock,
+
+      addedAt: new Date().toISOString(),
+    });
+
+    alert("Product Added Successfully!");
+  }}
+>
+  Add to Cart
+</PrimaryButton>
 
         <SecondaryButton>
           Wishlist

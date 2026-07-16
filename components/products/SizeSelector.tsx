@@ -1,16 +1,16 @@
 "use client";
 
-import { useState } from "react";
-
 interface SizeSelectorProps {
   sizes: string[];
+  selectedSize: string;
+  onSizeChange: (size: string) => void;
 }
 
 export default function SizeSelector({
   sizes,
+  selectedSize,
+  onSizeChange,
 }: SizeSelectorProps) {
-  const [selectedSize, setSelectedSize] = useState(sizes[1] ?? sizes[0]);
-
   return (
     <div className="mt-10">
       <h3 className="mb-4 text-lg font-semibold text-white">
@@ -22,7 +22,7 @@ export default function SizeSelector({
           <button
             key={size}
             type="button"
-            onClick={() => setSelectedSize(size)}
+            onClick={() => onSizeChange(size)}
             className={`h-12 w-12 rounded-xl border text-sm font-semibold transition-all duration-200 ${
               selectedSize === size
                 ? "border-purple-500 bg-purple-600 text-white"
