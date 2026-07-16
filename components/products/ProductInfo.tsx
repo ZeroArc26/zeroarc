@@ -5,6 +5,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Product } from "@/types/product";
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
+import { toast } from "sonner";
 
 import PrimaryButton from "@/components/ui/PrimaryButton";
 import SecondaryButton from "@/components/ui/SecondaryButton";
@@ -157,7 +158,7 @@ const isInWishlist = useWishlistStore((state) =>
       addedAt: new Date().toISOString(),
     });
 
-    alert("Product Added Successfully!");
+    toast.success("Product added to cart!");
   }}
 >
   Add to Cart
@@ -167,7 +168,7 @@ const isInWishlist = useWishlistStore((state) =>
   onClick={() => {
     if (isInWishlist) {
       removeFromWishlist(product.id);
-      alert("Removed from Wishlist!");
+      toast.success("Removed from wishlist!");
       return;
     }
 
@@ -190,7 +191,7 @@ const isInWishlist = useWishlistStore((state) =>
   availableStock: selectedVariant.stock,
 });
 
-    alert("Added to Wishlist!");
+    toast.success("Added to wishlist!");
   }}
 >
   {!mounted

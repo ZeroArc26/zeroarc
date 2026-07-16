@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/layout/Navbar";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -29,6 +30,12 @@ export default function RootLayout({
   className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}
 >
   <Navbar />
+
+  <Toaster
+  richColors
+  position="top-right"
+  theme="dark"
+/>
 
   {children}
 </body>

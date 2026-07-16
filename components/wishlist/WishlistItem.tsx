@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { Heart, ShoppingBag } from "lucide-react";
+import { toast } from "sonner";
 
 import {
   WishlistItem as WishlistItemType,
@@ -79,7 +80,7 @@ const addToCart = useCartStore(
 
     removeFromWishlist(item.productId);
 
-    alert("Moved to Cart!");
+    toast.success("Product moved to cart!");
   }}
   className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-purple-600 py-2.5 text-sm font-semibold text-white transition hover:bg-purple-500"
 >
@@ -91,7 +92,7 @@ const addToCart = useCartStore(
             <button
   onClick={() => {
     removeFromWishlist(item.productId);
-    alert("Removed from Wishlist!");
+    toast.success("Removed from wishlist!");
   }}
   className="rounded-xl border border-red-500/30 p-2.5 text-red-500 transition hover:bg-red-500/10"
 >
