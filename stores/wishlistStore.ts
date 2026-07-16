@@ -5,8 +5,17 @@ export interface WishlistItem {
   productId: number;
   slug: string;
   name: string;
+
+  variantId: string;
+  sku: string;
+  color: string;
+  size: string;
+
   image: string;
+
   price: number;
+
+  availableStock: number;
 }
 
 interface WishlistStore {

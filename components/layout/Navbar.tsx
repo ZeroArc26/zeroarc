@@ -1,15 +1,30 @@
 "use client";
 
 import Link from "next/link";
-import { Search, ShoppingBag, User } from "lucide-react";
+import {
+  Search,
+  ShoppingBag,
+  User,
+  Heart,
+} from "lucide-react";
 import { useState, useEffect } from "react";
 
 import { useCartStore } from "@/stores/cartStore";
+import { useWishlistStore } from "@/stores/wishlistStore";
+import WishlistDrawer from "@/components/wishlist/WishlistDrawer";
+
 import CartDrawer from "@/components/cart/CartDrawer";
 
 export default function Navbar() {
-  const totalItems = useCartStore((state) => state.getTotalItems());
+  const totalItems = useCartStore((state) =>
+    state.getTotalItems()
+  );
 
+  const totalWishlistItems = useWishlistStore((state) =>
+    state.getTotalItems()
+  );
+
+  const [wishlistOpen, setWishlistOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
 
@@ -39,7 +54,10 @@ export default function Navbar() {
               Shop
             </Link>
 
-            <Link href="/collections" className="hover:text-white transition">
+            <Link
+              href="/collections"
+              className="hover:text-white transition"
+            >
               Collections
             </Link>
 
@@ -55,6 +73,24 @@ export default function Navbar() {
               className="cursor-pointer transition hover:text-white"
             />
 
+            {/* Wishlist */}
+            <div
+  className="relative cursor-pointer"
+  onClick={() => setWishlistOpen(true)}
+>
+              <Heart
+                size={20}
+                className="transition hover:text-white"
+              />
+
+              {mounted && totalWishlistItems > 0 && (
+                <span className="absolute -right-2 -top-2 flex h-5 w-5 items-center justify-center rounded-full bg-pink-600 text-[10px] font-bold text-white">
+                  {totalWishlistItems}
+                </span>
+              )}
+            </div>
+
+            {/* Cart */}
             <div
               className="relative cursor-pointer"
               onClick={() => setCartOpen(true)}
@@ -78,6 +114,11 @@ export default function Navbar() {
           </div>
         </div>
       </header>
+
+      <WishlistDrawer
+        open={wishlistOpen}
+        onClose={() => setWishlistOpen(false)}
+/>
 
       <CartDrawer
         open={cartOpen}

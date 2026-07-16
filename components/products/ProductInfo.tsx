@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useEffect } from "react";
 
 import { Product } from "@/types/product";
 import { useCartStore } from "@/stores/cartStore";
@@ -34,6 +34,11 @@ export default function ProductInfo({
   const [selectedSize, setSelectedSize] = useState(
   product.sizes[0] ?? ""
 );
+const [mounted, setMounted] = useState(false);
+
+useEffect(() => {
+  setMounted(true);
+}, []);
 
 const addToCart = useCartStore(
   (state) => state.addToCart
@@ -169,19 +174,30 @@ const isInWishlist = useWishlistStore((state) =>
     if (!selectedVariant) return;
 
     addToWishlist({
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
-      image: selectedVariant.image,
-      price: product.price,
-    });
+  productId: product.id,
+  slug: product.slug,
+  name: product.name,
+
+  variantId: selectedVariant.id,
+  sku: selectedVariant.sku,
+  color: selectedVariant.color,
+  size: selectedSize,
+
+  image: selectedVariant.image,
+
+  price: product.price,
+
+  availableStock: selectedVariant.stock,
+});
 
     alert("Added to Wishlist!");
   }}
 >
-  {isInWishlist
-    ? "❤️ Remove Wishlist"
-    : "🤍 Add Wishlist"}
+  {!mounted
+  ? "🤍 Add Wishlist"
+  : isInWishlist
+  ? "❤️ Remove Wishlist"
+  : "🤍 Add Wishlist"}
 </SecondaryButton>
       </div>
     </div>
