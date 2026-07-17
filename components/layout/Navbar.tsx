@@ -15,6 +15,8 @@ import WishlistDrawer from "@/components/wishlist/WishlistDrawer";
 
 import CartDrawer from "@/components/cart/CartDrawer";
 
+import SearchDrawer from "@/components/search/SearchDrawer";
+
 export default function Navbar() {
   const totalItems = useCartStore((state) =>
     state.getTotalItems()
@@ -23,7 +25,8 @@ export default function Navbar() {
   const totalWishlistItems = useWishlistStore((state) =>
     state.getTotalItems()
   );
-
+  
+  const [searchOpen, setSearchOpen] = useState(false);
   const [wishlistOpen, setWishlistOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
@@ -68,10 +71,12 @@ export default function Navbar() {
 
           {/* Icons */}
           <div className="flex items-center gap-5 text-zinc-300">
-            <Search
-              size={20}
-              className="cursor-pointer transition hover:text-white"
-            />
+            <button
+  onClick={() => setSearchOpen(true)}
+  className="cursor-pointer transition hover:text-white"
+>
+  <Search size={20} />
+</button>
 
             {/* Wishlist */}
             <div
@@ -114,6 +119,11 @@ export default function Navbar() {
           </div>
         </div>
       </header>
+
+      <SearchDrawer
+  open={searchOpen}
+  onClose={() => setSearchOpen(false)}
+/>
 
       <WishlistDrawer
         open={wishlistOpen}
