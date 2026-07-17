@@ -3,8 +3,12 @@
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
+import { useRouter } from "next/navigation";
 
 export default function OrderSummary() {
+  const router = useRouter();
+
+const clearCart = useCartStore((state) => state.clearCart);
   const [mounted, setMounted] = useState(false);
 
 useEffect(() => {
@@ -17,6 +21,12 @@ useEffect(() => {
   const shipping = totalPrice > 999 ? 0 : 99;
   const grandTotal = totalPrice + shipping;
   const handlePayment = async () => {
+
+  if (items.length === 0) {
+    toast.error("Your cart is empty.");
+    return;
+  }
+
   try {
     const response = await fetch("/api/razorpay/order", {
       method: "POST",
@@ -42,11 +52,33 @@ useEffect(() => {
       description: "Premium Anime Streetwear",
       order_id: order.id,
 
-      handler: function (response: any) {
-        toast.success("Payment Successful 🎉");
-
-        console.log(response);
+      handler: async function (response: any) {
+  try {
+    const verifyResponse = await fetch("/api/razorpay/verify", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
       },
+      body: JSON.stringify(response),
+    });
+
+    const result = await verifyResponse.json();
+
+    if (result.success) {
+  toast.success("Payment Verified Successfully 🎉");
+
+  clearCart();
+
+  router.push("/payment-success");
+} else {
+      toast.error("Payment Verification Failed");
+    }
+  } catch (error) {
+    console.error(error);
+
+    toast.error("Verification Error");
+  }
+},
 
       theme: {
         color: "#7C3AED",
@@ -115,9 +147,16 @@ useEffect(() => {
 
       <button
   onClick={handlePayment}
-  className="mt-8 w-full rounded-2xl bg-purple-600 py-4 font-semibold text-white transition hover:bg-purple-500"
+  disabled={items.length === 0}
+  className={`mt-8 w-full rounded-2xl py-4 font-semibold transition ${
+    items.length === 0
+      ? "cursor-not-allowed bg-zinc-700 text-zinc-400"
+      : "bg-purple-600 text-white hover:bg-purple-500"
+  }`}
 >
-  Pay ₹{grandTotal}
+  {items.length === 0
+    ? "Cart is Empty"
+    : `Pay ₹${grandTotal}`}
 </button>
     </div>
   );
