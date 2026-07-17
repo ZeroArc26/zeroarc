@@ -1,14 +1,35 @@
-"use client";
+"use client"; 
 
+import { useEffect, useState } from "react";
 import { useCartStore } from "@/stores/cartStore";
 
 export default function OrderSummary() {
+  const [mounted, setMounted] = useState(false);
+
+useEffect(() => {
+  setMounted(true);
+}, []);
   const items = useCartStore((state) => state.items);
   const totalItems = useCartStore((state) => state.getTotalItems());
   const totalPrice = useCartStore((state) => state.getTotalPrice());
 
   const shipping = totalPrice > 999 ? 0 : 99;
   const grandTotal = totalPrice + shipping;
+  if (!mounted) {
+  return (
+    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8">
+      <div className="h-8 w-44 animate-pulse rounded bg-zinc-800" />
+
+      <div className="mt-8 space-y-5">
+        <div className="h-5 animate-pulse rounded bg-zinc-800" />
+        <div className="h-5 animate-pulse rounded bg-zinc-800" />
+        <div className="h-5 animate-pulse rounded bg-zinc-800" />
+      </div>
+
+      <div className="mt-8 h-14 animate-pulse rounded-2xl bg-zinc-800" />
+    </div>
+  );
+}
 
   return (
     <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8">
