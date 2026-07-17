@@ -1,6 +1,7 @@
 "use client"; 
 
 import { useEffect, useState } from "react";
+import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 
 export default function OrderSummary() {
@@ -15,6 +16,52 @@ useEffect(() => {
 
   const shipping = totalPrice > 999 ? 0 : 99;
   const grandTotal = totalPrice + shipping;
+  const handlePayment = async () => {
+  try {
+    const response = await fetch("/api/razorpay/order", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        amount: grandTotal,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create order");
+    }
+
+    const order = await response.json();
+
+    const options = {
+      key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+      amount: order.amount,
+      currency: order.currency,
+      name: "ZEROARC",
+      description: "Premium Anime Streetwear",
+      order_id: order.id,
+
+      handler: function (response: any) {
+        toast.success("Payment Successful 🎉");
+
+        console.log(response);
+      },
+
+      theme: {
+        color: "#7C3AED",
+      },
+    };
+
+    const razorpay = new (window as any).Razorpay(options);
+
+    razorpay.open();
+  } catch (error) {
+    console.error(error);
+
+    toast.error("Unable to start payment.");
+  }
+};
   if (!mounted) {
   return (
     <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8">
@@ -67,10 +114,11 @@ useEffect(() => {
       </div>
 
       <button
-        className="mt-8 w-full rounded-2xl bg-purple-600 py-4 font-semibold text-white transition hover:bg-purple-500"
-      >
-        Place Order
-      </button>
+  onClick={handlePayment}
+  className="mt-8 w-full rounded-2xl bg-purple-600 py-4 font-semibold text-white transition hover:bg-purple-500"
+>
+  Pay ₹{grandTotal}
+</button>
     </div>
   );
 }
