@@ -64,9 +64,42 @@ useEffect(() => {
 
     const result = await verifyResponse.json();
 
+    const orderData = {
+  orderId: `ZA-${Date.now()}`,
+  paymentId: response.razorpay_payment_id,
+  razorpayOrderId: response.razorpay_order_id,
+
+  customer: {
+    name: "Guest",
+    email: "",
+    phone: "",
+  },
+
+  items,
+
+  subtotal: totalPrice,
+  shipping,
+  total: grandTotal,
+};
+
     if (result.success) {
   toast.success("Payment Verified Successfully 🎉");
 
+  const saveOrder = await fetch("/api/orders", {
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(orderData),
+});
+
+const savedOrder = await saveOrder.json();
+
+if (!savedOrder.success) {
+  toast.error("Failed to save order.");
+  return;
+}
+  
   clearCart();
 
   router.push("/payment-success");
