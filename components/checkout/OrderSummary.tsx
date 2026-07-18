@@ -4,11 +4,15 @@ import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { useCartStore } from "@/stores/cartStore";
 import { useRouter } from "next/navigation";
+import { useShippingStore } from "@/stores/shippingStore";
 
 export default function OrderSummary() {
   const router = useRouter();
 
 const clearCart = useCartStore((state) => state.clearCart);
+const shippingData = useShippingStore(
+  (state) => state.shipping
+);
   const [mounted, setMounted] = useState(false);
 
 useEffect(() => {
@@ -26,6 +30,21 @@ useEffect(() => {
     toast.error("Your cart is empty.");
     return;
   }
+
+  if (
+  !shippingData.fullName ||
+  !shippingData.phone ||
+  !shippingData.email ||
+  !shippingData.house ||
+  !shippingData.street ||
+  !shippingData.city ||
+  !shippingData.state ||
+  !shippingData.pincode
+) {
+  toast.error("Please complete your shipping details.");
+
+  return;
+}
 
   try {
     const response = await fetch("/api/razorpay/order", {
@@ -65,27 +84,31 @@ useEffect(() => {
     const result = await verifyResponse.json();
 
     const orderData = {
-  orderId: `ZA-${Date.now()}`,
   paymentId: response.razorpay_payment_id,
+
   razorpayOrderId: response.razorpay_order_id,
 
   customer: {
-    name: "Guest",
-    email: "",
-    phone: "",
+    fullName: shippingData.fullName,
+    email: shippingData.email,
+    phone: shippingData.phone,
   },
+
+  shippingAddress: shippingData,
 
   items,
 
   subtotal: totalPrice,
+
   shipping,
+
   total: grandTotal,
 };
 
     if (result.success) {
   toast.success("Payment Verified Successfully 🎉");
 
-  const saveOrder = await fetch("/api/orders", {
+  const saveOrder = await fetch("/api/orders/create", {
   method: "POST",
   headers: {
     "Content-Type": "application/json",
