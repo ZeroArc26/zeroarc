@@ -2,31 +2,17 @@ import mongoose from "mongoose";
 
 const MONGODB_URI = process.env.MONGODB_URI!;
 
-if (!MONGODB_URI) {
-  throw new Error("Please define MONGODB_URI in .env.local");
-}
-
-let cached = (global as any).mongoose;
-
-if (!cached) {
-  cached = (global as any).mongoose = {
-    conn: null,
-    promise: null,
-  };
-}
-
 export async function connectDB() {
-  if (cached.conn) {
-    return cached.conn;
+  try {
+    console.log("Mongo URI:", MONGODB_URI);
+
+    const conn = await mongoose.connect(MONGODB_URI);
+
+    console.log("✅ Mongo Connected");
+
+    return conn;
+  } catch (err) {
+    console.error("❌ Mongo Error:", err);
+    throw err;
   }
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI, {
-      dbName: "zeroarc",
-    });
-  }
-
-  cached.conn = await cached.promise;
-
-  return cached.conn;
 }

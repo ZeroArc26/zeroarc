@@ -70,6 +70,11 @@ useEffect(() => {
       name: "ZEROARC",
       description: "Premium Anime Streetwear",
       order_id: order.id,
+      prefill: {
+  name: shippingData.fullName,
+  email: shippingData.email,
+  contact: shippingData.phone,
+},
 
       handler: async function (response: any) {
   try {
@@ -142,6 +147,11 @@ if (!savedOrder.success) {
     };
 
     const razorpay = new (window as any).Razorpay(options);
+    razorpay.on("payment.failed", function (response: any) {
+  console.log(response.error);
+
+  toast.error(response.error.description);
+});
 
     razorpay.open();
   } catch (error) {
