@@ -4,6 +4,8 @@ import bcrypt from "bcryptjs";
 import { connectDB } from "@/lib/mongodb";
 import User from "@/models/User";
 
+import jwt from "jsonwebtoken";
+
 export async function POST(req: Request) {
   try {
     await connectDB();
@@ -49,15 +51,37 @@ export async function POST(req: Request) {
       );
     }
 
-    return NextResponse.json({
-      success: true,
-      message: "Login successful.",
-      user: {
-        id: user._id.toString(),
-        fullName: user.fullName,
-        email: user.email,
-      },
-    });
+    const token = jwt.sign(
+  {
+    id: user._id,
+    email: user.email,
+    fullName: user.fullName,
+  },
+  process.env.JWT_SECRET!,
+  {
+    expiresIn: "7d",
+  }
+);
+
+    const response = NextResponse.json({
+  success: true,
+  message: "Login successful.",
+  user: {
+    id: user._id.toString(),
+    fullName: user.fullName,
+    email: user.email,
+  },
+});
+
+response.cookies.set("token", token, {
+  httpOnly: true,
+  secure: process.env.NODE_ENV === "production",
+  sameSite: "lax",
+  maxAge: 60 * 60 * 24 * 7, // 7 days
+  path: "/",
+});
+
+return response;
   } catch (error) {
     console.error("Login Error:", error);
 
