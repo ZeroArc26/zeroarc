@@ -3,9 +3,15 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/lib/mongodb";
 import Product from "@/models/Product";
 
+interface RouteParams {
+  params: Promise<{
+    slug: string;
+  }>;
+}
+
 export async function GET(
-  req: Request,
-  { params }: { params: Promise<{ slug: string }> }
+  request: Request,
+  { params }: RouteParams
 ) {
   try {
     await connectDB();

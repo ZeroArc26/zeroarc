@@ -2,20 +2,19 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface WishlistItem {
-  productId: number;
-  slug: string;
-  name: string;
+  productId: string;
 
-  variantId: string;
-  sku: string;
-  color: string;
-  size: string;
+  slug: string;
+  title: string;
 
   image: string;
 
+  color: string;
+  size: string;
+
   price: number;
 
-  availableStock: number;
+  stock: number;
 }
 
 interface WishlistStore {
@@ -23,9 +22,9 @@ interface WishlistStore {
 
   addToWishlist: (item: WishlistItem) => void;
 
-  removeFromWishlist: (productId: number) => void;
+  removeFromWishlist: (productId: string) => void;
 
-  isInWishlist: (productId: number) => boolean;
+  isInWishlist: (productId: string) => boolean;
 
   clearWishlist: () => void;
 

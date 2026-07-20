@@ -34,7 +34,7 @@ const addToCart = useCartStore(
         <div className="relative h-24 w-24 overflow-hidden rounded-xl bg-zinc-950">
           <Image
             src={item.image}
-            alt={item.name}
+            alt={item.title}
             fill
             className="object-contain p-2"
           />
@@ -45,7 +45,7 @@ const addToCart = useCartStore(
 
           <div>
             <h3 className="font-semibold text-white">
-              {item.name}
+              {item.title}
             </h3>
 
             <p className="mt-2 text-lg font-bold text-purple-400">
@@ -59,24 +59,24 @@ const addToCart = useCartStore(
             <button
   onClick={() => {
     addToCart({
-      productId: item.productId,
-      slug: item.slug,
-      name: item.name,
+  productId: item.productId,
 
-      variantId: item.variantId,
-      sku: item.sku,
-      color: item.color,
-      size: item.size,
+  slug: item.slug,
+  title: item.title,
 
-      image: item.image,
+  image: item.image,
 
-      price: item.price,
-      quantity: 1,
+  color: item.color,
+  size: item.size,
 
-      availableStock: item.availableStock,
+  price: item.price,
 
-      addedAt: new Date().toISOString(),
-    });
+  quantity: 1,
+
+  stock: item.stock,
+
+  addedAt: new Date().toISOString(),
+});
 
     removeFromWishlist(item.productId);
 

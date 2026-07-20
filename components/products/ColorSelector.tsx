@@ -1,15 +1,13 @@
 "use client";
 
-import { ProductVariant } from "@/types/product";
-
 interface ColorSelectorProps {
-  variants: ProductVariant[];
+  colors: string[];
   selectedColor: string;
   onColorChange: (color: string) => void;
 }
 
 export default function ColorSelector({
-  variants,
+  colors,
   selectedColor,
   onColorChange,
 }: ColorSelectorProps) {
@@ -20,18 +18,18 @@ export default function ColorSelector({
       </h3>
 
       <div className="flex flex-wrap gap-3">
-        {variants.map((variant) => (
+        {colors.map((color) => (
           <button
-            key={variant.id}
+            key={color}
             type="button"
-            onClick={() => onColorChange(variant.color)}
+            onClick={() => onColorChange(color)}
             className={`rounded-xl border px-5 py-3 text-sm font-medium transition ${
-              selectedColor === variant.color
+              selectedColor === color
                 ? "border-purple-500 bg-purple-600 text-white"
                 : "border-zinc-700 bg-zinc-900 text-zinc-300 hover:border-purple-500"
             }`}
           >
-            {variant.color}
+            {color}
           </button>
         ))}
       </div>

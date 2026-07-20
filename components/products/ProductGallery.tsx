@@ -11,15 +11,13 @@ export default function ProductGallery({
   images,
 }: ProductGalleryProps) {
   const [selectedImage, setSelectedImage] = useState(
-    images?.[0] || "/images/products/placeholder.png"
+    images[0] || "/placeholder.png"
   );
 
   return (
     <div>
       {/* Main Image */}
-
       <div className="relative aspect-square overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900">
-
         <Image
           src={selectedImage}
           alt="Product"
@@ -27,13 +25,10 @@ export default function ProductGallery({
           priority
           className="object-contain p-10 transition duration-300 hover:scale-105"
         />
-
       </div>
 
       {/* Thumbnails */}
-
       <div className="mt-5 flex gap-4 overflow-x-auto">
-
         {images.map((image, index) => (
           <button
             key={index}
@@ -46,15 +41,13 @@ export default function ProductGallery({
           >
             <Image
               src={image}
-              alt={`Product ${index + 1}`}
+              alt={`Thumbnail ${index + 1}`}
               fill
               className="object-contain p-2"
             />
           </button>
         ))}
-
       </div>
-
     </div>
   );
 }

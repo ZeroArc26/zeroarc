@@ -2,21 +2,21 @@ import { create } from "zustand";
 import { persist } from "zustand/middleware";
 
 export interface CartItem {
-  productId: number;
-  slug: string;
-  name: string;
+  productId: string;
 
-  variantId: string;
-  sku: string;
-  color: string;
-  size: string;
+  slug: string;
+  title: string;
 
   image: string;
 
+  color: string;
+  size: string;
+
   price: number;
+
   quantity: number;
 
-  availableStock: number;
+  stock: number;
 
   addedAt: string;
 }
@@ -27,15 +27,17 @@ interface CartStore {
   addToCart: (item: CartItem) => void;
 
   removeFromCart: (
-    variantId: string,
-    size: string
-  ) => void;
+  productId: string,
+  color: string,
+  size: string
+) => void;
 
   updateQuantity: (
-    variantId: string,
-    size: string,
-    quantity: number
-  ) => void;
+  productId: string,
+  color: string,
+  size: string,
+  quantity: number
+) => void;
 
   clearCart: () => void;
 
@@ -50,21 +52,23 @@ export const useCartStore = create<CartStore>()(
 
       addToCart: (item) => {
         const existingItem = get().items.find(
-          (cartItem) =>
-            cartItem.variantId === item.variantId &&
-            cartItem.size === item.size
-        );
+  (cartItem) =>
+    cartItem.productId === item.productId &&
+    cartItem.color === item.color &&
+    cartItem.size === item.size
+);
 
         if (existingItem) {
           set({
             items: get().items.map((cartItem) =>
-              cartItem.variantId === item.variantId &&
-              cartItem.size === item.size
+              cartItem.productId === item.productId &&
+cartItem.color === item.color &&
+cartItem.size === item.size
                 ? {
                     ...cartItem,
                     quantity: Math.min(
                       cartItem.quantity + item.quantity,
-                      cartItem.availableStock
+                      cartItem.stock
                     ),
                   }
                 : cartItem
@@ -79,29 +83,36 @@ export const useCartStore = create<CartStore>()(
         });
       },
 
-      removeFromCart: (variantId, size) => {
+      removeFromCart: (productId, color, size) => {
         set({
           items: get().items.filter(
             (item) =>
               !(
-                item.variantId === variantId &&
-                item.size === size
+                item.productId === productId &&
+item.color === color &&
+item.size === size
               )
           ),
         });
       },
-            updateQuantity: (variantId, size, quantity) => {
+            updateQuantity: (
+  productId,
+  color,
+  size,
+  quantity
+) => {
         set({
           items: get().items.map((item) => {
             if (
-              item.variantId === variantId &&
-              item.size === size
+              item.productId === productId &&
+item.color === color &&
+item.size === size
             ) {
               return {
                 ...item,
                 quantity: Math.max(
                   1,
-                  Math.min(quantity, item.availableStock)
+                  Math.min(quantity, item.stock)
                 ),
               };
             }

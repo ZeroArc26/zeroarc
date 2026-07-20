@@ -1,10 +1,7 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
-import { Product } from "@/types/product";
-import { useCartStore } from "@/stores/cartStore";
-import { useWishlistStore } from "@/stores/wishlistStore";
 import { toast } from "sonner";
 
 import PrimaryButton from "@/components/ui/PrimaryButton";
@@ -13,71 +10,92 @@ import SecondaryButton from "@/components/ui/SecondaryButton";
 import SizeSelector from "./SizeSelector";
 import ColorSelector from "./ColorSelector";
 
+import { useCartStore } from "@/stores/cartStore";
+import { useWishlistStore } from "@/stores/wishlistStore";
+
 interface ProductInfoProps {
-  product: Product;
+  product: {
+    _id: string;
+
+    title: string;
+    slug: string;
+
+    description: string;
+
+    price: number;
+    comparePrice?: number;
+
+    category: string;
+    collection: string;
+
+    images: string[];
+
+    colors: string[];
+
+    sizes: string[];
+
+    stock: number;
+  };
 }
 
 export default function ProductInfo({
   product,
 }: ProductInfoProps) {
   const [selectedColor, setSelectedColor] = useState(
-    product.variants[0]?.color ?? ""
+    product.colors[0] ?? ""
   );
-  const [quantity, setQuantity] = useState(1);
-
-  const selectedVariant = useMemo(() => {
-    return (
-      product.variants.find(
-        (variant) => variant.color === selectedColor
-      ) ?? product.variants[0]
-    );
-  }, [product.variants, selectedColor]);
 
   const [selectedSize, setSelectedSize] = useState(
-  product.sizes[0] ?? ""
-);
-const [mounted, setMounted] = useState(false);
+    product.sizes[0] ?? ""
+  );
 
-useEffect(() => {
-  setMounted(true);
-}, []);
+  const [quantity, setQuantity] = useState(1);
 
-const addToCart = useCartStore(
-  (state) => state.addToCart
-);
+  const [mounted, setMounted] = useState(false);
 
-const addToWishlist = useWishlistStore(
-  (state) => state.addToWishlist
-);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
-const removeFromWishlist = useWishlistStore(
-  (state) => state.removeFromWishlist
-);
+  const addToCart = useCartStore(
+    (state) => state.addToCart
+  );
 
-const isInWishlist = useWishlistStore((state) =>
-  state.isInWishlist(product.id)
-);
+  const addToWishlist = useWishlistStore(
+    (state) => state.addToWishlist
+  );
+
+  const removeFromWishlist = useWishlistStore(
+    (state) => state.removeFromWishlist
+  );
+
+  const isInWishlist = useWishlistStore((state) =>
+    state.isInWishlist(product._id)
+  );
 
   return (
     <div>
+
       <p className="text-sm uppercase tracking-[0.3em] text-purple-400">
         {product.collection}
       </p>
 
       <h1 className="mt-3 text-5xl font-black">
-        {product.name}
+        {product.title}
       </h1>
 
       <div className="mt-4 flex items-center gap-3">
+
         <span className="text-3xl font-bold text-purple-400">
           ₹{product.price}
         </span>
 
-        {product.originalPrice && (
+        {product.comparePrice && (
           <span className="text-xl text-zinc-500 line-through">
-            ₹{product.originalPrice}
+            ₹{product.comparePrice}
           </span>
         )}
+
       </div>
 
       <p className="mt-6 leading-8 text-zinc-400">
@@ -85,160 +103,193 @@ const isInWishlist = useWishlistStore((state) =>
       </p>
 
       <SizeSelector
-  sizes={product.sizes}
-  selectedSize={selectedSize}
-  onSizeChange={setSelectedSize}
-/>
+        sizes={product.sizes}
+        selectedSize={selectedSize}
+        onSizeChange={setSelectedSize}
+      />
 
       <ColorSelector
-        variants={product.variants}
+        colors={product.colors}
         selectedColor={selectedColor}
         onColorChange={setSelectedColor}
       />
 
-      <div className="mt-10">
-        <h3 className="mb-4 text-lg font-semibold">
-          Features
-        </h3>
+            <div className="mt-10 rounded-2xl border border-zinc-800 p-6">
 
-        <ul className="space-y-3 text-zinc-300">
-          {product.features.map((feature) => (
-            <li key={feature}>• {feature}</li>
-          ))}
-        </ul>
-      </div>
-
-      <div className="mt-10 rounded-2xl border border-zinc-800 p-6">
         <div className="flex justify-between">
-          <span className="text-zinc-400">Fabric</span>
+          <span className="text-zinc-400">
+            Category
+          </span>
 
-          <span>{product.fabric}</span>
-        </div>
-        
-
-        <div className="mt-4 flex justify-between">
-          <span className="text-zinc-400">Fit</span>
-
-          <span>{product.fit}</span>
+          <span>
+            {product.category}
+          </span>
         </div>
 
         <div className="mt-4 flex justify-between">
-          <span className="text-zinc-400">Stock</span>
+          <span className="text-zinc-400">
+            Collection
+          </span>
 
-          <span>{selectedVariant?.stock ?? 0}</span>
+          <span>
+            {product.collection}
+          </span>
         </div>
 
         <div className="mt-4 flex justify-between">
-          <span className="text-zinc-400">SKU</span>
+          <span className="text-zinc-400">
+            Available Stock
+          </span>
 
-          <span>{selectedVariant?.sku}</span>
+          <span className="font-semibold">
+            {product.stock}
+          </span>
         </div>
+
       </div>
 
       <div className="mt-8">
 
-  <h3 className="mb-3 text-lg font-semibold">
-    Quantity
-  </h3>
+        <h3 className="mb-3 text-lg font-semibold">
+          Quantity
+        </h3>
 
-  <div className="flex w-fit items-center rounded-xl border border-zinc-800">
+        <div className="flex w-fit items-center rounded-xl border border-zinc-800">
 
-    <button
-      onClick={() =>
-        setQuantity((prev) => Math.max(1, prev - 1))
-      }
-      className="px-5 py-3 text-xl"
-    >
-      −
-    </button>
+          <button
+            onClick={() =>
+              setQuantity((prev) =>
+                Math.max(1, prev - 1)
+              )
+            }
+            className="px-5 py-3 text-xl transition hover:bg-zinc-800"
+          >
+            −
+          </button>
 
-    <span className="w-14 text-center font-bold">
-      {quantity}
-    </span>
+          <span className="w-14 text-center font-bold">
+            {quantity}
+          </span>
 
-    <button
-      onClick={() =>
-        setQuantity((prev) =>
-          Math.min(selectedVariant?.stock ?? 1, prev + 1)
-        )
-      }
-      className="px-5 py-3 text-xl"
-    >
-      +
-    </button>
+          <button
+            onClick={() =>
+              setQuantity((prev) =>
+                Math.min(product.stock, prev + 1)
+              )
+            }
+            className="px-5 py-3 text-xl transition hover:bg-zinc-800"
+          >
+            +
+          </button>
 
-  </div>
+        </div>
 
-</div>
+      </div>
 
-      <div className="mt-10 flex gap-4">
+      <div className="mt-10">
+
+        <h3 className="mb-4 text-lg font-semibold">
+          Product Details
+        </h3>
+
+        <ul className="space-y-3 text-zinc-400">
+
+          <li>
+            • Premium 240 GSM Cotton
+          </li>
+
+          <li>
+            • Oversized Fit
+          </li>
+
+          <li>
+            • High Quality Print
+          </li>
+
+          <li>
+            • Soft & Breathable Fabric
+          </li>
+
+          <li>
+            • Made for Daily Wear
+          </li>
+
+        </ul>
+
+      </div>
+
+            <div className="mt-10 flex gap-4">
+
         <PrimaryButton
-  onClick={() => {
-    if (!selectedVariant) return;
+          onClick={() => {
+            addToCart({
+              productId: product._id,
 
-    addToCart({
-      productId: product.id,
-      slug: product.slug,
-      name: product.name,
+              slug: product.slug,
 
-      variantId: selectedVariant.id,
-      sku: selectedVariant.sku,
-      color: selectedVariant.color,
-      size: selectedSize,
+              title: product.title,
 
-      image: selectedVariant.image,
+              image: product.images[0],
 
-      price: product.price,
-      quantity: quantity,
+              color: selectedColor,
 
-      availableStock: selectedVariant.stock,
+              size: selectedSize,
 
-      addedAt: new Date().toISOString(),
-    });
+              price: product.price,
 
-    toast.success("Product added to cart!");
-  }}
->
-  Add to Cart
-</PrimaryButton>
+              quantity,
+
+              stock: product.stock,
+
+              addedAt: new Date().toISOString(),
+            });
+
+            toast.success("Added to Cart 🛒");
+          }}
+        >
+          Add to Cart
+        </PrimaryButton>
 
         <SecondaryButton
-  onClick={() => {
-    if (isInWishlist) {
-      removeFromWishlist(product.id);
-      toast.success("Removed from wishlist!");
-      return;
-    }
+          onClick={() => {
+            if (isInWishlist) {
+              removeFromWishlist(product._id);
 
-    if (!selectedVariant) return;
+              toast.success("Removed from Wishlist ❤️");
 
-    addToWishlist({
-  productId: product.id,
-  slug: product.slug,
-  name: product.name,
+              return;
+            }
 
-  variantId: selectedVariant.id,
-  sku: selectedVariant.sku,
-  color: selectedVariant.color,
-  size: selectedSize,
+            addToWishlist({
+              productId: product._id,
 
-  image: selectedVariant.image,
+              slug: product.slug,
 
-  price: product.price,
+              title: product.title,
 
-  availableStock: selectedVariant.stock,
-});
+              image: product.images[0],
 
-    toast.success("Added to wishlist!");
-  }}
->
-  {!mounted
-  ? "🤍 Add Wishlist"
-  : isInWishlist
-  ? "❤️ Remove Wishlist"
-  : "🤍 Add Wishlist"}
-</SecondaryButton>
+              color: selectedColor,
+
+              size: selectedSize,
+
+              price: product.price,
+
+              stock: product.stock,
+            });
+
+            toast.success("Added to Wishlist ❤️");
+          }}
+        >
+          {!mounted
+            ? "🤍 Wishlist"
+            : isInWishlist
+            ? "❤️ Remove Wishlist"
+            : "🤍 Wishlist"}
+        </SecondaryButton>
+
       </div>
+
     </div>
   );
 }

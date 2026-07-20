@@ -43,8 +43,8 @@ export default async function ProductPage({
       <Container className="grid gap-16 lg:grid-cols-2">
 
         <ProductGallery
-          images={product.images}
-        />
+  images={product.images}
+/>
 
         <ProductInfo
           product={product}
