@@ -73,6 +73,8 @@ export async function POST(req: Request) {
   },
 });
 
+console.log("✅ Setting token cookie...");
+
 response.cookies.set("token", token, {
   httpOnly: true,
   secure: process.env.NODE_ENV === "production",
@@ -80,6 +82,8 @@ response.cookies.set("token", token, {
   maxAge: 60 * 60 * 24 * 7, // 7 days
   path: "/",
 });
+
+console.log("✅ Returning login response");
 
 return response;
   } catch (error) {

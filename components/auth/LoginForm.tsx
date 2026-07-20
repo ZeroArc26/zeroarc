@@ -33,6 +33,7 @@ export default function LoginForm() {
 
       const response = await fetch("/api/auth/login", {
         method: "POST",
+        credentials: "include",
         headers: {
           "Content-Type": "application/json",
         },
@@ -51,9 +52,9 @@ export default function LoginForm() {
 
       toast.success("Login successful!");
 
-      console.log(data.user);
+router.refresh();
 
-      router.push("/");
+router.replace("/");
     } catch (error) {
       console.error(error);
 

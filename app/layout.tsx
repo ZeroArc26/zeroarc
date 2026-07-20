@@ -3,9 +3,9 @@ import { Inter, Space_Grotesk } from "next/font/google";
 import Script from "next/script";
 
 import "./globals.css";
-import Navbar from "@/components/layout/Navbar";
-import { Toaster } from "sonner";
 
+import NavbarServer from "@/components/layout/NavbarServer";
+import { Toaster } from "sonner";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -30,22 +30,23 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-  className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}
->
-  <Navbar />
+        className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}
+      >
+        <NavbarServer />
 
-  <Toaster
-  richColors
-  position="top-right"
-  theme="dark"
-/>
+        <Toaster
+          richColors
+          position="top-right"
+          theme="dark"
+        />
 
-  {children}
-  <Script
-  src="https://checkout.razorpay.com/v1/checkout.js"
-  strategy="beforeInteractive"
-/>
-</body>
+        {children}
+
+        <Script
+          src="https://checkout.razorpay.com/v1/checkout.js"
+          strategy="beforeInteractive"
+        />
+      </body>
     </html>
   );
 }
