@@ -23,6 +23,7 @@ export default function ProductInfo({
   const [selectedColor, setSelectedColor] = useState(
     product.variants[0]?.color ?? ""
   );
+  const [quantity, setQuantity] = useState(1);
 
   const selectedVariant = useMemo(() => {
     return (
@@ -113,6 +114,7 @@ const isInWishlist = useWishlistStore((state) =>
 
           <span>{product.fabric}</span>
         </div>
+        
 
         <div className="mt-4 flex justify-between">
           <span className="text-zinc-400">Fit</span>
@@ -133,6 +135,42 @@ const isInWishlist = useWishlistStore((state) =>
         </div>
       </div>
 
+      <div className="mt-8">
+
+  <h3 className="mb-3 text-lg font-semibold">
+    Quantity
+  </h3>
+
+  <div className="flex w-fit items-center rounded-xl border border-zinc-800">
+
+    <button
+      onClick={() =>
+        setQuantity((prev) => Math.max(1, prev - 1))
+      }
+      className="px-5 py-3 text-xl"
+    >
+      −
+    </button>
+
+    <span className="w-14 text-center font-bold">
+      {quantity}
+    </span>
+
+    <button
+      onClick={() =>
+        setQuantity((prev) =>
+          Math.min(selectedVariant?.stock ?? 1, prev + 1)
+        )
+      }
+      className="px-5 py-3 text-xl"
+    >
+      +
+    </button>
+
+  </div>
+
+</div>
+
       <div className="mt-10 flex gap-4">
         <PrimaryButton
   onClick={() => {
@@ -151,7 +189,7 @@ const isInWishlist = useWishlistStore((state) =>
       image: selectedVariant.image,
 
       price: product.price,
-      quantity: 1,
+      quantity: quantity,
 
       availableStock: selectedVariant.stock,
 

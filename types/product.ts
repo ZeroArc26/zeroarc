@@ -1,48 +1,28 @@
-export interface ProductVariant {
-  id: string;
-  sku: string;
-
-  color: string;
-
-  image: string;
-
-  stock: number;
-}
-
 export interface Product {
-  id: number;
+  _id?: string;
 
+  title: string;
   slug: string;
-
-  name: string;
-
-  price: number;
-
-  originalPrice?: number;
-
-  tag?: string;
-
-  category: string;
-
-  collection: string;
-
-  sizes: string[];
-
-  variants: ProductVariant[];
-
-  rating: number;
-
-  reviews: number;
 
   description: string;
 
-  features: string[];
+  price: number;
+  comparePrice?: number;
 
-  fabric: string;
+  category: string;
+  collection: string;
 
-  fit: string;
+  images: string[];
+
+  sizes: string[];
+
+  colors: string[];
+
+  stock: number;
 
   featured?: boolean;
-
+  bestseller?: boolean;
   newArrival?: boolean;
+
+  active?: boolean;
 }

@@ -1,58 +1,96 @@
+"use client";
+
 import Image from "next/image";
 import Link from "next/link";
+import { Heart, ShoppingBag } from "lucide-react";
 
-import { ProductVariant } from "@/types/product";
-
-interface ProductCardProps {
+type Product = {
+  _id: string;
+  title: string;
   slug: string;
-  name: string;
   price: number;
-  variants: ProductVariant[];
-  tag?: string;
-}
+  comparePrice?: number;
+  images: string[];
+  bestseller?: boolean;
+  newArrival?: boolean;
+};
 
 export default function ProductCard({
-  slug,
-  name,
-  price,
-  variants,
-  tag,
-}: ProductCardProps) {
-  const previewImage =
-    variants.length > 0
-      ? variants[0].image
-      : "/images/products/placeholder.png";
-
+  product,
+}: {
+  product: Product;
+}) {
   return (
-    <Link href={`/products/${slug}`}>
-      <div className="group overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/50 transition-all duration-300 hover:-translate-y-2 hover:border-purple-500/40 hover:shadow-[0_0_40px_rgba(168,85,247,0.15)]">
+    <div className="group overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 transition duration-300 hover:-translate-y-1 hover:border-purple-500/50">
 
-        <div className="relative aspect-square overflow-hidden bg-zinc-950">
-          {tag && (
-            <span className="absolute left-4 top-4 z-10 rounded-full bg-purple-600 px-3 py-1 text-xs font-semibold text-white">
-              {tag}
+      <Link href={`/products/${product.slug}`}>
+
+        <div className="relative aspect-square overflow-hidden bg-zinc-900">
+
+          <Image
+            src={product.images[0]}
+            alt={product.title}
+            fill
+            sizes="(max-width:768px) 100vw, 25vw"
+            className="object-cover transition duration-500 group-hover:scale-110"
+          />
+
+          {product.newArrival && (
+            <span className="absolute left-4 top-4 rounded-full bg-purple-600 px-3 py-1 text-xs font-bold text-white">
+              NEW
             </span>
           )}
 
-          <Image
-            src={previewImage}
-            alt={name}
-            fill
-            className="object-contain p-2 transition-transform duration-500 group-hover:scale-105"
-          />
+          {product.bestseller && (
+            <span className="absolute right-4 top-4 rounded-full bg-yellow-500 px-3 py-1 text-xs font-bold text-black">
+              BEST
+            </span>
+          )}
+
         </div>
 
-        <div className="p-6">
-          <h3 className="text-xl font-bold text-white transition-colors group-hover:text-purple-400">
-            {name}
-          </h3>
+      </Link>
 
-          <p className="mt-2 text-lg font-semibold text-purple-400">
-            ₹{price}
-          </p>
+      <div className="space-y-3 p-5">
+
+        <h3 className="line-clamp-1 text-lg font-bold text-white">
+          {product.title}
+        </h3>
+
+        <div className="flex items-center gap-3">
+
+          <span className="text-xl font-bold text-white">
+            ₹{product.price}
+          </span>
+
+          {product.comparePrice && (
+            <span className="text-sm text-zinc-500 line-through">
+              ₹{product.comparePrice}
+            </span>
+          )}
+
+        </div>
+
+        <div className="flex gap-3">
+
+          <button className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-3 font-semibold text-white transition hover:scale-[1.02]">
+
+            <ShoppingBag size={18} />
+
+            Add to Cart
+
+          </button>
+
+          <button className="rounded-xl border border-white/10 p-3 transition hover:border-pink-500 hover:text-pink-500">
+
+            <Heart size={20} />
+
+          </button>
+
         </div>
 
       </div>
-    </Link>
+
+    </div>
   );
 }
