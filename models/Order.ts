@@ -2,12 +2,6 @@ import mongoose, { Schema, models, model } from "mongoose";
 
 const OrderSchema = new Schema(
   {
-    orderId: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-
     customer: {
       firstName: {
         type: String,
@@ -31,11 +25,30 @@ const OrderSchema = new Schema(
     },
 
     shippingAddress: {
-      address: String,
-      city: String,
-      state: String,
-      pincode: String,
-      country: String,
+      address: {
+        type: String,
+        required: true,
+      },
+
+      city: {
+        type: String,
+        required: true,
+      },
+
+      state: {
+        type: String,
+        required: true,
+      },
+
+      pincode: {
+        type: String,
+        required: true,
+      },
+
+      country: {
+        type: String,
+        required: true,
+      },
     },
 
     products: [
@@ -44,15 +57,17 @@ const OrderSchema = new Schema(
 
         title: String,
 
+        slug: String,
+
         image: String,
 
         color: String,
 
         size: String,
 
-        price: Number,
-
         quantity: Number,
+
+        price: Number,
       },
     ],
 
@@ -64,22 +79,12 @@ const OrderSchema = new Schema(
 
     total: Number,
 
-    paymentMethod: {
-      type: String,
-      default: "Razorpay",
-    },
-
-    paymentStatus: {
-      type: String,
-      enum: ["Pending", "Paid", "Failed"],
-      default: "Pending",
-    },
-
-    orderStatus: {
+    status: {
       type: String,
       enum: [
         "Pending",
         "Confirmed",
+        "Packed",
         "Shipped",
         "Delivered",
         "Cancelled",
@@ -92,4 +97,5 @@ const OrderSchema = new Schema(
   }
 );
 
-export default models.Order || model("Order", OrderSchema);
+export default models.Order ||
+  model("Order", OrderSchema);
