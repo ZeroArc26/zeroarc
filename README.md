@@ -1,36 +1,400 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🛍️ ZeroArc
 
-## Getting Started
+A modern fashion e-commerce website built with **Next.js 15**, **MongoDB**, **Tailwind CSS** and **TypeScript**.
 
-First, run the development server:
+---
 
-```bash
+# 🌐 Main Website Routes
+
+## Home
+
+http://localhost:3000/
+
+➡ Landing Page
+
+---
+
+## Shop
+
+http://localhost:3000/shop
+
+➡ All Products
+
+---
+
+## Product Details
+
+http://localhost:3000/product/[slug]
+
+Example:
+
+http://localhost:3000/product/oversized-black-hoodie
+
+➡ Single Product Page
+
+---
+
+## Cart
+
+http://localhost:3000/cart
+
+➡ Shopping Cart
+
+---
+
+## Checkout
+
+http://localhost:3000/checkout
+
+➡ Place Order
+
+---
+
+## Search
+
+http://localhost:3000/search
+
+➡ Search Products
+
+---
+
+## Wishlist (Future)
+
+http://localhost:3000/wishlist
+
+➡ Saved Products
+
+---
+
+## Profile (Future)
+
+http://localhost:3000/profile
+
+➡ User Profile
+
+---
+
+# 👑 Admin Panel
+
+## Dashboard
+
+http://localhost:3000/admin
+
+➡ Overview
+- Revenue
+- Orders
+- Products
+- Analytics
+
+---
+
+## Orders
+
+http://localhost:3000/admin/orders
+
+➡ Manage Orders
+
+Features
+
+- View Orders
+- Change Status
+- Customer Details
+- Products Ordered
+
+---
+
+## Products
+
+http://localhost:3000/admin/products
+
+➡ Product List
+
+Features
+
+- All Products
+- Edit
+- Delete
+- Inventory
+- Stock
+
+---
+
+## Add Product
+
+http://localhost:3000/admin/products/add
+
+➡ Add New Product
+
+Features
+
+- Images
+- Price
+- Category
+- Collection
+- Stock
+- Featured
+- Bestseller
+- New Arrival
+
+---
+
+## Edit Product (Future)
+
+http://localhost:3000/admin/products/edit/[id]
+
+Example
+
+http://localhost:3000/admin/products/edit/6847d82f1c....
+
+➡ Edit Existing Product
+
+---
+
+## Inventory (Future)
+
+http://localhost:3000/admin/inventory
+
+➡ Manage Stock
+
+---
+
+## Coupons (Future)
+
+http://localhost:3000/admin/coupons
+
+➡ Coupon Management
+
+---
+
+## Users (Future)
+
+http://localhost:3000/admin/users
+
+➡ User Management
+
+---
+
+## Analytics (Future)
+
+http://localhost:3000/admin/analytics
+
+➡ Sales Analytics
+
+---
+
+# 🔥 API Routes
+
+## Products
+
+GET
+
+/api/products
+
+➡ Fetch all products
+
+POST
+
+/api/products
+
+➡ Create Product
+
+---
+
+## Orders
+
+GET
+
+/api/orders
+
+➡ Fetch Orders
+
+POST
+
+/api/orders
+
+➡ Create Order
+
+---
+
+## Order Status
+
+PATCH
+
+/api/orders/[id]
+
+➡ Update Order Status
+
+---
+
+## Dashboard
+
+GET
+
+/api/admin/dashboard
+
+➡ Dashboard Analytics
+
+---
+
+# 📂 Folder Structure
+
+app/
+
+admin/
+
+products/
+
+orders/
+
+cart/
+
+checkout/
+
+api/
+
+components/
+
+lib/
+
+models/
+
+public/
+
+---
+
+# 🗄️ MongoDB Models
+
+Product
+
+- title
+- slug
+- description
+- price
+- comparePrice
+- category
+- collection
+- images
+- sizes
+- colors
+- stock
+- featured
+- bestseller
+- newArrival
+- active
+
+---
+
+Order
+
+- customer
+- shippingAddress
+- products
+- totalItems
+- subtotal
+- shipping
+- total
+- status
+
+---
+
+# 🚀 Current Features
+
+✅ Home
+
+✅ Shop
+
+✅ Product Page
+
+✅ Cart
+
+✅ Checkout
+
+✅ MongoDB
+
+✅ Orders
+
+✅ Admin Dashboard
+
+✅ Admin Orders
+
+✅ Order Status Update
+
+✅ Product List
+
+✅ Add Product
+
+---
+
+# 🛣️ Roadmap
+
+✅ Dashboard
+
+✅ Orders
+
+✅ Product List
+
+✅ Add Product
+
+⬜ Edit Product
+
+⬜ Delete Product
+
+⬜ Inventory
+
+⬜ Variant Stock
+
+⬜ Coupons
+
+⬜ Wishlist
+
+⬜ Reviews
+
+⬜ Razorpay
+
+⬜ User Authentication
+
+⬜ Analytics
+
+⬜ Email Notifications
+
+⬜ Admin Settings
+
+⬜ Production Deployment
+
+---
+
+# 💻 Tech Stack
+
+Next.js 15
+
+React
+
+TypeScript
+
+Tailwind CSS
+
+MongoDB
+
+Mongoose
+
+Vercel
+
+---
+
+# 📌 Local Development
+
+Install
+
+npm install
+
+Run
+
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Open
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+http://localhost:3000
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+---
 
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Made with ❤️ by ZeroArc
