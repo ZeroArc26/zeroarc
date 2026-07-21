@@ -7,9 +7,17 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    const data = await req.json();
+    const body = await req.json();
 
-    const order = await Order.create(data);
+    const order = await Order.create({
+      ...body,
+
+      orderId:
+        "ZA-" +
+        Date.now() +
+        "-" +
+        Math.floor(Math.random() * 1000),
+    });
 
     return NextResponse.json({
       success: true,
@@ -21,7 +29,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(
       {
         success: false,
-        message: "Failed to save order",
+        message: "Failed to create order.",
       },
       {
         status: 500,

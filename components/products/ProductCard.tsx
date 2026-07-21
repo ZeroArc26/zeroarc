@@ -28,7 +28,7 @@ export default function ProductCard({
         <div className="relative aspect-square overflow-hidden bg-zinc-900">
 
           <Image
-            src={product.images[0]}
+            src={product.images?.[0] || "/products/default.webp"}
             alt={product.title}
             fill
             sizes="(max-width:768px) 100vw, 25vw"

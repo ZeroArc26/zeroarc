@@ -2,52 +2,19 @@ import mongoose, { Schema, models, model } from "mongoose";
 
 const OrderSchema = new Schema(
   {
-    // ===========================
-    // ORDER INFORMATION
-    // ===========================
-
     orderId: {
       type: String,
       required: true,
       unique: true,
     },
 
-    invoiceNumber: {
-      type: String,
-      default: "",
-    },
-
-    // ===========================
-    // PAYMENT
-    // ===========================
-
-    paymentId: {
-      type: String,
-      required: true,
-    },
-
-    razorpayOrderId: {
-      type: String,
-      required: true,
-    },
-
-    paymentMethod: {
-      type: String,
-      default: "Razorpay",
-    },
-
-    paymentStatus: {
-      type: String,
-      enum: ["pending", "paid", "failed", "refunded"],
-      default: "paid",
-    },
-
-    // ===========================
-    // CUSTOMER
-    // ===========================
-
     customer: {
-      fullName: {
+      firstName: {
+        type: String,
+        required: true,
+      },
+
+      lastName: {
         type: String,
         required: true,
       },
@@ -63,140 +30,61 @@ const OrderSchema = new Schema(
       },
     },
 
-    // ===========================
-    // SHIPPING ADDRESS
-    // ===========================
-
     shippingAddress: {
-      fullName: String,
-      phone: String,
-      email: String,
-
-      house: String,
-      street: String,
-      landmark: String,
-
+      address: String,
       city: String,
       state: String,
       pincode: String,
       country: String,
-
-      instructions: String,
     },
 
-    // ===========================
-    // PRODUCTS
-    // ===========================
-
-    items: [
+    products: [
       {
-        productId: Number,
+        productId: String,
 
-        slug: String,
+        title: String,
 
-        name: String,
-
-        sku: String,
-
-        variantId: String,
+        image: String,
 
         color: String,
 
         size: String,
 
-        image: String,
+        price: Number,
 
         quantity: Number,
-
-        price: Number,
       },
     ],
 
-    // ===========================
-    // PRICE DETAILS
-    // ===========================
+    totalItems: Number,
 
-    subtotal: {
-      type: Number,
-      required: true,
-    },
+    subtotal: Number,
 
-    shipping: {
-      type: Number,
-      required: true,
-    },
+    shipping: Number,
 
-    total: {
-      type: Number,
-      required: true,
-    },
+    total: Number,
 
-    // ===========================
-    // SHIPPING DETAILS
-    // ===========================
-
-    courier: {
+    paymentMethod: {
       type: String,
-      default: "",
+      default: "Razorpay",
     },
 
-    trackingNumber: {
+    paymentStatus: {
       type: String,
-      default: "",
+      enum: ["Pending", "Paid", "Failed"],
+      default: "Pending",
     },
-
-    // ===========================
-    // ORDER STATUS
-    // ===========================
 
     orderStatus: {
       type: String,
       enum: [
-        "processing",
-        "packed",
-        "shipped",
-        "out_for_delivery",
-        "delivered",
-        "cancelled",
-        "returned",
+        "Pending",
+        "Confirmed",
+        "Shipped",
+        "Delivered",
+        "Cancelled",
       ],
-      default: "processing",
-    },
-
-    statusHistory: [
-      {
-        status: {
-          type: String,
-        },
-
-        updatedAt: {
-          type: Date,
-          default: Date.now,
-        },
-      },
-    ],
-
-    // ===========================
-    // NOTES
-    // ===========================
-
-    adminNotes: {
-      type: String,
-      default: "",
-    },
-
-    customerNotes: {
-      type: String,
-      default: "",
-    },
-
-    // ===========================
-    // SOFT DELETE
-    // ===========================
-
-    isDeleted: {
-      type: Boolean,
-      default: false,
+      default: "Pending",
     },
   },
   {
@@ -204,7 +92,4 @@ const OrderSchema = new Schema(
   }
 );
 
-const Order =
-  models.Order || model("Order", OrderSchema);
-
-export default Order;
+export default models.Order || model("Order", OrderSchema);
