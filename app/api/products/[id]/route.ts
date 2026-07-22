@@ -1,10 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
 import connectDB from "@/lib/mongodb";
 import Product from "@/models/Product";
 
 export async function GET(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -18,7 +18,7 @@ export async function GET(
       return NextResponse.json(
         {
           success: false,
-          message: "Product not found",
+          message: "Product not found.",
         },
         {
           status: 404,
@@ -47,7 +47,7 @@ export async function GET(
 }
 
 export async function PATCH(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -57,7 +57,7 @@ export async function PATCH(
 
     const body = await req.json();
 
-    const product = await Product.findByIdAndUpdate(
+    const updatedProduct = await Product.findByIdAndUpdate(
       id,
       body,
       {
@@ -66,11 +66,11 @@ export async function PATCH(
       }
     );
 
-    if (!product) {
+    if (!updatedProduct) {
       return NextResponse.json(
         {
           success: false,
-          message: "Product not found",
+          message: "Product not found.",
         },
         {
           status: 404,
@@ -80,7 +80,8 @@ export async function PATCH(
 
     return NextResponse.json({
       success: true,
-      product,
+      message: "Product updated successfully.",
+      product: updatedProduct,
     });
 
   } catch (error) {
@@ -99,7 +100,7 @@ export async function PATCH(
 }
 
 export async function DELETE(
-  req: Request,
+  req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
@@ -107,13 +108,13 @@ export async function DELETE(
 
     const { id } = await params;
 
-    const product = await Product.findByIdAndDelete(id);
+    const deletedProduct = await Product.findByIdAndDelete(id);
 
-    if (!product) {
+    if (!deletedProduct) {
       return NextResponse.json(
         {
           success: false,
-          message: "Product not found",
+          message: "Product not found.",
         },
         {
           status: 404,

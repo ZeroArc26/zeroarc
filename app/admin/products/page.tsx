@@ -49,6 +49,37 @@ export default function AdminProductsPage() {
     fetchProducts();
   }, []);
 
+  async function handleDelete(id: string) {
+    const confirmDelete = window.confirm(
+      "Are you sure you want to delete this product?"
+    );
+
+    if (!confirmDelete) return;
+
+    try {
+      const res = await fetch(`/api/products/${id}`, {
+        method: "DELETE",
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        throw new Error(data.message);
+      }
+
+      setProducts((prev) =>
+        prev.filter((product) => product._id !== id)
+      );
+
+      alert("✅ Product Deleted Successfully!");
+
+    } catch (error) {
+      console.error(error);
+
+      alert("❌ Failed to delete product.");
+    }
+  }
+
   return (
     <main className="min-h-screen bg-[#09090B] py-32 text-white">
 
@@ -80,15 +111,14 @@ export default function AdminProductsPage() {
         <div className="mt-12">
 
           {loading ? (
-
             <p className="text-zinc-400">
               Loading Products...
             </p>
-
           ) : (
 
             <div className="grid gap-8 md:grid-cols-2 xl:grid-cols-3">
-                              {products.map((product) => (
+
+                            {products.map((product) => (
 
                 <div
                   key={product._id}
@@ -163,6 +193,7 @@ export default function AdminProductsPage() {
                       </Link>
 
                       <button
+                        onClick={() => handleDelete(product._id)}
                         className="flex-1 rounded-xl bg-red-600 py-3 font-bold transition hover:bg-red-700"
                       >
                         Delete
@@ -175,8 +206,7 @@ export default function AdminProductsPage() {
                 </div>
 
               ))}
-
-            </div>
+                          </div>
 
           )}
 

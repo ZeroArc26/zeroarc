@@ -28,6 +28,10 @@ export default function AddProductPage() {
     colors: "",
   });
 
+  const [uploading, setUploading] = useState(false);
+
+const [preview, setPreview] = useState("");
+
   function handleChange(
     e: React.ChangeEvent<
       HTMLInputElement |
@@ -45,6 +49,48 @@ export default function AddProductPage() {
           : value,
     }));
   }
+
+  async function handleImageUpload(
+  e: React.ChangeEvent<HTMLInputElement>
+) {
+  const file = e.target.files?.[0];
+
+  if (!file) return;
+
+  setUploading(true);
+
+  try {
+    const form = new FormData();
+
+    form.append("file", file);
+
+    const res = await fetch("/api/upload", {
+      method: "POST",
+      body: form,
+    });
+
+    const data = await res.json();
+
+    if (!data.success) {
+      throw new Error("Upload failed");
+    }
+
+    setPreview(data.imageUrl);
+
+    setFormData((prev) => ({
+      ...prev,
+      images: data.imageUrl,
+    }));
+
+  } catch (error) {
+    console.error(error);
+
+    alert("Image upload failed.");
+  } finally {
+    setUploading(false);
+  }
+}
+
   async function handleSubmit() {
   if (
     !formData.title ||
@@ -242,14 +288,38 @@ export default function AddProductPage() {
 
           {/* Images */}
 
-          <textarea
-            name="images"
-            value={formData.images}
-            onChange={handleChange}
-            rows={3}
-            placeholder="Image URLs (comma separated)"
-            className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-5 py-4 outline-none focus:border-violet-500"
-          />
+<div className="space-y-4">
+
+  <input
+    type="file"
+    accept="image/*"
+    onChange={handleImageUpload}
+    className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-5 py-4"
+  />
+
+  {uploading && (
+    <p className="text-yellow-400 font-semibold">
+      Uploading Image...
+    </p>
+  )}
+
+  {preview && (
+    <img
+      src={preview}
+      alt="Preview"
+      className="h-64 w-full rounded-xl object-cover border border-zinc-700"
+    />
+  )}
+
+  <input
+    type="text"
+    name="images"
+    value={formData.images}
+    readOnly
+    className="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-5 py-4 text-zinc-400"
+  />
+
+</div>
 
           {/* Sizes */}
 

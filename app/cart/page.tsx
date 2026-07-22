@@ -1,9 +1,12 @@
 "use client";
 
 import { Trash2 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { useCartStore } from "@/stores/cartStore";
 
 export default function CartPage() {
+  const router = useRouter();
+
   const items = useCartStore((state) => state.items);
 
   const getTotalPrice = useCartStore(
@@ -214,7 +217,11 @@ export default function CartPage() {
 
             </div>
 
-            <button className="mt-8 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-4 text-lg font-bold transition hover:scale-[1.02]">
+            <button
+              onClick={() => router.push("/checkout")}
+              disabled={items.length === 0}
+              className="mt-8 w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-4 text-lg font-bold transition hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50"
+            >
               Proceed to Checkout
             </button>
 
