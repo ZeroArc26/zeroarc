@@ -1,5 +1,27 @@
 import mongoose, { Schema, models, model } from "mongoose";
 
+const VariantSchema = new Schema(
+  {
+    size: {
+      type: String,
+      required: true,
+    },
+
+    color: {
+      type: String,
+      required: true,
+    },
+
+    stock: {
+      type: Number,
+      default: 0,
+    },
+  },
+  {
+    _id: false,
+  }
+);
+
 const ProductSchema = new Schema(
   {
     title: {
@@ -58,9 +80,19 @@ const ProductSchema = new Schema(
       },
     ],
 
+    // Total Stock
     stock: {
       type: Number,
       default: 0,
+    },
+
+    // Size + Color Inventory
+    variants: [VariantSchema],
+
+    // Auto Low Stock Warning
+    lowStockLimit: {
+      type: Number,
+      default: 5,
     },
 
     featured: {
@@ -81,6 +113,27 @@ const ProductSchema = new Schema(
     active: {
       type: Boolean,
       default: true,
+    },
+
+    // Analytics
+    soldCount: {
+      type: Number,
+      default: 0,
+    },
+
+    views: {
+      type: Number,
+      default: 0,
+    },
+
+    averageRating: {
+      type: Number,
+      default: 0,
+    },
+
+    reviewCount: {
+      type: Number,
+      default: 0,
     },
   },
   {
