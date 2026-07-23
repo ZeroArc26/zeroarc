@@ -1,114 +1,86 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import RevenueChart from "@/components/admin/RevenueChart";
+import Link from "next/link";
 
-interface DashboardStats {
-  totalRevenue: number;
-  totalOrders: number;
-  totalProducts: number;
-  totalUsers: number;
-}
-
-interface RecentOrder {
-  _id: string;
-
-  customer: {
-    firstName: string;
-    lastName: string;
+interface DashboardData {
+  stats: {
+    totalRevenue: number;
+    totalOrders: number;
+    totalProducts: number;
+    lowStockProducts: number;
   };
 
-  total: number;
+  recentOrders: any[];
 
-  status: string;
-
-  createdAt: string;
-}
-
-interface MonthlyRevenue {
-  _id: {
-    month: number;
-  };
-
-  revenue: number;
+  lowStockProducts: any[];
 }
 
 export default function AdminDashboard() {
-  const [stats, setStats] = useState<DashboardStats>({
-    totalRevenue: 0,
-    totalOrders: 0,
-    totalProducts: 0,
-    totalUsers: 0,
-  });
-
-  const [recentOrders, setRecentOrders] = useState<RecentOrder[]>([]);
-
-  const [monthlyRevenue, setMonthlyRevenue] = useState<
-    MonthlyRevenue[]
-  >([]);
+  const [data, setData] = useState<DashboardData | null>(null);
 
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    async function fetchDashboard() {
-      try {
-        const res = await fetch("/api/admin/dashboard");
-
-        const data = await res.json();
-
-        if (data.success) {
-          setStats(data.stats);
-          setRecentOrders(data.recentOrders);
-          setMonthlyRevenue(data.monthlyRevenue);
-        }
-      } catch (error) {
-        console.error(error);
-      } finally {
-        setLoading(false);
-      }
-    }
-
     fetchDashboard();
   }, []);
 
-  function getStatusColor(status: string) {
-    switch (status) {
-      case "Pending":
-        return "bg-yellow-500/20 text-yellow-400";
+  async function fetchDashboard() {
+    try {
+      const res = await fetch("/api/admin/dashboard");
 
-      case "Confirmed":
-        return "bg-blue-500/20 text-blue-400";
+      const dashboard = await res.json();
 
-      case "Packed":
-        return "bg-purple-500/20 text-purple-400";
+      if (dashboard.success) {
+        setData(dashboard);
+      }
 
-      case "Shipped":
-        return "bg-orange-500/20 text-orange-400";
+    } catch (error) {
+      console.error(error);
 
-      case "Delivered":
-        return "bg-green-500/20 text-green-400";
-
-      case "Cancelled":
-        return "bg-red-500/20 text-red-400";
-
-      default:
-        return "bg-zinc-700 text-white";
+    } finally {
+      setLoading(false);
     }
   }
 
-  return (
+  if (loading) {
+    return (
+      <main className="min-h-screen bg-[#09090B] flex items-center justify-center text-white">
+        <h1 className="text-4xl font-bold">
+          Loading Dashboard...
+        </h1>
+      </main>
+    );
+  }
+
+  if (!data) return null;
+    return (
     <main className="min-h-screen bg-[#09090B] py-32 text-white">
+
       <div className="mx-auto max-w-7xl px-6">
 
-        <h1 className="text-5xl font-black">
-          Dashboard
-        </h1>
+        <div className="flex items-center justify-between">
 
-        <p className="mt-3 text-zinc-400">
-          Welcome to ZeroArc Admin Panel
-        </p>
+          <div>
 
-                {/* Stats Cards */}
+            <h1 className="text-5xl font-black">
+              Admin Dashboard
+            </h1>
+
+            <p className="mt-3 text-zinc-400">
+              Welcome back! Here's your store overview.
+            </p>
+
+          </div>
+
+          <Link
+            href="/admin/products/add"
+            className="rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 px-6 py-4 font-bold transition hover:scale-105"
+          >
+            + Add Product
+          </Link>
+
+        </div>
 
         <div className="mt-12 grid gap-6 md:grid-cols-2 xl:grid-cols-4">
 
@@ -117,8 +89,8 @@ export default function AdminDashboard() {
               Total Revenue
             </p>
 
-            <h2 className="mt-3 text-4xl font-black text-purple-400">
-              {loading ? "..." : `₹${stats.totalRevenue}`}
+            <h2 className="mt-3 text-4xl font-black text-green-400">
+              ₹{data.stats.totalRevenue}
             </h2>
           </div>
 
@@ -128,7 +100,7 @@ export default function AdminDashboard() {
             </p>
 
             <h2 className="mt-3 text-4xl font-black">
-              {loading ? "..." : stats.totalOrders}
+              {data.stats.totalOrders}
             </h2>
           </div>
 
@@ -138,122 +110,138 @@ export default function AdminDashboard() {
             </p>
 
             <h2 className="mt-3 text-4xl font-black">
-              {loading ? "..." : stats.totalProducts}
+              {data.stats.totalProducts}
             </h2>
           </div>
 
           <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8">
             <p className="text-zinc-400">
-              Total Users
+              Low Stock
             </p>
 
-            <h2 className="mt-3 text-4xl font-black">
-              {loading ? "..." : stats.totalUsers}
+            <h2 className="mt-3 text-4xl font-black text-red-400">
+              {data.stats.lowStockProducts}
             </h2>
           </div>
 
         </div>
 
-        {/* Revenue Chart */}
+                <div className="mt-12 grid gap-8 lg:grid-cols-2">
 
-        <div className="mt-16">
+          {/* Recent Orders */}
 
-          <RevenueChart
-            data={monthlyRevenue.map((item) => ({
-              month: [
-                "",
-                "Jan",
-                "Feb",
-                "Mar",
-                "Apr",
-                "May",
-                "Jun",
-                "Jul",
-                "Aug",
-                "Sep",
-                "Oct",
-                "Nov",
-                "Dec",
-              ][item._id.month],
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8">
 
-              revenue: item.revenue,
-            }))}
-          />
+            <h2 className="text-3xl font-bold">
+              Recent Orders
+            </h2>
 
-        </div>
+            <div className="mt-8 space-y-4">
 
-        {/* Recent Orders */}
+              {data.recentOrders.length === 0 ? (
 
-        <div className="mt-16 rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8">
+                <p className="text-zinc-500">
+                  No recent orders.
+                </p>
 
-          <h2 className="text-3xl font-black">
-            Recent Orders
-          </h2>
+              ) : (
 
-          <div className="mt-8 space-y-4">
+                data.recentOrders.map((order: any) => (
 
-            {loading ? (
+                  <div
+                    key={order._id}
+                    className="flex items-center justify-between rounded-2xl bg-zinc-950 p-4"
+                  >
 
-              <p className="text-zinc-400">
-                Loading...
-              </p>
+                    <div>
 
-            ) : recentOrders.length === 0 ? (
+                      <p className="font-bold">
+                        {order.customer.firstName} {order.customer.lastName}
+                      </p>
 
-              <p className="text-zinc-500">
-                No orders found.
-              </p>
+                      <p className="text-sm text-zinc-500">
+                        {order.customer.email}
+                      </p>
 
-            ) : (
+                    </div>
 
-              recentOrders.map((order) => (
+                    <div className="text-right">
 
-                <div
-                  key={order._id}
-                  className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950 p-5"
-                >
+                      <p className="font-bold text-violet-400">
+                        ₹{order.total}
+                      </p>
 
-                  <div>
+                      <p className="text-sm text-zinc-500">
+                        {order.status}
+                      </p>
 
-                    <h3 className="font-bold text-white">
-                      {order.customer.firstName}{" "}
-                      {order.customer.lastName}
-                    </h3>
-
-                    <p className="mt-1 text-sm text-zinc-500">
-                      {new Date(
-                        order.createdAt
-                      ).toLocaleString()}
-                    </p>
+                    </div>
 
                   </div>
 
-                  <div className="text-right">
+                ))
 
-                    <p className="text-xl font-black text-purple-400">
-                      ₹{order.total}
-                    </p>
+              )}
 
-                    <span
-                      className={`mt-2 inline-block rounded-full px-3 py-1 text-xs font-bold ${getStatusColor(
-                        order.status
-                      )}`}
-                    >
-                      {order.status}
+            </div>
+
+          </div>
+
+          {/* Low Stock */}
+
+          <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-8">
+
+            <h2 className="text-3xl font-bold">
+              Low Stock Products
+            </h2>
+
+            <div className="mt-8 space-y-4">
+
+              {data.lowStockProducts.length === 0 ? (
+
+                <p className="text-zinc-500">
+                  No low stock products 🎉
+                </p>
+
+              ) : (
+
+                data.lowStockProducts.map((product: any) => (
+
+                  <div
+                    key={product._id}
+                    className="flex items-center justify-between rounded-2xl bg-zinc-950 p-4"
+                  >
+
+                    <div>
+
+                      <p className="font-bold">
+                        {product.title}
+                      </p>
+
+                      <p className="text-sm text-zinc-500">
+                        {product.category}
+                      </p>
+
+                    </div>
+
+                    <span className="rounded-full bg-red-500/20 px-3 py-1 text-sm font-bold text-red-400">
+                      {product.stock} Left
                     </span>
 
                   </div>
 
-                </div>
+                ))
 
-              ))
+              )}
 
-            )}
+            </div>
 
           </div>
 
         </div>
-              </div>
+
+      </div>
+
     </main>
   );
 }
