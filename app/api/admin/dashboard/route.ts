@@ -4,79 +4,50 @@ import connectDB from "@/lib/mongodb";
 
 import Order from "@/models/Order";
 import Product from "@/models/Product";
-import User from "@/models/User";
 
 export async function GET() {
   try {
     await connectDB();
 
-    // Dashboard Stats
-    const totalOrders = await Order.countDocuments();
+    const [
+      totalProducts,
+      totalOrders,
+      products,
+      recentOrders,
+    ] = await Promise.all([
+      Product.countDocuments(),
 
-    const totalProducts = await Product.countDocuments();
+      Order.countDocuments(),
 
-    const totalUsers = await User.countDocuments();
+      Product.find(),
 
-    // Total Revenue
-    const revenueData = await Order.aggregate([
-      {
-        $group: {
-          _id: null,
-          totalRevenue: {
-            $sum: "$total",
-          },
-        },
-      },
+      Order.find()
+        .sort({ createdAt: -1 })
+        .limit(5),
     ]);
 
-    const totalRevenue =
-      revenueData.length > 0
-        ? revenueData[0].totalRevenue
-        : 0;
+        const totalRevenue = recentOrders.reduce(
+      (sum, order) => sum + order.total,
+      0
+    );
 
-    // Recent Orders
-    const recentOrders = await Order.find()
-      .sort({
-        createdAt: -1,
-      })
-      .limit(5);
-
-    // Monthly Revenue
-    const monthlyRevenue = await Order.aggregate([
-      {
-        $group: {
-          _id: {
-            month: {
-              $month: "$createdAt",
-            },
-          },
-
-          revenue: {
-            $sum: "$total",
-          },
-        },
-      },
-
-      {
-        $sort: {
-          "_id.month": 1,
-        },
-      },
-    ]);
+    const lowStockProducts = products.filter(
+      (product) => product.stock <= 5
+    );
 
     return NextResponse.json({
       success: true,
 
       stats: {
-        totalRevenue,
-        totalOrders,
         totalProducts,
-        totalUsers,
+        totalOrders,
+        totalRevenue,
+        lowStockProducts: lowStockProducts.length,
       },
 
       recentOrders,
 
-      monthlyRevenue,
+      lowStockProducts: lowStockProducts.slice(0, 5),
     });
 
   } catch (error) {
