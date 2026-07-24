@@ -1,68 +1,111 @@
-# ⚡ ZeroArc
+# ⚡ ZeroArc Admin Panel
 
-> **Wear Your Next Story.**
+A modern, production-ready eCommerce Admin Panel built with **Next.js 16**, **TypeScript**, **MongoDB**, **React Hook Form**, and **Tailwind CSS**.
 
-A premium anime-inspired streetwear e-commerce platform built with **Next.js**, **TypeScript**, **Tailwind CSS**, **MongoDB**, and a modern admin dashboard.
+Designed for managing products, orders, customers, analytics, coupons, inventory, payments, and much more.
 
 ---
 
-## 🚀 Features
+## ✨ Features
 
-- 🛍️ Premium E-commerce Store
-- 👕 Product Management
-- 📦 Inventory Management
-- 📊 Admin Dashboard
-- 📈 Revenue Analytics
-- 👥 Customer Management
-- 🧾 Order Management
-- 🔍 Product Search & Filters
-- 📱 Fully Responsive UI
-- 🌙 Modern Dark Theme
-- ⚡ Fast Performance
+### 🔐 Authentication
+
+- Secure Admin Login
+- JWT Authentication
+- Protected Admin Routes
+- Role Based Access Control
+- Logout
+
+### 👤 Admin Profile
+
+- Dynamic Profile
+- Edit Profile
+- Change Password
+- Dynamic Navbar
+- Dynamic Profile Dropdown
+
+### 📦 Product Management
+
+- Create Product
+- Product Validation (Zod)
+- Auto Slug Generator
+- Inventory Management
+- Featured Products
+- Bestseller Products
+- New Arrival Products
+- Active / Inactive Products
+
+### 🚧 Coming Soon
+
+- Edit Product
+- Delete Product
+- Product Images Upload
+- Product Variants
+- Categories
+- Collections
+- Orders
+- Customers
+- Analytics
+- Coupons
+- Payments
+- Inventory Dashboard
 
 ---
 
 # 🛠 Tech Stack
 
-| Technology | Version |
-|------------|----------|
-| Next.js | Latest |
-| React | Latest |
-| TypeScript | Latest |
-| Tailwind CSS | Latest |
-| MongoDB | Latest |
-| Framer Motion | Latest |
-| GSAP | Latest |
-| Lucide React | Latest |
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS
+- MongoDB
+- Mongoose
+- React Hook Form
+- Zod
+- JWT
+- bcryptjs
+- Lucide React
 
 ---
 
 # 📂 Project Structure
 
-```
-zeroarc/
-│
-├── app/
-├── components/
-├── lib/
-├── public/
-├── types/
-├── models/
-├── api/
-├── styles/
-├── package.json
-└── README.md
+```text
+app/
+ ├── admin/
+ ├── api/
+ ├── login/
+ └── ...
+
+components/
+ ├── admin/
+ ├── ui/
+ └── ...
+
+hooks/
+
+lib/
+ ├── auth/
+ ├── mongodb.ts
+ ├── validations/
+ └── ...
+
+models/
+ ├── Admin.ts
+ └── Product.ts
 ```
 
 ---
 
-# ⚙ Installation
+# 🚀 Getting Started
 
 ## 1. Clone Repository
 
 ```bash
-git clone https://github.com/USERNAME/zeroarc.git
+git clone https://github.com/ZeroArc26/zeroarc.git
+```
 
+```bash
 cd zeroarc
 ```
 
@@ -70,17 +113,13 @@ cd zeroarc
 
 ## 2. Install Dependencies
 
+Using npm
+
 ```bash
 npm install
 ```
 
-or
-
-```bash
-yarn
-```
-
-or
+or using pnpm
 
 ```bash
 pnpm install
@@ -88,47 +127,33 @@ pnpm install
 
 ---
 
-## 3. Create Environment File
+## 3. Create Environment Variables
 
-Create a file named
+Create a file named:
 
-```
+```text
 .env.local
 ```
 
-inside the root directory.
-
-Example:
+Add:
 
 ```env
 MONGODB_URI=
 
-NEXTAUTH_SECRET=
+JWT_SECRET=
 
-NEXTAUTH_URL=http://localhost:3000
-
-TMDB_API_KEY=
-
-BUNNY_STORAGE_API_KEY=
-
-BUNNY_STORAGE_ZONE=
-
-BUNNY_STORAGE_REGION=
-
-BUNNY_PULL_ZONE=
-
-BUNNY_CDN_URL=
+NEXT_PUBLIC_APP_URL=http://localhost:3000
 ```
 
 ---
 
-## 4. Run Development Server
+## 4. Start Development Server
 
 ```bash
 npm run dev
 ```
 
-Open
+Open:
 
 ```
 http://localhost:3000
@@ -136,120 +161,118 @@ http://localhost:3000
 
 ---
 
-# 🏗 Production Build
+# 📦 Build Production
 
 ```bash
 npm run build
+```
 
+Run Production
+
+```bash
 npm start
 ```
 
 ---
 
-# 📦 Required Software
-
-Before running the project, make sure you have installed:
-
-- Node.js (v22 or newer)
-- Git
-- VS Code (Recommended)
-
-Check versions
-
-```bash
-node -v
-
-npm -v
-
-git --version
-```
-
----
-
-# 📜 Available Scripts
+# 🧪 Scripts
 
 ```bash
 npm run dev
 ```
 
-Runs the development server.
+Start development server
 
 ```bash
 npm run build
 ```
 
-Builds the application.
+Build production
 
 ```bash
-npm start
+npm run start
 ```
 
-Runs production build.
+Start production server
 
 ```bash
 npm run lint
 ```
 
-Runs ESLint.
+Run ESLint
 
 ---
 
-# 🌐 Deployment
+# 🔒 Environment Variables
 
-Recommended platforms
-
-- Vercel
-- Netlify
-- Railway
+| Variable | Description |
+|----------|-------------|
+| MONGODB_URI | MongoDB Connection String |
+| JWT_SECRET | Secret Key for Authentication |
+| NEXT_PUBLIC_APP_URL | Application URL |
 
 ---
 
 # 📸 Screenshots
 
-> Add screenshots of your Home Page, Admin Dashboard and Product Page here.
+> Add screenshots here after completing the project.
+
+```
+/public/screenshots/
+```
+
+Example:
+
+- Login
+- Dashboard
+- Products
+- Orders
+- Analytics
 
 ---
 
-# 📈 Roadmap
+# 🗺 Roadmap
 
-- Product Reviews
-- Wishlist
-- Multi Vendor Support
-- AI Product Recommendation
-- Order Tracking
-- Coupons
-- Inventory Analytics
-- Email Notifications
-- Payment Gateway
-- Mobile App
+- [x] Authentication
+- [x] Admin Profile
+- [x] Create Product
+- [ ] Read Products
+- [ ] Update Product
+- [ ] Delete Product
+- [ ] Product Images
+- [ ] Categories
+- [ ] Orders
+- [ ] Customers
+- [ ] Coupons
+- [ ] Analytics
+- [ ] Inventory
+- [ ] Payments
 
 ---
 
 # 🤝 Contributing
 
-Contributions are welcome.
+1. Fork the repository
 
-Fork the repository.
-
-Create your feature branch.
+2. Create a new branch
 
 ```bash
-git checkout -b feature/AmazingFeature
+git checkout -b feature/feature-name
 ```
 
-Commit your changes.
+3. Commit changes
 
 ```bash
-git commit -m "Add AmazingFeature"
+git commit -m "feat: add feature"
 ```
 
-Push your branch.
+4. Push branch
 
 ```bash
-git push origin feature/AmazingFeature
+git push origin feature/feature-name
 ```
 
-Open a Pull Request.
+5. Open a Pull Request
 
 ---
 
@@ -259,24 +282,14 @@ This project is licensed under the MIT License.
 
 ---
 
-# ❤️ Developed By
+# 👨‍💻 Author
 
 **Vimarsh Singh**
 
-Co-Founder of **ZeroArc**
+GitHub
+
+https://github.com/ZeroArc26
 
 ---
 
-# ⭐ Support
-
-If you like this project,
-
-please consider giving it a ⭐ on GitHub.
-
-It helps a lot ❤️
-
----
-
-## 🚀 ZeroArc
-
-**Wear Your Next Story**
+⭐ If you like this project, don't forget to give it a Star.
