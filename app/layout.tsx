@@ -3,7 +3,6 @@ import { Inter, Space_Grotesk } from "next/font/google";
 
 import "./globals.css";
 
-import NavbarServer from "@/components/layout/NavbarServer";
 import { Toaster } from "sonner";
 
 const inter = Inter({
@@ -31,7 +30,7 @@ export default function RootLayout({
       <body
         className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}
       >
-        <NavbarServer />
+        
 
         <Toaster
           richColors
