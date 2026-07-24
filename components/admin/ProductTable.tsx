@@ -4,6 +4,7 @@ import { useState } from "react";
 import Image from "next/image";
 import { Pencil, Trash2 } from "lucide-react";
 import Link from "next/link";
+import ProductDrawer from "./ProductDrawer";
 
 interface Product {
   _id: string;
@@ -20,6 +21,9 @@ interface Props {
 
 export default function ProductTable({ products }: Props) {
     const [selectedProducts, setSelectedProducts] = useState<string[]>([]);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+const [drawerOpen, setDrawerOpen] = useState(false);
     async function handleBulkDelete() {
   if (selectedProducts.length === 0) return;
 
@@ -57,6 +61,7 @@ export default function ProductTable({ products }: Props) {
   }
 }
   return (
+    <>
     <div className="overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/40">
 
         {selectedProducts.length > 0 && (
@@ -132,16 +137,21 @@ export default function ProductTable({ products }: Props) {
           {products.map((product) => (
 
             <tr
-              key={product._id}
-              className="border-b border-zinc-800 hover:bg-zinc-800/30 transition"
-            >
+  key={product._id}
+  onClick={() => {
+    setSelectedProduct(product);
+    setDrawerOpen(true);
+  }}
+  className="cursor-pointer border-b border-zinc-800 transition hover:bg-zinc-800/30"
+>
 
 <td className="px-4 py-4">
 
   <input
     type="checkbox"
     checked={selectedProducts.includes(product._id)}
-    onChange={() => {
+    onClick={(e) => e.stopPropagation()}
+onChange={() => {
       if (selectedProducts.includes(product._id)) {
         setSelectedProducts(
           selectedProducts.filter(
@@ -199,13 +209,20 @@ export default function ProductTable({ products }: Props) {
                 <div className="flex justify-center gap-3">
 
                   <Link
-                href={`/admin/products/edit/${product._id}`}
-                className="rounded-lg p-2 transition hover:bg-zinc-800"
-                >
+  href={`/admin/products/edit/${product._id}`}
+  onClick={(e) => e.stopPropagation()}
+  className="rounded-lg p-2 transition hover:bg-zinc-800"
+>
                  <Pencil size={18} />
                 </Link>
 
-                  <button className="text-red-400">
+                  <button
+  onClick={(e) => {
+    e.stopPropagation();
+    // Delete logic baad me add karenge
+  }}
+  className="text-red-400"
+>
                     <Trash2 size={18} />
                   </button>
 
@@ -222,5 +239,17 @@ export default function ProductTable({ products }: Props) {
       </table>
 
     </div>
+
+          <ProductDrawer
+  product={selectedProduct}
+  open={drawerOpen}
+  onClose={() => {
+    setDrawerOpen(false);
+    setSelectedProduct(null);
+  }}
+/>
+
+</>
+    
   );
 }
