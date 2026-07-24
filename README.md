@@ -1,400 +1,282 @@
-# 🛍️ ZeroArc
+# ⚡ ZeroArc
 
-A modern fashion e-commerce website built with **Next.js 15**, **MongoDB**, **Tailwind CSS** and **TypeScript**.
+> **Wear Your Next Story.**
 
----
-
-# 🌐 Main Website Routes
-
-## Home
-
-http://localhost:3000/
-
-➡ Landing Page
+A premium anime-inspired streetwear e-commerce platform built with **Next.js**, **TypeScript**, **Tailwind CSS**, **MongoDB**, and a modern admin dashboard.
 
 ---
 
-## Shop
+## 🚀 Features
 
-http://localhost:3000/shop
-
-➡ All Products
+- 🛍️ Premium E-commerce Store
+- 👕 Product Management
+- 📦 Inventory Management
+- 📊 Admin Dashboard
+- 📈 Revenue Analytics
+- 👥 Customer Management
+- 🧾 Order Management
+- 🔍 Product Search & Filters
+- 📱 Fully Responsive UI
+- 🌙 Modern Dark Theme
+- ⚡ Fast Performance
 
 ---
 
-## Product Details
+# 🛠 Tech Stack
 
-http://localhost:3000/product/[slug]
+| Technology | Version |
+|------------|----------|
+| Next.js | Latest |
+| React | Latest |
+| TypeScript | Latest |
+| Tailwind CSS | Latest |
+| MongoDB | Latest |
+| Framer Motion | Latest |
+| GSAP | Latest |
+| Lucide React | Latest |
+
+---
+
+# 📂 Project Structure
+
+```
+zeroarc/
+│
+├── app/
+├── components/
+├── lib/
+├── public/
+├── types/
+├── models/
+├── api/
+├── styles/
+├── package.json
+└── README.md
+```
+
+---
+
+# ⚙ Installation
+
+## 1. Clone Repository
+
+```bash
+git clone https://github.com/USERNAME/zeroarc.git
+
+cd zeroarc
+```
+
+---
+
+## 2. Install Dependencies
+
+```bash
+npm install
+```
+
+or
+
+```bash
+yarn
+```
+
+or
+
+```bash
+pnpm install
+```
+
+---
+
+## 3. Create Environment File
+
+Create a file named
+
+```
+.env.local
+```
+
+inside the root directory.
 
 Example:
 
-http://localhost:3000/product/oversized-black-hoodie
+```env
+MONGODB_URI=
 
-➡ Single Product Page
+NEXTAUTH_SECRET=
 
----
+NEXTAUTH_URL=http://localhost:3000
 
-## Cart
+TMDB_API_KEY=
 
-http://localhost:3000/cart
+BUNNY_STORAGE_API_KEY=
 
-➡ Shopping Cart
+BUNNY_STORAGE_ZONE=
 
----
+BUNNY_STORAGE_REGION=
 
-## Checkout
+BUNNY_PULL_ZONE=
 
-http://localhost:3000/checkout
-
-➡ Place Order
-
----
-
-## Search
-
-http://localhost:3000/search
-
-➡ Search Products
+BUNNY_CDN_URL=
+```
 
 ---
 
-## Wishlist (Future)
+## 4. Run Development Server
 
-http://localhost:3000/wishlist
-
-➡ Saved Products
-
----
-
-## Profile (Future)
-
-http://localhost:3000/profile
-
-➡ User Profile
-
----
-
-# 👑 Admin Panel
-
-## Dashboard
-
-http://localhost:3000/admin
-
-➡ Overview
-- Revenue
-- Orders
-- Products
-- Analytics
-
----
-
-## Orders
-
-http://localhost:3000/admin/orders
-
-➡ Manage Orders
-
-Features
-
-- View Orders
-- Change Status
-- Customer Details
-- Products Ordered
-
----
-
-## Products
-
-http://localhost:3000/admin/products
-
-➡ Product List
-
-Features
-
-- All Products
-- Edit
-- Delete
-- Inventory
-- Stock
-
----
-
-## Add Product
-
-http://localhost:3000/admin/products/add
-
-➡ Add New Product
-
-Features
-
-- Images
-- Price
-- Category
-- Collection
-- Stock
-- Featured
-- Bestseller
-- New Arrival
-
----
-
-## Edit Product (Future)
-
-http://localhost:3000/admin/products/edit/[id]
-
-Example
-
-http://localhost:3000/admin/products/edit/6847d82f1c....
-
-➡ Edit Existing Product
-
----
-
-## Inventory (Future)
-
-http://localhost:3000/admin/inventory
-
-➡ Manage Stock
-
----
-
-## Coupons (Future)
-
-http://localhost:3000/admin/coupons
-
-➡ Coupon Management
-
----
-
-## Users (Future)
-
-http://localhost:3000/admin/users
-
-➡ User Management
-
----
-
-## Analytics (Future)
-
-http://localhost:3000/admin/analytics
-
-➡ Sales Analytics
-
----
-
-# 🔥 API Routes
-
-## Products
-
-GET
-
-/api/products
-
-➡ Fetch all products
-
-POST
-
-/api/products
-
-➡ Create Product
-
----
-
-## Orders
-
-GET
-
-/api/orders
-
-➡ Fetch Orders
-
-POST
-
-/api/orders
-
-➡ Create Order
-
----
-
-## Order Status
-
-PATCH
-
-/api/orders/[id]
-
-➡ Update Order Status
-
----
-
-## Dashboard
-
-GET
-
-/api/admin/dashboard
-
-➡ Dashboard Analytics
-
----
-
-# 📂 Folder Structure
-
-app/
-
-admin/
-
-products/
-
-orders/
-
-cart/
-
-checkout/
-
-api/
-
-components/
-
-lib/
-
-models/
-
-public/
-
----
-
-# 🗄️ MongoDB Models
-
-Product
-
-- title
-- slug
-- description
-- price
-- comparePrice
-- category
-- collection
-- images
-- sizes
-- colors
-- stock
-- featured
-- bestseller
-- newArrival
-- active
-
----
-
-Order
-
-- customer
-- shippingAddress
-- products
-- totalItems
-- subtotal
-- shipping
-- total
-- status
-
----
-
-# 🚀 Current Features
-
-✅ Home
-
-✅ Shop
-
-✅ Product Page
-
-✅ Cart
-
-✅ Checkout
-
-✅ MongoDB
-
-✅ Orders
-
-✅ Admin Dashboard
-
-✅ Admin Orders
-
-✅ Order Status Update
-
-✅ Product List
-
-✅ Add Product
-
----
-
-# 🛣️ Roadmap
-
-✅ Dashboard
-
-✅ Orders
-
-✅ Product List
-
-✅ Add Product
-
-⬜ Edit Product
-
-⬜ Delete Product
-
-⬜ Inventory
-
-⬜ Variant Stock
-
-⬜ Coupons
-
-⬜ Wishlist
-
-⬜ Reviews
-
-⬜ Razorpay
-
-⬜ User Authentication
-
-⬜ Analytics
-
-⬜ Email Notifications
-
-⬜ Admin Settings
-
-⬜ Production Deployment
-
----
-
-# 💻 Tech Stack
-
-Next.js 15
-
-React
-
-TypeScript
-
-Tailwind CSS
-
-MongoDB
-
-Mongoose
-
-Vercel
-
----
-
-# 📌 Local Development
-
-Install
-
-npm install
-
-Run
-
+```bash
 npm run dev
+```
 
 Open
 
+```
 http://localhost:3000
+```
 
 ---
 
-Made with ❤️ by ZeroArc
+# 🏗 Production Build
+
+```bash
+npm run build
+
+npm start
+```
+
+---
+
+# 📦 Required Software
+
+Before running the project, make sure you have installed:
+
+- Node.js (v22 or newer)
+- Git
+- VS Code (Recommended)
+
+Check versions
+
+```bash
+node -v
+
+npm -v
+
+git --version
+```
+
+---
+
+# 📜 Available Scripts
+
+```bash
+npm run dev
+```
+
+Runs the development server.
+
+```bash
+npm run build
+```
+
+Builds the application.
+
+```bash
+npm start
+```
+
+Runs production build.
+
+```bash
+npm run lint
+```
+
+Runs ESLint.
+
+---
+
+# 🌐 Deployment
+
+Recommended platforms
+
+- Vercel
+- Netlify
+- Railway
+
+---
+
+# 📸 Screenshots
+
+> Add screenshots of your Home Page, Admin Dashboard and Product Page here.
+
+---
+
+# 📈 Roadmap
+
+- Product Reviews
+- Wishlist
+- Multi Vendor Support
+- AI Product Recommendation
+- Order Tracking
+- Coupons
+- Inventory Analytics
+- Email Notifications
+- Payment Gateway
+- Mobile App
+
+---
+
+# 🤝 Contributing
+
+Contributions are welcome.
+
+Fork the repository.
+
+Create your feature branch.
+
+```bash
+git checkout -b feature/AmazingFeature
+```
+
+Commit your changes.
+
+```bash
+git commit -m "Add AmazingFeature"
+```
+
+Push your branch.
+
+```bash
+git push origin feature/AmazingFeature
+```
+
+Open a Pull Request.
+
+---
+
+# 📄 License
+
+This project is licensed under the MIT License.
+
+---
+
+# ❤️ Developed By
+
+**Vimarsh Singh**
+
+Co-Founder of **ZeroArc**
+
+---
+
+# ⭐ Support
+
+If you like this project,
+
+please consider giving it a ⭐ on GitHub.
+
+It helps a lot ❤️
+
+---
+
+## 🚀 ZeroArc
+
+**Wear Your Next Story**
