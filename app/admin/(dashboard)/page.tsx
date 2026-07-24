@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import RevenueChart from "@/components/admin/RevenueChart";
 
 interface DashboardData {
   stats: {
@@ -241,6 +242,10 @@ export default function AdminDashboard() {
         </div>
 
       </div>
+
+      <div className="mt-12">
+  <RevenueChart />
+</div>
 
     </main>
   );
