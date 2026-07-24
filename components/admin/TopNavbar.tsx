@@ -2,9 +2,54 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export default function TopNavbar() {
   const [search, setSearch] = useState("");
+  const pathname = usePathname();
+
+const pageConfig: Record<
+  string,
+  {
+    title: string;
+    subtitle: string;
+  }
+> = {
+  "/admin": {
+    title: "Dashboard",
+    subtitle: "Welcome back, Admin 👋",
+  },
+
+  "/admin/products": {
+    title: "Products",
+    subtitle: "Manage your products",
+  },
+
+  "/admin/orders": {
+    title: "Orders",
+    subtitle: "Manage customer orders",
+  },
+
+  "/admin/customers": {
+    title: "Customers",
+    subtitle: "Manage your customers",
+  },
+
+  "/admin/inventory": {
+    title: "Inventory",
+    subtitle: "Track your stock",
+  },
+
+  "/admin/settings": {
+    title: "Settings",
+    subtitle: "Manage your store settings",
+  },
+};
+
+const currentPage = pageConfig[pathname] || {
+  title: "Admin",
+  subtitle: "ZeroArc Admin Panel",
+};
 const [showResults, setShowResults] = useState(false);
 
 const [results, setResults] = useState<{
@@ -50,12 +95,12 @@ useEffect(() => {
 
       <div>
         <h1 className="text-2xl font-black">
-          Dashboard
-        </h1>
+  {currentPage.title}
+</h1>
 
-        <p className="text-sm text-zinc-500">
-          Welcome back, Admin 👋
-        </p>
+<p className="text-sm text-zinc-500">
+  {currentPage.subtitle}
+</p>
       </div>
 
       <div className="flex items-center gap-4">
