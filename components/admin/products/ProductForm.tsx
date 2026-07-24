@@ -4,78 +4,109 @@ import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+
 import { productSchema } from "@/lib/validations/product";
 
 type ProductFormProps = {
   mode: "create" | "edit";
+  initialData?: any;
 };
 
 export default function ProductForm({
   mode,
+  initialData,
 }: ProductFormProps) {
   const [loading, setLoading] = useState(false);
 
   const {
-    register,
-    handleSubmit,
-    watch,
-    setValue,
-    formState: { errors },
-  } = useForm({
+  register,
+  handleSubmit,
+  watch,
+  setValue,
+  reset,
+  formState: { errors },
+} = useForm({
     resolver: zodResolver(productSchema),
-    defaultValues: {
-      title: "",
-      slug: "",
-      description: "",
-      price: 0,
-      comparePrice: 0,
-      category: "",
-      collection: "",
-      images: [],
-      sizes: [],
-      colors: [],
-      stock: 0,
-      lowStockLimit: 5,
-      featured: false,
-      bestseller: false,
-      newArrival: false,
-      active: true,
-    },
+    defaultValues: initialData ?? {
+  title: "",
+  slug: "",
+  description: "",
+  price: 0,
+  comparePrice: 0,
+  category: "",
+  collection: "",
+  images: [],
+  sizes: [],
+  colors: [],
+  stock: 0,
+  lowStockLimit: 5,
+  featured: false,
+  bestseller: false,
+  newArrival: false,
+  active: true,
+},
   });
 
   const title = watch("title");
 
   useEffect(() => {
-    const slug = title
-      ?.toLowerCase()
-      .trim()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]+/g, "");
+  if (mode === "edit") return;
 
-    setValue("slug", slug);
-  }, [title, setValue]);
+  const slug = title
+    ?.toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^\w-]+/g, "");
+
+  setValue("slug", slug);
+}, [title, setValue, mode]);
+
+  useEffect(() => {
+  if (mode === "edit" && initialData) {
+    reset(initialData);
+  }
+}, [mode, initialData, reset]);
 
   const onSubmit = async (data: any) => {
   try {
     setLoading(true);
 
-    const res = await fetch("/api/admin/products", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(data),
-    });
+    const endpoint =
+  mode === "create"
+    ? "/api/admin/products"
+    : `/api/admin/products/${initialData._id}`;
+
+const method =
+  mode === "create"
+    ? "POST"
+    : "PUT";
+
+const res = await fetch(endpoint, {
+  method,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(data),
+});
 
     const result = await res.json();
 
     if (!res.ok) {
   console.log(result);
-  alert(result.message || "Failed to create product.");
+  alert(
+  result.message ||
+    (mode === "create"
+      ? "Failed to create product."
+      : "Failed to update product.")
+);
   return;
 }
 
-    alert("✅ Product created successfully!");
+    alert(
+  mode === "create"
+    ? "✅ Product created successfully!"
+    : "✅ Product updated successfully!"
+);
 
     window.location.href = "/admin/products";
   } catch (error) {
@@ -122,7 +153,7 @@ export default function ProductForm({
 
               {errors.title && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.title.message}
+                  {String(errors.title.message)}
                 </p>
               )}
             </div>
@@ -140,7 +171,7 @@ export default function ProductForm({
 
               {errors.slug && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.slug.message}
+                  {String(errors.slug.message)}
                 </p>
               )}
             </div>
@@ -162,7 +193,7 @@ export default function ProductForm({
 
             {errors.description && (
               <p className="mt-2 text-sm text-red-500">
-                {errors.description.message}
+                {String(errors.description.message)}
               </p>
             )}
 
@@ -196,7 +227,7 @@ export default function ProductForm({
 
               {errors.price && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.price.message}
+                  {String(errors.price.message)}
                 </p>
               )}
             </div>
@@ -217,7 +248,7 @@ export default function ProductForm({
 
               {errors.comparePrice && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.comparePrice.message}
+                  {String(errors.comparePrice.message)}
                 </p>
               )}
             </div>
@@ -252,7 +283,7 @@ export default function ProductForm({
 
               {errors.stock && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.stock.message}
+                  {String(errors.stock.message)}
                 </p>
               )}
             </div>
@@ -273,7 +304,7 @@ export default function ProductForm({
 
               {errors.lowStockLimit && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.lowStockLimit.message}
+                  {String(errors.lowStockLimit.message)}
                 </p>
               )}
             </div>
@@ -306,7 +337,7 @@ export default function ProductForm({
 
               {errors.category && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.category.message}
+                  {String(errors.category.message)}
                 </p>
               )}
 
@@ -326,7 +357,7 @@ export default function ProductForm({
 
               {errors.collection && (
                 <p className="mt-2 text-sm text-red-500">
-                  {errors.collection.message}
+                  {String(errors.collection.message)}
                 </p>
               )}
 
