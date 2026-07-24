@@ -3,6 +3,9 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Dropdown from "@/components/ui/dropdown/Dropdown";
+import NotificationDropdown from "@/components/admin/NotificationDropdown";
+import ProfileDropdown from "@/components/admin/ProfileDropdown";
 
 export default function TopNavbar() {
   const [search, setSearch] = useState("");
@@ -174,22 +177,36 @@ useEffect(() => {
 
   </div>
 
-  <button className="rounded-2xl border border-zinc-700 bg-zinc-900 p-3 transition hover:border-violet-500">
-    🔔
-  </button>
+  <Dropdown
+  trigger={
+    <div className="relative rounded-2xl border border-zinc-700 bg-zinc-900 p-3 transition hover:border-violet-500">
+      🔔
 
-  <button className="flex items-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 transition hover:border-violet-500">
-
-    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-r from-violet-600 to-fuchsia-600 font-bold">
-      A
+      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
+        4
+      </span>
     </div>
+  }
+>
+  <NotificationDropdown />
+</Dropdown>
 
-    <div className="text-left">
-      <p className="font-semibold">Admin</p>
-      <p className="text-xs text-zinc-500">Super Admin</p>
-    </div>
+  <Dropdown
+  trigger={
+    <button className="flex items-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-900 px-4 py-2 transition hover:border-violet-500">
+      <div className="flex h-10 w-10 items-center justify-center rounded-full bg-violet-600 font-bold">
+        A
+      </div>
 
-  </button>
+      <div className="hidden text-left md:block">
+        <p className="text-sm font-semibold">Admin</p>
+        <p className="text-xs text-zinc-400">Super Admin</p>
+      </div>
+    </button>
+  }
+>
+  <ProfileDropdown />
+</Dropdown>
 
 </div>
 
