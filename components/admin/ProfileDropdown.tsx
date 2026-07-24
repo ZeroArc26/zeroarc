@@ -1,16 +1,26 @@
 import Link from "next/link";
 import { User, Settings, LogOut } from "lucide-react";
+import useCurrentAdmin from "@/hooks/useCurrentAdmin";
+import LogoutButton from "@/components/admin/LogoutButton";
 
 export default function ProfileDropdown() {
+  const { admin, loading } = useCurrentAdmin();
   return (
     <div className="w-72">
 
       {/* Header */}
       <div className="border-b border-zinc-800 p-4">
-        <h3 className="font-semibold text-white">Admin</h3>
-        <p className="text-sm text-zinc-400">
-          admin@zeroarc.in
-        </p>
+        <h3 className="font-semibold text-white">
+  {loading ? "Loading..." : admin?.name}
+</h3>
+
+<p className="text-sm text-zinc-400">
+  {loading ? "" : admin?.email}
+</p>
+
+<p className="mt-1 text-xs font-medium uppercase tracking-wide text-violet-400">
+  {loading ? "" : admin?.role.replace("_", " ")}
+</p>
       </div>
 
       {/* Menu */}
@@ -32,12 +42,7 @@ export default function ProfileDropdown() {
           <span>Account Settings</span>
         </Link>
 
-        <button
-          className="mt-1 flex w-full items-center gap-3 rounded-xl px-4 py-3 text-red-400 transition hover:bg-red-500/10"
-        >
-          <LogOut size={18} />
-          <span>Logout</span>
-        </button>
+        <LogoutButton />
 
       </div>
 
