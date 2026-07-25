@@ -28,26 +28,33 @@ const [mounted, setMounted] = useState(false);
 useEffect(() => {
   setMounted(true);
 }, []);
-  
-  const totalItems = getTotalItems();
-  const subtotal = getTotalPrice();
-  const shipping = subtotal >= 999 ? 0 : 99;
-  const total = subtotal + shipping;
 
   const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
-    firstName: "",
-    lastName: "",
-    email: "",
-    phone: "",
+  firstName: "",
+  lastName: "",
+  email: "",
+  phone: "",
 
-    address: "",
-    city: "",
-    state: "",
-    pincode: "",
-    country: "India",
-  });
+  address: "",
+  city: "",
+  state: "",
+  pincode: "",
+  country: "India",
+
+  paymentMethod: "ONLINE",
+});
+
+const totalItems = getTotalItems();
+const subtotal = getTotalPrice();
+
+const shipping =
+  formData.paymentMethod === "ONLINE"
+    ? 0
+    : 99;
+
+const total = subtotal + shipping;
 
   useEffect(() => {
     if (items.length === 0) {
@@ -137,6 +144,8 @@ useEffect(() => {
             pincode: formData.pincode,
             country: formData.country,
           },
+
+          paymentMethod: formData.paymentMethod,
 
           products: items,
 
@@ -269,6 +278,62 @@ useEffect(() => {
 
             </div>
 
+            {/* Payment Method */}
+
+<div className="rounded-2xl border border-zinc-800 bg-zinc-900/40 p-6">
+  <h2 className="text-xl font-bold mb-5">
+    Payment Method
+  </h2>
+
+  <div className="space-y-4">
+
+    <label className="flex cursor-pointer items-center justify-between rounded-xl border border-zinc-700 p-4 hover:border-violet-500">
+
+      <div>
+        <p className="font-semibold">
+          Online Payment
+        </p>
+
+        <p className="text-sm text-green-400">
+          FREE Shipping 🎉
+        </p>
+      </div>
+
+      <input
+        type="radio"
+        name="paymentMethod"
+        value="ONLINE"
+        checked={formData.paymentMethod === "ONLINE"}
+        onChange={handleChange}
+      />
+
+    </label>
+
+    <label className="flex cursor-pointer items-center justify-between rounded-xl border border-zinc-700 p-4 hover:border-violet-500">
+
+      <div>
+        <p className="font-semibold">
+          Cash on Delivery
+        </p>
+
+        <p className="text-sm text-yellow-400">
+          ₹99 Shipping Charge
+        </p>
+      </div>
+
+      <input
+        type="radio"
+        name="paymentMethod"
+        value="COD"
+        checked={formData.paymentMethod === "COD"}
+        onChange={handleChange}
+      />
+
+    </label>
+
+  </div>
+</div>
+
           </div>
 
           {/* Order Summary */}
@@ -292,11 +357,24 @@ useEffect(() => {
               </div>
 
               <div className="flex justify-between">
-                <span>Shipping</span>
-                <span>
-                  {shipping === 0 ? "FREE" : `₹${shipping}`}
-                </span>
-              </div>
+  <span>Shipping</span>
+
+  <span>
+    {formData.paymentMethod === "ONLINE" ? (
+      <span className="font-semibold text-green-400">
+        FREE 🎉
+      </span>
+    ) : (
+      `₹${shipping}`
+    )}
+  </span>
+</div>
+
+{formData.paymentMethod === "ONLINE" && (
+  <p className="text-sm text-green-400">
+    🎉 You saved ₹99 by choosing Online Payment.
+  </p>
+)}
 
               <div className="border-t border-zinc-800 pt-4 flex justify-between text-xl font-bold">
                 <span>Total</span>

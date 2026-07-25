@@ -71,13 +71,37 @@ const OrderSchema = new Schema(
       },
     ],
 
-    totalItems: Number,
+    totalItems: {
+      type: Number,
+      required: true,
+    },
 
-    subtotal: Number,
+    subtotal: {
+      type: Number,
+      required: true,
+    },
 
-    shipping: Number,
+    shipping: {
+      type: Number,
+      required: true,
+    },
 
-    total: Number,
+    total: {
+      type: Number,
+      required: true,
+    },
+
+    paymentMethod: {
+      type: String,
+      enum: ["COD", "ONLINE"],
+      required: true,
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: ["PENDING", "PAID", "FAILED", "REFUNDED"],
+      default: "PENDING",
+    },
 
     status: {
       type: String,
@@ -97,5 +121,7 @@ const OrderSchema = new Schema(
   }
 );
 
-export default models.Order ||
-  model("Order", OrderSchema);
+const Order =
+  models.Order || model("Order", OrderSchema);
+
+export default Order;
