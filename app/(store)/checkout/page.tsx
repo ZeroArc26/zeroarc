@@ -158,15 +158,15 @@ const total = subtotal + shipping;
 
       const data = await res.json();
 
-      if (!data.success) {
-        throw new Error(data.message);
-      }
+if (!data.success) {
+  throw new Error(data.message);
+}
 
-      toast.success("Order Placed Successfully!");
+toast.success("Order Placed Successfully!");
 
-      clearCart();
+// clearCart();
 
-      router.push("/order-success");
+router.push(`/order-success?orderId=${data.order._id}`);
 
     } catch (error) {
       console.error(error);
