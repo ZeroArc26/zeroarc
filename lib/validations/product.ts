@@ -24,7 +24,7 @@ export const productSchema = z.object({
 
   category: z.string().min(1, "Category is required."),
 
-  collection: z.string().min(1, "Collection is required."),
+  collectionName: z.string().min(1, "Collection is required."),
 
   images: z.array(z.string()).default([]),
 
@@ -33,6 +33,16 @@ export const productSchema = z.object({
   colors: z.array(z.string()).default([]),
 
   stock: z.number().min(0),
+
+  variants: z
+  .array(
+    z.object({
+      color: z.string().min(1, "Color is required."),
+      size: z.string().min(1, "Size is required."),
+      stock: z.number().min(0),
+    })
+  )
+  .default([]),
 
   lowStockLimit: z.number().min(0).default(5),
 

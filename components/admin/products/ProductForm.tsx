@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useForm } from "react-hook-form";
+import { useForm, useFieldArray } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
+import ProductImageUpload from "@/components/admin/products/ProductImageUpload";
 
 import { productSchema } from "@/lib/validations/product";
 
@@ -20,6 +21,7 @@ export default function ProductForm({
 
   const {
   register,
+  control,
   handleSubmit,
   watch,
   setValue,
@@ -34,11 +36,18 @@ export default function ProductForm({
   price: 0,
   comparePrice: 0,
   category: "",
-  collection: "",
+  collectionName: "",
   images: [],
   sizes: [],
   colors: [],
   stock: 0,
+  variants: [
+  {
+    color: "",
+    size: "",
+    stock: 0,
+  },
+],
   lowStockLimit: 5,
   featured: false,
   bestseller: false,
@@ -47,7 +56,13 @@ export default function ProductForm({
 },
   });
 
+  const { fields, append, remove } = useFieldArray({
+  control,
+  name: "variants",
+});
+
   const title = watch("title");
+  const images = watch("images");
 
   useEffect(() => {
   if (mode === "edit") return;
@@ -350,14 +365,14 @@ const res = await fetch(endpoint, {
               </label>
 
               <input
-                {...register("collection")}
+                {...register("collectionName")}
                 placeholder="Summer Drop 2026"
                 className="w-full rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3 outline-none transition focus:border-violet-500"
               />
 
-              {errors.collection && (
+              {errors.collectionName && (
                 <p className="mt-2 text-sm text-red-500">
-                  {String(errors.collection.message)}
+                  {String(errors.collectionName.message)}
                 </p>
               )}
 
@@ -366,6 +381,71 @@ const res = await fetch(endpoint, {
           </div>
 
         </section>
+
+        <ProductImageUpload
+  images={images}
+  onChange={(newImages) => {
+    setValue("images", newImages, {
+      shouldValidate: true,
+    });
+  }}
+/>
+
+<section>
+  <h3 className="mb-6 text-xl font-semibold">Variants</h3>
+
+  <div className="space-y-4">
+    {fields.map((field, index) => (
+      <div
+        key={field.id}
+        className="grid gap-4 rounded-xl border border-zinc-700 p-4 md:grid-cols-4"
+      >
+        <input
+          {...register(`variants.${index}.color`)}
+          placeholder="Color"
+          className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3"
+        />
+
+        <input
+          {...register(`variants.${index}.size`)}
+          placeholder="Size"
+          className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3"
+        />
+
+        <input
+          type="number"
+          {...register(`variants.${index}.stock`, {
+            valueAsNumber: true,
+          })}
+          placeholder="Stock"
+          className="rounded-xl border border-zinc-700 bg-zinc-800 px-4 py-3"
+        />
+
+        <button
+          type="button"
+          onClick={() => remove(index)}
+          className="rounded-xl bg-red-600 px-4 py-3 text-white"
+        >
+          Remove
+        </button>
+      </div>
+    ))}
+
+    <button
+      type="button"
+      onClick={() =>
+        append({
+          color: "",
+          size: "",
+          stock: 0,
+        })
+      }
+      className="rounded-xl bg-violet-600 px-6 py-3 font-semibold text-white"
+    >
+      + Add Variant
+    </button>
+  </div>
+</section>
 
                 {/* ================= Product Settings ================= */}
 

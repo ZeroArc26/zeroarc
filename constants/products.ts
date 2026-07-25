@@ -1,6 +1,6 @@
-import { Product } from "@/types/product";
+import { FeaturedProduct } from "@/types/featured-product";
 
-export const FEATURED_PRODUCTS: Product[] = [
+export const FEATURED_PRODUCTS: FeaturedProduct[] = [
   {
     id: 1,
 
@@ -16,7 +16,7 @@ export const FEATURED_PRODUCTS: Product[] = [
 
     category: "Oversized T-Shirt",
 
-    collection: "ZeroArc Originals",
+    collectionName: "ZeroArc Originals",
 
     sizes: ["S", "M", "L", "XL"],
 
@@ -76,7 +76,7 @@ export const FEATURED_PRODUCTS: Product[] = [
 
     category: "Oversized T-Shirt",
 
-    collection: "ZeroArc Originals",
+    collectionName: "ZeroArc Originals",
 
     sizes: ["S", "M", "L", "XL"],
 
@@ -128,7 +128,7 @@ export const FEATURED_PRODUCTS: Product[] = [
 
     category: "Oversized T-Shirt",
 
-    collection: "ZeroArc Originals",
+    collectionName: "ZeroArc Originals",
 
     sizes: ["S", "M", "L", "XL"],
 
@@ -188,7 +188,7 @@ export const FEATURED_PRODUCTS: Product[] = [
 
     category: "Oversized T-Shirt",
 
-    collection: "ZeroArc Originals",
+    collectionName: "ZeroArc Originals",
 
     sizes: ["S", "M", "L", "XL"],
 

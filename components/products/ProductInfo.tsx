@@ -26,7 +26,7 @@ interface ProductInfoProps {
     comparePrice?: number;
 
     category: string;
-    collection: string;
+    collectionName: string;
 
     images: string[];
 
@@ -77,7 +77,7 @@ export default function ProductInfo({
     <div>
 
       <p className="text-sm uppercase tracking-[0.3em] text-purple-400">
-        {product.collection}
+        {product.collectionName}
       </p>
 
       <h1 className="mt-3 text-5xl font-black">
@@ -132,7 +132,7 @@ export default function ProductInfo({
           </span>
 
           <span>
-            {product.collection}
+            {product.collectionName}
           </span>
         </div>
 

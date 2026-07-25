@@ -13,7 +13,7 @@ export default function AddProductPage() {
     comparePrice: "",
 
     category: "",
-    collection: "",
+    collectionName: "",
 
     stock: "",
 
@@ -98,7 +98,7 @@ const [preview, setPreview] = useState("");
     !formData.description ||
     !formData.price ||
     !formData.category ||
-    !formData.collection
+    !formData.collectionName
   ) {
     alert("Please fill all required fields.");
     return;
@@ -119,7 +119,7 @@ const [preview, setPreview] = useState("");
         comparePrice: Number(formData.comparePrice),
 
         category: formData.category,
-        collection: formData.collection,
+        collectionName: formData.collectionName,
 
         stock: Number(formData.stock),
 
@@ -162,7 +162,7 @@ const [preview, setPreview] = useState("");
       comparePrice: "",
 
       category: "",
-      collection: "",
+      collectionName: "",
 
       stock: "",
 
@@ -267,7 +267,7 @@ const [preview, setPreview] = useState("");
 
             <input
               name="collection"
-              value={formData.collection}
+              value={formData.collectionName}
               onChange={handleChange}
               placeholder="Collection"
               className="rounded-xl border border-zinc-700 bg-zinc-950 px-5 py-4 outline-none focus:border-violet-500"

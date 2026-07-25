@@ -1,10 +1,13 @@
+import { useState } from "react";
 import Image from "next/image";
 import ProductStatusBadge from "./ProductStatusBadge";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import DeleteProductDialog from "./DeleteProductDialog";
 
 export type Product = {
   _id: string;
+  slug: string;
   title: string;
   category: string;
   price: number;
@@ -22,21 +25,16 @@ export default function ProductRow({
 }: ProductRowProps) {
 
     const router = useRouter();
+    const [dialogOpen, setDialogOpen] = useState(false);
+const [deleting, setDeleting] = useState(false);
 
     const handleDelete = async () => {
-  const confirmed = window.confirm(
-    "Are you sure you want to delete this product?"
-  );
-
-  if (!confirmed) return;
+  setDeleting(true);
 
   try {
-    const res = await fetch(
-      `/api/admin/products/${product._id}`,
-      {
-        method: "DELETE",
-      }
-    );
+    const res = await fetch(`/api/admin/products/${product._id}`, {
+      method: "DELETE",
+    });
 
     const result = await res.json();
 
@@ -47,14 +45,18 @@ export default function ProductRow({
 
     alert("✅ Product deleted successfully!");
 
+    setDialogOpen(false);
     router.refresh();
   } catch (error) {
     console.error(error);
     alert("Something went wrong.");
+  } finally {
+    setDeleting(false);
   }
 };
 
   return (
+  <>
     <tr className="border-t border-zinc-800 transition hover:bg-zinc-900/40">
       <td className="px-6 py-4">
         <div className="relative h-16 w-16 overflow-hidden rounded-xl border border-zinc-800 bg-zinc-900">
@@ -89,9 +91,12 @@ export default function ProductRow({
 
       <td className="px-6 py-4">
         <div className="flex gap-2">
-          <button className="rounded-lg border border-zinc-700 px-3 py-1 text-sm transition hover:border-violet-500 hover:text-violet-400">
-            View
-          </button>
+          <Link
+  href={`/products/${product.slug}`}
+  className="rounded-lg border border-zinc-700 px-3 py-1 text-sm transition hover:border-violet-500 hover:text-violet-400"
+>
+  View
+</Link>
 
           <Link
   href={`/admin/products/${product._id}/edit`}
@@ -101,13 +106,22 @@ export default function ProductRow({
 </Link>
 
           <button
-  onClick={handleDelete}
+  onClick={() => setDialogOpen(true)}
   className="rounded-lg border border-red-700 px-3 py-1 text-sm text-red-400 transition hover:bg-red-600 hover:text-white"
 >
   Delete
 </button>
         </div>
       </td>
-    </tr>
-  );
+        </tr>
+
+    <DeleteProductDialog
+      open={dialogOpen}
+      productTitle={product.title}
+      loading={deleting}
+      onClose={() => setDialogOpen(false)}
+      onConfirm={handleDelete}
+    />
+  </>
+);
 }

@@ -64,6 +64,13 @@ export async function POST(req: NextRequest) {
 
     const data: ProductInput = parsed.data;
 
+    const totalStock = data.variants.reduce(
+  (total, variant) => total + variant.stock,
+  0
+);
+
+data.stock = totalStock;
+
     const slugExists = await Product.findOne({
       slug: data.slug,
     });

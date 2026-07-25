@@ -3,10 +3,10 @@
 import Image from "next/image";
 import Link from "next/link";
 
-import { Product } from "@/types/product";
+import { FeaturedProduct } from "@/types/featured-product";
 
 interface SearchResultCardProps {
-  product: Product;
+  product: FeaturedProduct;
   onClick: () => void;
 }
 

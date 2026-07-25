@@ -57,10 +57,10 @@ const ProductSchema = new Schema(
       required: true,
     },
 
-    collection: {
-      type: String,
-      required: true,
-    },
+    collectionName: {
+  type: String,
+  required: true,
+},
 
     images: [
       {

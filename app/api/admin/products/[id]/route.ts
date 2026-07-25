@@ -62,6 +62,13 @@ export async function PUT(
 
     const validatedData = productSchema.parse(body);
 
+    const totalStock = (validatedData.variants ?? []).reduce(
+  (total, variant) => total + variant.stock,
+  0
+);
+
+validatedData.stock = totalStock;
+
     const existingProduct = await Product.findById(id);
 
     if (!existingProduct) {

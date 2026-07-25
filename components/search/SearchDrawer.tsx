@@ -25,7 +25,7 @@ export default function SearchDrawer({
     return FEATURED_PRODUCTS.filter((product) => {
       return (
         product.name.toLowerCase().includes(search) ||
-        product.collection.toLowerCase().includes(search) ||
+        product.collectionName.toLowerCase().includes(search) ||
         product.category.toLowerCase().includes(search) ||
         (product.tag ?? "").toLowerCase().includes(search) ||
         product.description.toLowerCase().includes(search) ||

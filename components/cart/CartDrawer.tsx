@@ -133,7 +133,7 @@ export default function CartDrawer({
               {items.map((item) => (
 
                 <CartItem
-                  key={`${item.variantId}-${item.size}`}
+                  key={`${item.productId}-${item.color}-${item.size}`}
                   item={item}
                 />
 

@@ -10,8 +10,8 @@ export interface Product {
   comparePrice?: number;
 
   category: string;
-  collection: string;
-
+  collectionName: string;
+  
   images: string[];
 
   sizes: string[];

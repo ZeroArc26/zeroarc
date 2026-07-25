@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 dotenv.config({ path: ".env.local" });
 
 import Product from "./models/Product";
-import { connectDB } from "./lib/mongodb";
+import connectDB from "./lib/mongodb";
 
 async function seed() {
   try {
@@ -21,7 +21,7 @@ async function seed() {
         price: 1499,
         comparePrice: 1999,
         category: "T-Shirts",
-        collection: "Summer 2026",
+        collectionName: "Summer 2026",
         images: [
           "/products/arc-beginning/front.webp",
           "/products/arc-beginning/back.webp",

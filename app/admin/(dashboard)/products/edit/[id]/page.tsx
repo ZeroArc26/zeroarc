@@ -18,7 +18,7 @@ export default function EditProductPage() {
     comparePrice: "",
 
     category: "",
-    collection: "",
+    collectionName: "",
 
     stock: "",
 
@@ -56,7 +56,7 @@ export default function EditProductPage() {
           comparePrice: String(product.comparePrice ?? ""),
 
           category: product.category || "",
-          collection: product.collection || "",
+          collectionName: product.collectionName || "",
 
           stock: String(product.stock ?? ""),
 
@@ -114,7 +114,7 @@ export default function EditProductPage() {
           comparePrice: Number(formData.comparePrice),
 
           category: formData.category,
-          collection: formData.collection,
+          collectionName: formData.collectionName,
 
           stock: Number(formData.stock),
 
@@ -249,7 +249,7 @@ export default function EditProductPage() {
 
             <input
               name="collection"
-              value={formData.collection}
+              value={formData.collectionName}
               onChange={handleChange}
               placeholder="Collection"
               className="rounded-xl border border-zinc-700 bg-zinc-950 px-5 py-4 outline-none focus:border-violet-500"
