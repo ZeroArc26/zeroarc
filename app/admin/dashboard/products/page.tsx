@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+import PageHeader from "@/components/admin/shared/PageHeader";
 import ProductTable from "@/components/admin/products/ProductTable";
 import ProductEmpty from "@/components/admin/products/ProductEmpty";
 import ProductSkeleton from "@/components/admin/products/ProductSkeleton";
@@ -33,27 +34,18 @@ export default function ProductsPage() {
 
   return (
     <div className="space-y-8">
-      {/* Header */}
-      <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h1 className="text-3xl font-bold">Products</h1>
-
-          <p className="mt-2 text-zinc-400">
-            Manage your entire product catalog.
-          </p>
-
-          <p className="mt-1 text-sm text-zinc-500">
-            Total Products: {products.length}
-          </p>
-        </div>
-
-        <Link
-          href="/admin/products/new"
-          className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-5 py-3 font-semibold transition hover:bg-violet-500"
-        >
-          + Add Product
-        </Link>
-      </div>
+      <PageHeader
+        title="Products"
+        description={`Manage your entire product catalog • ${products.length} Products`}
+        action={
+          <Link
+            href="/admin/products/new"
+            className="inline-flex items-center justify-center rounded-xl bg-violet-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-violet-500"
+          >
+            + Add Product
+          </Link>
+        }
+      />
 
       {loading ? (
         <ProductSkeleton />
