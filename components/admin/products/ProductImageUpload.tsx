@@ -11,18 +11,32 @@ export default function ProductImageUpload({
   images,
   onChange,
 }: ProductImageUploadProps) {
-  const handleImageSelect = (
-    e: ChangeEvent<HTMLInputElement>
-  ) => {
+  const handleImageSelect = async (
+  e: ChangeEvent<HTMLInputElement>
+) => {
     const files = e.target.files;
 
     if (!files) return;
 
-    const previews = Array.from(files).map((file) =>
-      URL.createObjectURL(file)
-    );
+    const uploadedImages: string[] = [];
 
-    onChange([...images, ...previews]);
+for (const file of Array.from(files)) {
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const res = await fetch("/api/upload", {
+    method: "POST",
+    body: formData,
+  });
+
+  const data = await res.json();
+
+  if (data.success) {
+    uploadedImages.push(data.imageUrl);
+  }
+}
+
+onChange([...images, ...uploadedImages]);
   };
 
   const removeImage = (index: number) => {
