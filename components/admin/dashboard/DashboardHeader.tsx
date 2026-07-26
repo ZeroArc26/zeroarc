@@ -34,7 +34,7 @@ export default function DashboardHeader() {
 
       {/* Right */}
       <Link
-        href="/admin/products/new"
+        href="/admin/dashboard/products/new"
         className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl bg-violet-600 px-6 font-semibold text-white transition-all duration-200 hover:bg-violet-500 hover:shadow-lg hover:shadow-violet-600/20"
       >
         <Plus className="h-5 w-5" />

@@ -15,7 +15,7 @@ export default function EditProductPage() {
     async function fetchProduct() {
       try {
         const res = await fetch(
-          `/api/admin/products/${params.id}`
+          `/api/admin/dashboard/products/${params.id}`
         );
 
         const data = await res.json();

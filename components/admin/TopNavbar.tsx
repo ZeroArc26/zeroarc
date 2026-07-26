@@ -25,7 +25,7 @@ const pageConfig: Record<
     subtitle: "Welcome back, Admin 👋",
   },
 
-  "/admin/products": {
+  "/admin/dashboard/products": {
     title: "Products",
     subtitle: "Manage your products",
   },
@@ -145,7 +145,7 @@ useEffect(() => {
     {results.products.map((product: any) => (
       <Link
   key={product._id}
-  href={`/admin/products/edit/${product._id}`}
+  href={`/admin/dashboard/products/${product._id}`}
   className="flex w-full items-center rounded-xl px-4 py-3 transition hover:bg-zinc-800"
 >
   📦 {product.title}

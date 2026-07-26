@@ -24,7 +24,7 @@ const menuItems = [
   },
   {
     title: "Products",
-    href: "/admin/products",
+    href: "/admin/dashboard/products",
     icon: ShoppingBag,
   },
   {

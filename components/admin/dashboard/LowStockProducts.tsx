@@ -45,7 +45,7 @@ export default function LowStockProducts() {
       description="Products that need to be restocked."
       action={
         <Link
-          href="/admin/products"
+          href="/admin/dashboard/products"
           className="text-sm font-medium text-violet-400 transition hover:text-violet-300"
         >
           View Inventory

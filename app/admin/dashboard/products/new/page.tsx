@@ -1,19 +1,15 @@
+import PageHeader from "@/components/admin/shared/PageHeader";
 import ProductForm from "@/components/admin/products/ProductForm";
 
 export default function NewProductPage() {
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">
-          Add Product
-        </h1>
+      <PageHeader
+        title="Add Product"
+        description="Create a new product for your ZeroArc store."
+      />
 
-        <p className="mt-2 text-zinc-400">
-          Create a new product for your store.
-        </p>
-      </div>
-
-      <ProductForm mode="create" />
+      <ProductForm />
     </div>
   );
 }

@@ -26,7 +26,7 @@ export const adminNavItems: AdminNavItem[] = [
   },
   {
     title: "Products",
-    href: "/admin/products",
+    href: "/admin/dashboard/products",
     icon: Package,
   },
   {

@@ -209,7 +209,7 @@ onChange={() => {
                 <div className="flex justify-center gap-3">
 
                   <Link
-  href={`/admin/products/edit/${product._id}`}
+  href={`/admin/dashboard/products/${product._id}`}
   onClick={(e) => e.stopPropagation()}
   className="rounded-lg p-2 transition hover:bg-zinc-800"
 >

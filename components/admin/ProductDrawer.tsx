@@ -285,7 +285,7 @@ useEffect(() => {
               <div className="sticky bottom-0 -mx-6 mt-6 space-y-3 border-t border-zinc-800 bg-[#0B0B0D] px-6 py-6">
 
   <Link
-  href={`/admin/products/edit/${product._id}`}
+  href={`/admin/dashboard/products/${product._id}`}
   className="block w-full rounded-2xl bg-gradient-to-r from-violet-600 to-fuchsia-600 py-4 text-center font-bold transition hover:scale-[1.02]"
 >
   ✏ Edit Product
