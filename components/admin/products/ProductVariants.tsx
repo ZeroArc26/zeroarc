@@ -1,91 +1,80 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Plus, X } from "lucide-react";
+import { useFormContext } from "react-hook-form";
+import type { ProductFormValues } from "@/lib/validations/product.schema";
+
+import VariantGenerator from "./ProductVariants/VariantGenerator";
+import VariantSummary from "./ProductVariants/VariantSummary";
+import VariantAlerts from "./ProductVariants/VariantAlerts";
+import VariantTable from "./ProductVariants/VariantTable";
+
+import { Variant } from "./ProductVariants/types";
 
 export default function ProductVariants() {
+  const { watch, setValue } =
+  useFormContext<ProductFormValues>();
+
+const variants =
+  watch("variants") ?? [];
+
+const setVariants = (
+  value:
+    | Variant[]
+    | ((prev: Variant[]) => Variant[])
+) => {
+  const updated =
+    typeof value === "function"
+      ? value(variants)
+      : value;
+
+  setValue("variants", updated, {
+    shouldDirty: true,
+    shouldTouch: true,
+    shouldValidate: true,
+  });
+};
+
   return (
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur">
-      <h2 className="text-xl font-bold text-white">
-        Product Variants
-      </h2>
+    <div className="space-y-6">
 
-      <p className="mt-1 text-sm text-zinc-400">
-        Add colors, sizes and other product options.
-      </p>
+      {/* Top Section */}
 
-      {/* Colors */}
+      <div className="grid gap-6 xl:grid-cols-3">
 
-      <div className="mt-6">
-        <Label>Colors</Label>
+        {/* Generator */}
 
-        <div className="mt-3 flex flex-wrap gap-3">
-          <div className="flex items-center gap-2 rounded-xl border border-zinc-700 px-3 py-2">
-            <span>Black</span>
+        <div className="xl:col-span-2">
 
-            <button type="button">
-              <X size={16} />
-            </button>
-          </div>
-
-          <Button
-            type="button"
-            variant="outline"
-          >
-            <Plus size={16} className="mr-2" />
-            Add Color
-          </Button>
-        </div>
-      </div>
-
-      {/* Sizes */}
-
-      <div className="mt-8">
-        <Label>Sizes</Label>
-
-        <div className="mt-3 flex flex-wrap gap-3">
-          {["S", "M", "L", "XL"].map((size) => (
-            <div
-              key={size}
-              className="rounded-xl border border-zinc-700 px-4 py-2"
-            >
-              {size}
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Preview */}
-
-      <div className="mt-10 rounded-2xl border border-zinc-800 bg-zinc-950 p-5">
-        <h3 className="font-semibold text-white">
-          Variant Preview
-        </h3>
-
-        <div className="mt-5 space-y-4">
-
-          <div className="grid grid-cols-4 gap-4">
-            <Input value="Black / M" readOnly />
-
-            <Input
-              type="number"
-              placeholder="Price"
-            />
-
-            <Input
-              type="number"
-              placeholder="Stock"
-            />
-
-            <Input
-              placeholder="SKU"
-            />
-          </div>
+          <VariantGenerator
+            variants={variants}
+            setVariants={setVariants}
+          />
 
         </div>
+
+        {/* Right Sidebar */}
+
+        <div className="space-y-6">
+
+          <VariantSummary
+            variants={variants}
+          />
+
+          <VariantAlerts
+            variants={variants}
+          />
+
+        </div>
+
       </div>
+
+      {/* Table */}
+
+      <VariantTable
+        variants={variants}
+        setVariants={setVariants}
+      />
+
     </div>
   );
 }

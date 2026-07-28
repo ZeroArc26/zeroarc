@@ -1,63 +1,121 @@
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+"use client";
+
+import { useMemo, useState } from "react";
+
+import PricingForm from "./ProductPricing/PricingForm";
+import PricingSummary from "./ProductPricing/PricingSummary";
+import CustomerPreview from "./ProductPricing/CustomerPreview";
+import PricingWarnings from "./ProductPricing/PricingWarnings";
+
+import {
+  calculateProfit,
+  calculateMargin,
+  calculateCustomerSavings,
+  calculateBreakEvenPrice,
+} from "./ProductPricing/utils";
 
 export default function ProductPricing() {
+  const [sellingPrice, setSellingPrice] = useState(1299);
+  const [comparePrice, setComparePrice] = useState(1999);
+  const [costPrice, setCostPrice] = useState(650);
+
+  const [taxRate, setTaxRate] = useState(18);
+
+  const [discountType, setDiscountType] = useState<
+    "percentage" | "fixed"
+  >("percentage");
+
+  const [discountValue, setDiscountValue] = useState(35);
+
+  const profit = useMemo(
+    () =>
+      calculateProfit(
+        sellingPrice,
+        costPrice
+      ),
+    [sellingPrice, costPrice]
+  );
+
+  const margin = useMemo(
+    () =>
+      calculateMargin(
+        sellingPrice,
+        costPrice
+      ),
+    [sellingPrice, costPrice]
+  );
+
+  const customerSavings = useMemo(
+    () =>
+      calculateCustomerSavings(
+        sellingPrice,
+        comparePrice
+      ),
+    [sellingPrice, comparePrice]
+  );
+
+  const breakEvenPrice = useMemo(
+    () =>
+      calculateBreakEvenPrice(
+        costPrice,
+        taxRate
+      ),
+    [costPrice, taxRate]
+  );
+
   return (
-    <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur">
-      <h2 className="text-xl font-bold text-white">
-        Pricing
-      </h2>
+    <div className="space-y-8">
 
-      <p className="mt-1 text-sm text-zinc-400">
-        Configure the pricing details for this product.
-      </p>
+      <div className="grid gap-8 xl:grid-cols-3">
 
-      <div className="mt-6 grid gap-6 md:grid-cols-2">
-        <div className="space-y-2">
-          <Label htmlFor="price">Selling Price</Label>
+        <div className="xl:col-span-2">
 
-          <Input
-            id="price"
-            type="number"
-            placeholder="999"
+          <PricingForm
+            sellingPrice={sellingPrice}
+            comparePrice={comparePrice}
+            costPrice={costPrice}
+            taxRate={taxRate}
+            discountType={discountType}
+            discountValue={discountValue}
+            setSellingPrice={setSellingPrice}
+            setComparePrice={setComparePrice}
+            setCostPrice={setCostPrice}
+            setTaxRate={setTaxRate}
+            setDiscountType={setDiscountType}
+            setDiscountValue={setDiscountValue}
           />
+
         </div>
 
-        <div className="space-y-2">
-          <Label htmlFor="comparePrice">
-            Compare At Price
-          </Label>
+        <PricingSummary
+  sellingPrice={sellingPrice}
+  comparePrice={comparePrice}
+  costPrice={costPrice}
+  taxRate={taxRate}
+  discountType={discountType}
+  discountValue={discountValue}
+  profit={profit}
+  margin={margin}
+  customerSavings={customerSavings}
+  breakEvenPrice={breakEvenPrice}
+/>
 
-          <Input
-            id="comparePrice"
-            type="number"
-            placeholder="1299"
-          />
-        </div>
+                <CustomerPreview
+          sellingPrice={sellingPrice}
+          comparePrice={comparePrice}
+          discountType={discountType}
+          discountValue={discountValue}
+        />
 
-        <div className="space-y-2">
-          <Label htmlFor="costPrice">
-            Cost Price
-          </Label>
-
-          <Input
-            id="costPrice"
-            type="number"
-            placeholder="650"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label htmlFor="tax">
-            Tax Class
-          </Label>
-
-          <Input
-            id="tax"
-            placeholder="GST 18%"
-          />
-        </div>
       </div>
+
+      <PricingWarnings
+        sellingPrice={sellingPrice}
+        comparePrice={comparePrice}
+        costPrice={costPrice}
+        margin={margin}
+      />
+
     </div>
   );
 }

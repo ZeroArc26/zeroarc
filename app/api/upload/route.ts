@@ -1,58 +1,64 @@
-import { NextRequest, NextResponse } from "next/server";
-import cloudinary from "@/lib/cloudinary";
+import { NextResponse } from "next/server";
+import { v4 as uuid } from "uuid";
 
-export const runtime = "nodejs";
-
-export async function POST(req: NextRequest) {
+export async function POST(request: Request) {
   try {
-    const formData = await req.formData();
+    const formData = await request.formData();
 
-    const file = formData.get("file") as File | null;
+    const file = formData.get("file");
 
-    if (!file) {
+    if (!(file instanceof File)) {
       return NextResponse.json(
-        {
-          success: false,
-          message: "No file uploaded.",
-        },
+        { error: "No file uploaded." },
         { status: 400 }
       );
     }
 
-    const bytes = await file.arrayBuffer();
-    const buffer = Buffer.from(bytes);
+    const extension =
+      file.name.split(".").pop() ?? "jpg";
 
-    const result = await new Promise<any>((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream(
-          {
-            folder: "zeroarc/products",
-          },
-          (error, result) => {
-            if (error) return reject(error);
-            resolve(result);
-          }
-        )
-        .end(buffer);
-    });
+    const filename = `products/${uuid()}.${extension}`;
+
+    const buffer = Buffer.from(await file.arrayBuffer());
+
+    const response = await fetch(
+      `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${filename}`,
+      {
+        method: "PUT",
+        headers: {
+          AccessKey:
+            process.env.BUNNY_STORAGE_API_KEY!,
+          "Content-Type": file.type,
+        },
+        body: buffer,
+      }
+    );
+
+    if (!response.ok) {
+      return NextResponse.json(
+        {
+          error: "Bunny upload failed.",
+        },
+        {
+          status: 500,
+        }
+      );
+    }
 
     return NextResponse.json({
       success: true,
-      imageUrl: result.secure_url,
-      publicId: result.public_id,
+      url: `${process.env.BUNNY_CDN_URL}/${filename}`,
     });
   } catch (error) {
     console.error(error);
 
     return NextResponse.json(
-  {
-    success: false,
-    message:
-      error instanceof Error ? error.message : "Upload failed.",
-  },
-  {
-    status: 500,
-  }
-);
+      {
+        error: "Internal Server Error",
+      },
+      {
+        status: 500,
+      }
+    );
   }
 }
