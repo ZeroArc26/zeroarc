@@ -55,22 +55,22 @@ const safeReorderLevel = Number.isFinite(reorderLevel)
     getStockStatus(availableStock);
 
   const stats = [
-    {
-      title: "Available Stock",
-      value: safeStockQuantity,
-      icon: PackageCheck,
-    },
-    {
-      title: "Reserved Stock",
-      value: reservedStock,
-      icon: Boxes,
-    },
-    {
-      title: "Total Stock",
-      value: stockQuantity,
-      icon: Warehouse,
-    },
-  ];
+  {
+    title: "Available Stock",
+    value: safeStockQuantity,
+    icon: PackageCheck,
+  },
+  {
+    title: "Reserved Stock",
+    value: reservedStock,
+    icon: Boxes,
+  },
+  {
+    title: "Total Stock",
+    value: safeStockQuantity,
+    icon: Warehouse,
+  },
+];
 
   return (
     <Card className="rounded-3xl border border-white/10 bg-[#111113] shadow-xl">

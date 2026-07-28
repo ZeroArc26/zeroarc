@@ -1,6 +1,7 @@
 "use client";
 
 import { IndianRupee, CheckCircle2 } from "lucide-react";
+import { useFormContext } from "react-hook-form";
 
 import {
   Card,
@@ -38,6 +39,7 @@ export default function PricingForm({
   setDiscountType,
   setDiscountValue,
 }: PricingFormProps) {
+  const { setValue } = useFormContext();
   return (
     <Card className="overflow-hidden rounded-3xl border border-white/10 bg-[#111113] shadow-xl">
 

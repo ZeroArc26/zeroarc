@@ -19,8 +19,8 @@ import ProductPublishCard from "./ProductPublishCard";
 export default function ProductForm() {
   const methods = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
-
     mode: "onChange",
+    shouldFocusError: true,
 
     defaultValues: {
       basicInfo: {
@@ -46,6 +46,7 @@ export default function ProductForm() {
         barcode: "",
         quantity: 0,
         lowStockThreshold: 5,
+        reorderLevel: 10,
         trackInventory: true,
         allowBackorders: false,
       },
@@ -68,9 +69,7 @@ export default function ProductForm() {
     },
   });
 
-  const onSubmit = async (
-    data: ProductFormValues
-  ) => {
+  const onSubmit = async (data: ProductFormValues) => {
     try {
       const response = await fetch("/api/products", {
         method: "POST",
@@ -89,21 +88,24 @@ export default function ProductForm() {
       }
 
       alert("✅ Product created successfully!");
-
       console.log(result.product);
 
       methods.reset();
     } catch (error) {
       console.error("Create Product Error:", error);
-
       alert("Something went wrong.");
     }
   };
 
+const onError = (errors: any) => {
+  console.log(errors);
+  alert("Check Console");
+};
+
   return (
     <FormProvider {...methods}>
       <form
-        onSubmit={methods.handleSubmit(onSubmit)}
+        onSubmit={methods.handleSubmit(onSubmit, onError)}
         className="space-y-8"
       >
         <ProductBasicInfo />

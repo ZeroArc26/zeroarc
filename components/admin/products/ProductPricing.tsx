@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import { useFormContext } from "react-hook-form";
 
 import PricingForm from "./ProductPricing/PricingForm";
 import PricingSummary from "./ProductPricing/PricingSummary";
@@ -18,7 +19,6 @@ export default function ProductPricing() {
   const [sellingPrice, setSellingPrice] = useState(1299);
   const [comparePrice, setComparePrice] = useState(1999);
   const [costPrice, setCostPrice] = useState(650);
-
   const [taxRate, setTaxRate] = useState(18);
 
   const [discountType, setDiscountType] = useState<

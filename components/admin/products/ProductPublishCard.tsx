@@ -190,6 +190,12 @@ export default function ProductPublishCard() {
   Publish Product
 </Button>
       </div>
+      <button
+  type="submit"
+  className="w-full rounded-xl bg-red-600 p-3 text-white"
+>
+  TEST SUBMIT
+</button>
     </div>
   );
 }

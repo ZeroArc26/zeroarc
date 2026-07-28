@@ -44,7 +44,7 @@ export default function NewProductPage() {
         }
       />
 
-      <ProductForm mode="create" />
+      <ProductForm />
     </div>
   );
 }

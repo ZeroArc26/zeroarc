@@ -21,6 +21,7 @@ export default function ProductBasicInfo() {
     setValue,
   } = useFormContext<ProductFormValues>();
 
+  const tags = watch("basicInfo.tags") ?? [];
   const title = watch("basicInfo.title") ?? "";
   const slug = watch("basicInfo.slug") ?? "";
   const description = watch("basicInfo.description") ?? "";
@@ -82,20 +83,16 @@ useEffect(() => {
 /* Auto Barcode                               */
 /* ------------------------------------------ */
 
-useEffect(() => {
-  const currentBarcode = watch("inventory.barcode");
+const barcode = watch("inventory.barcode");
 
-  if (!currentBarcode) {
-    setValue(
-      "inventory.barcode",
-      generateBarcode(),
-      {
-        shouldDirty: false,
-        shouldValidate: true,
-      }
-    );
+useEffect(() => {
+  if (!barcode) {
+    setValue("inventory.barcode", generateBarcode(), {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
   }
-}, [setValue, watch]);
+}, [barcode, setValue]);
 
   /* ------------------------------------------ */
   /* Auto SEO Title                             */
@@ -293,11 +290,26 @@ useEffect(() => {
 
           </div>
 
+
+
           <Input
-            id="tags"
-            placeholder="Anime, Naruto, Oversized, Cotton, Graphic Tee"
-            {...register("basicInfo.tags")}
-          />
+  id="tags"
+  placeholder="Anime, Naruto, Oversized"
+  value={tags.join(", ")}
+  onChange={(e) => {
+    setValue(
+      "basicInfo.tags",
+      e.target.value
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean),
+      {
+        shouldDirty: true,
+        shouldValidate: true,
+      }
+    );
+  }}
+/>
 
           <p className="mt-2 text-xs text-zinc-500">
             Example: Anime, Naruto, Oversized, Cotton. Separate each tag using a comma.
