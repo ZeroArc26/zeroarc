@@ -4,7 +4,12 @@ import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import { Package2, CheckCircle2 } from "lucide-react";
 
+
 import type { ProductFormValues } from "@/lib/validations/product.schema";
+import {
+  generateSKU,
+  generateBarcode,
+} from "@/lib/utils/inventory";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -21,6 +26,7 @@ export default function ProductBasicInfo() {
   const description = watch("basicInfo.description") ?? "";
   const metaTitle = watch("seo.metaTitle") ?? "";
   const metaDescription = watch("seo.metaDescription") ?? "";
+  const sku = watch("inventory.sku") ?? "";
 
   /* ------------------------------------------ */
   /* Auto Slug                                  */
@@ -44,6 +50,52 @@ useEffect(() => {
     shouldValidate: true,
   });
 }, [title, setValue]);
+
+/* ------------------------------------------ */
+/* Auto SKU                                   */
+/* ------------------------------------------ */
+
+useEffect(() => {
+  // Title empty ho to SKU bhi clear kar do
+  if (!title.trim()) {
+    setValue("inventory.sku", "", {
+      shouldDirty: false,
+      shouldValidate: true,
+    });
+    return;
+  }
+
+  // Sirf tab generate karo jab SKU empty ho
+  if (!sku.trim()) {
+    setValue(
+      "inventory.sku",
+      generateSKU(title),
+      {
+        shouldDirty: false,
+        shouldValidate: true,
+      }
+    );
+  }
+}, [title, sku, setValue]);
+
+/* ------------------------------------------ */
+/* Auto Barcode                               */
+/* ------------------------------------------ */
+
+useEffect(() => {
+  const currentBarcode = watch("inventory.barcode");
+
+  if (!currentBarcode) {
+    setValue(
+      "inventory.barcode",
+      generateBarcode(),
+      {
+        shouldDirty: false,
+        shouldValidate: true,
+      }
+    );
+  }
+}, [setValue, watch]);
 
   /* ------------------------------------------ */
   /* Auto SEO Title                             */

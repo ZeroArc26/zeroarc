@@ -1,30 +1,72 @@
 import { z } from "zod";
 
-/* -------------------------------------------------------------------------- */
-/*                                   Basic                                    */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------------------
+   Images
+----------------------------------------- */
+
+export const imageSchema = z.object({
+  url: z.string().url("Invalid image URL"),
+
+  color: z.string().default("Default"),
+
+  alt: z.string().default(""),
+
+  isCover: z.boolean().default(false),
+
+  order: z.number().int().default(0),
+});
+
+/* ----------------------------------------
+   Variants
+----------------------------------------- */
+
+export const variantSchema = z.object({
+  id: z.string(),
+
+  color: z.string(),
+
+  colorHex: z.string().optional(),
+
+  size: z.string(),
+
+  sku: z.string(),
+
+  barcode: z.string(),
+
+  price: z.number().min(0),
+
+  stock: z.number().int().min(0),
+
+  image: z.string().optional(),
+
+  isActive: z.boolean().default(true),
+});
+
+/* ----------------------------------------
+   Basic Info
+----------------------------------------- */
 
 export const basicInfoSchema = z.object({
   title: z
     .string()
     .trim()
-    .min(3, "Product title must be at least 3 characters.")
-    .max(120, "Product title cannot exceed 120 characters."),
+    .min(3, "Title must be at least 3 characters")
+    .max(120),
 
   slug: z
     .string()
     .trim()
-    .min(3, "Slug must be at least 3 characters.")
+    .min(3)
     .max(150)
     .regex(
-      /^[a-z0-9-]+$/,
-      "Slug can only contain lowercase letters, numbers and hyphens."
+      /^[a-z0-9]+(?:-[a-z0-9]+)*$/,
+      "Slug must contain only lowercase letters, numbers and hyphens"
     ),
 
   description: z
     .string()
     .trim()
-    .min(20, "Description must be at least 20 characters.")
+    .min(10, "Description is too short")
     .max(5000),
 
   brand: z
@@ -36,38 +78,35 @@ export const basicInfoSchema = z.object({
   category: z
     .string()
     .trim()
-    .min(1, "Category is required."),
+    .min(2)
+    .max(60),
 
-  tags: z.array(z.string()).default([]),
+  tags: z
+    .array(z.string().trim())
+    .default([]),
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                  Pricing                                   */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------------------
+   Pricing
+----------------------------------------- */
 
 export const pricingSchema = z.object({
-  sellingPrice: z.number().min(
-  0,
-  "Selling price must be greater than or equal to 0."
-),
+  sellingPrice: z
+  .number()
+  .min(0, "Selling price must be at least 0"),
 
   comparePrice: z
     .number()
     .min(0)
     .optional(),
 
-  costPrice: z.number().min(
-  0,
-  "Cost price must be greater than or equal to 0."
-),
+  costPrice: z
+  .number()
+  .min(0, "Cost price must be at least 0"),
 
-  taxClass: z.enum([
-    "0",
-    "5",
-    "12",
-    "18",
-    "28",
-  ]),
+  taxClass: z
+    .string()
+    .default("GST 18%"),
 
   discountType: z.enum([
     "none",
@@ -81,26 +120,25 @@ export const pricingSchema = z.object({
     .default(0),
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                 Inventory                                  */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------------------
+   Inventory
+----------------------------------------- */
 
 export const inventorySchema = z.object({
   sku: z
     .string()
     .trim()
-    .min(3)
-    .max(60),
+    .min(2, "SKU must be at least 2 characters"),
 
   barcode: z
     .string()
     .trim()
-    .optional(),
+    .default(""),
 
   quantity: z
     .number()
     .int()
-    .min(0),
+    .min(0, "Quantity cannot be negative"),
 
   lowStockThreshold: z
     .number()
@@ -108,39 +146,33 @@ export const inventorySchema = z.object({
     .min(0)
     .default(5),
 
-  trackInventory: z.boolean().default(true),
+  reorderLevel: z
+    .number()
+    .int()
+    .min(0)
+    .default(10),
 
-  allowBackorders: z.boolean().default(false),
+  trackInventory: z
+    .boolean()
+    .default(true),
+
+  allowBackorders: z
+    .boolean()
+    .default(false),
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                   Images                                   */
-/* -------------------------------------------------------------------------- */
-
-export const imageSchema = z.object({
-  url: z.string().url(),
-
-  alt: z.string().default(""),
-
-  isCover: z.boolean().default(false),
-
-  order: z.number().int(),
-});
-
-/* -------------------------------------------------------------------------- */
-/*                                     SEO                                    */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------------------
+   SEO
+----------------------------------------- */
 
 export const seoSchema = z.object({
   metaTitle: z
     .string()
-    .trim()
     .max(60)
     .optional(),
 
   metaDescription: z
     .string()
-    .trim()
     .max(160)
     .optional(),
 
@@ -149,9 +181,9 @@ export const seoSchema = z.object({
     .default(true),
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                  Publish                                   */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------------------
+   Publish
+----------------------------------------- */
 
 export const publishSchema = z.object({
   status: z.enum([
@@ -160,16 +192,19 @@ export const publishSchema = z.object({
     "archived",
   ]),
 
-  featured: z.boolean().default(false),
+  featured: z
+    .boolean()
+    .default(false),
 
   publishedAt: z
     .date()
-    .optional(),
+    .nullable()
+    .default(null),
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                  Product                                   */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------------------
+   Product Schema
+----------------------------------------- */
 
 export const productSchema = z.object({
   basicInfo: basicInfoSchema,
@@ -180,16 +215,21 @@ export const productSchema = z.object({
 
   images: z.array(imageSchema).default([]),
 
-  variants: z.array(z.any()).default([]),
+  variants: z.array(variantSchema).default([]),
 
   seo: seoSchema,
 
   publish: publishSchema,
 });
 
-/* -------------------------------------------------------------------------- */
-/*                                   Types                                    */
-/* -------------------------------------------------------------------------- */
+/* ----------------------------------------
+   Types
+----------------------------------------- */
 
-export type ProductFormValues = z.input<typeof productSchema>;
-export type Product = z.output<typeof productSchema>;
+export type ProductFormValues = z.input<
+  typeof productSchema
+>;
+
+export type Product = z.output<
+  typeof productSchema
+>;

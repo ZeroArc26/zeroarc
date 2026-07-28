@@ -174,17 +174,21 @@ export default function ProductPublishCard() {
       {/* Buttons */}
       <div className="mt-6 space-y-3">
         <Button
-          variant="secondary"
-          className="w-full gap-2 rounded-xl"
-        >
-          <Save size={16} />
-          Save Draft
-        </Button>
+  type="submit"
+  variant="secondary"
+  className="w-full gap-2 rounded-xl"
+>
+  <Save size={16} />
+  Save Draft
+</Button>
 
-        <Button className="w-full gap-2 rounded-xl">
-          <Globe size={16} />
-          Publish Product
-        </Button>
+        <Button
+  type="submit"
+  className="w-full gap-2 rounded-xl"
+>
+  <Globe size={16} />
+  Publish Product
+</Button>
       </div>
     </div>
   );

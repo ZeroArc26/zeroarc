@@ -1,5 +1,7 @@
 "use client";
 
+import { useFormContext } from "react-hook-form";
+
 import {
   Boxes,
   PackageCheck,
@@ -14,23 +16,48 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 
-import { InventorySummaryProps } from "./types";
 import { getStockStatus } from "./utils";
 
-export default function InventorySummary({
-  stockQuantity,
-  reservedStock,
-  availableStock,
-  lowStockAlert,
-  reorderLevel,
-}: InventorySummaryProps) {
+export default function InventorySummary() {
+  const { watch } = useFormContext();
 
-  const stockStatus = getStockStatus(availableStock);
+  const stockQuantity = Number(
+  watch("inventory.quantity")
+);
+
+const lowStockAlert = Number(
+  watch("inventory.lowStockThreshold")
+);
+
+const reorderLevel = Number(
+  watch("inventory.reorderLevel")
+);
+
+const safeStockQuantity = Number.isFinite(stockQuantity)
+  ? stockQuantity
+  : 0;
+
+const safeLowStockAlert = Number.isFinite(lowStockAlert)
+  ? lowStockAlert
+  : 5;
+
+const safeReorderLevel = Number.isFinite(reorderLevel)
+  ? reorderLevel
+  : 10;
+
+  // Reserved stock future orders se aayega
+  const reservedStock = 0;
+
+  const availableStock =
+  safeStockQuantity - reservedStock;
+
+  const stockStatus =
+    getStockStatus(availableStock);
 
   const stats = [
     {
       title: "Available Stock",
-      value: availableStock,
+      value: safeStockQuantity,
       icon: PackageCheck,
     },
     {
@@ -63,28 +90,21 @@ export default function InventorySummary({
       <CardContent className="space-y-6">
 
         <div className="space-y-4">
-
-          {stats.map((item) => {
-
+                    {stats.map((item) => {
             const Icon = item.icon;
 
             return (
-
               <div
                 key={item.title}
                 className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#18181b] p-5 transition-all duration-300 hover:border-violet-500/30 hover:bg-[#1d1d21]"
               >
-
                 <div className="flex items-center gap-4">
 
                   <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-violet-500/10">
-
                     <Icon className="h-5 w-5 text-violet-400" />
-
                   </div>
 
                   <div>
-
                     <p className="text-sm text-zinc-400">
                       {item.title}
                     </p>
@@ -92,19 +112,19 @@ export default function InventorySummary({
                     <h3 className="mt-1 text-3xl font-bold text-white">
                       {item.value}
                     </h3>
-
                   </div>
 
                 </div>
-
               </div>
-
             );
-
           })}
-
         </div>
-                {/* Stock Health */}
+
+
+
+
+
+        {/* ================= Stock Health ================= */}
 
         <div className="rounded-2xl border border-white/10 bg-[#18181b] p-6">
 
@@ -146,16 +166,22 @@ export default function InventorySummary({
           </div>
 
           <p className="mt-4 text-sm text-zinc-500">
+
             {stockStatus.color === "green"
               ? "Inventory is healthy and ready for sales."
               : stockStatus.color === "yellow"
               ? "Inventory is getting low. Consider restocking soon."
               : "Inventory is critically low. Immediate restocking is recommended."}
+
           </p>
 
         </div>
 
-        {/* Threshold Settings */}
+
+
+
+
+        {/* ================= Threshold ================= */}
 
         <div className="grid gap-4 sm:grid-cols-2">
 
@@ -166,7 +192,7 @@ export default function InventorySummary({
             </p>
 
             <h3 className="mt-2 text-2xl font-bold text-white">
-              {lowStockAlert}
+              {safeLowStockAlert}
             </h3>
 
           </div>
@@ -178,7 +204,7 @@ export default function InventorySummary({
             </p>
 
             <h3 className="mt-2 text-2xl font-bold text-white">
-              {reorderLevel}
+              {safeReorderLevel}
             </h3>
 
           </div>

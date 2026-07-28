@@ -18,7 +18,7 @@ import ProductPublishCard from "./ProductPublishCard";
 
 export default function ProductForm() {
   const methods = useForm<ProductFormValues>({
-  resolver: zodResolver(productSchema),
+    resolver: zodResolver(productSchema),
 
     mode: "onChange",
 
@@ -36,7 +36,7 @@ export default function ProductForm() {
         sellingPrice: 0,
         comparePrice: 0,
         costPrice: 0,
-        taxClass: "18",
+        taxClass: "GST 18%",
         discountType: "none",
         discountValue: 0,
       },
@@ -55,25 +55,49 @@ export default function ProductForm() {
       variants: [],
 
       seo: {
-  metaTitle: "",
-  metaDescription: "",
-  index: true,
-},
+        metaTitle: "",
+        metaDescription: "",
+        index: true,
+      },
 
       publish: {
         status: "draft",
         featured: false,
-        publishedAt: undefined,
+        publishedAt: null,
       },
     },
   });
 
   const onSubmit = async (
-  data: ProductFormValues
-) => {
-    console.log(data);
+    data: ProductFormValues
+  ) => {
+    try {
+      const response = await fetch("/api/products", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
-    // API call here
+      const result = await response.json();
+
+      if (!response.ok) {
+        alert(result.message || "Failed to create product.");
+        console.error(result);
+        return;
+      }
+
+      alert("✅ Product created successfully!");
+
+      console.log(result.product);
+
+      methods.reset();
+    } catch (error) {
+      console.error("Create Product Error:", error);
+
+      alert("Something went wrong.");
+    }
   };
 
   return (
