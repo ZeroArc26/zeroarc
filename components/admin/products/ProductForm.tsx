@@ -2,6 +2,7 @@
 
 import { FormProvider, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 
 import {
   productSchema,
@@ -16,13 +17,25 @@ import ProductVariants from "./ProductVariants";
 import ProductSEO from "./ProductSEO";
 import ProductPublishCard from "./ProductPublishCard";
 
-export default function ProductForm() {
+
+type ProductFormProps = {
+  mode?: "create" | "edit";
+  initialData?: ProductFormValues & {
+    _id: string;
+  };
+};
+
+export default function ProductForm({
+  mode = "create",
+  initialData,
+}: ProductFormProps) {
+  const router = useRouter();
   const methods = useForm<ProductFormValues>({
     resolver: zodResolver(productSchema),
     mode: "onChange",
     shouldFocusError: true,
 
-    defaultValues: {
+    defaultValues: initialData ?? {
       basicInfo: {
         title: "",
         slug: "",
@@ -71,13 +84,23 @@ export default function ProductForm() {
 
   const onSubmit = async (data: ProductFormValues) => {
     try {
-      const response = await fetch("/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const url =
+  mode === "edit"
+    ? `/api/products/${initialData?._id}`
+    : "/api/products";
+
+const method =
+  mode === "edit"
+    ? "PUT"
+    : "POST";
+
+const response = await fetch(url, {
+  method,
+  headers: {
+    "Content-Type": "application/json",
+  },
+  body: JSON.stringify(data),
+});
 
       const result = await response.json();
 
@@ -87,10 +110,15 @@ export default function ProductForm() {
         return;
       }
 
-      alert("✅ Product created successfully!");
       console.log(result.product);
 
-      methods.reset();
+if (mode === "create") {
+  methods.reset();
+}
+
+router.push("/admin/dashboard/products");
+router.refresh();
+
     } catch (error) {
       console.error("Create Product Error:", error);
       alert("Something went wrong.");
@@ -99,7 +127,8 @@ export default function ProductForm() {
 
 const onError = (errors: any) => {
   console.log(errors);
-  alert("Check Console");
+
+  alert(Object.keys(errors).join(", "));
 };
 
   return (
@@ -120,7 +149,7 @@ const onError = (errors: any) => {
 
         <ProductSEO />
 
-        <ProductPublishCard />
+        <ProductPublishCard mode={mode} />
       </form>
     </FormProvider>
   );

@@ -18,7 +18,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-export default function ProductPublishCard() {
+type ProductPublishCardProps = {
+  mode?: "create" | "edit";
+};
+
+export default function ProductPublishCard({
+  mode = "create",
+}: ProductPublishCardProps) {
   const completed = 2;
   const total = 5;
   const progress = (completed / total) * 100;
@@ -173,29 +179,36 @@ export default function ProductPublishCard() {
 
       {/* Buttons */}
       <div className="mt-6 space-y-3">
-        <Button
-  type="submit"
-  variant="secondary"
-  className="w-full gap-2 rounded-xl"
->
-  <Save size={16} />
-  Save Draft
-</Button>
+        {mode === "edit" ? (
+  <Button
+    type="submit"
+    className="w-full gap-2 rounded-xl"
+  >
+    <Save size={16} />
+    Save Changes
+  </Button>
+) : (
+  <>
+    <Button
+      type="submit"
+      variant="secondary"
+      className="w-full gap-2 rounded-xl"
+    >
+      <Save size={16} />
+      Save Draft
+    </Button>
 
-        <Button
-  type="submit"
-  className="w-full gap-2 rounded-xl"
->
-  <Globe size={16} />
-  Publish Product
-</Button>
+    <Button
+      type="submit"
+      className="w-full gap-2 rounded-xl"
+    >
+      <Globe size={16} />
+      Publish Product
+    </Button>
+  </>
+)}
       </div>
-      <button
-  type="submit"
-  className="w-full rounded-xl bg-red-600 p-3 text-white"
->
-  TEST SUBMIT
-</button>
+      
     </div>
   );
 }

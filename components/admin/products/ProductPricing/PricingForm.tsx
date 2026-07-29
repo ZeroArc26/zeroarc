@@ -102,9 +102,16 @@ export default function PricingForm({
               <Input
                 type="number"
                 value={sellingPrice}
-                onChange={(e) =>
-                  setSellingPrice(Number(e.target.value))
-                }
+                onChange={(e) => {
+  const value = Number(e.target.value);
+
+  setSellingPrice(value);
+
+  setValue("pricing.sellingPrice", value, {
+    shouldValidate: true,
+    shouldDirty: true,
+  });
+}}
                 placeholder="0.00"
                 className="h-14 rounded-2xl border-white/10 bg-[#18181b] pl-10 text-base"
               />
@@ -134,9 +141,16 @@ export default function PricingForm({
               <Input
                 type="number"
                 value={comparePrice}
-                onChange={(e) =>
-                  setComparePrice(Number(e.target.value))
-                }
+                onChange={(e) => {
+  const value = Number(e.target.value);
+
+  setComparePrice(value);
+
+  setValue("pricing.comparePrice", value, {
+    shouldValidate: true,
+    shouldDirty: true,
+  });
+}}
                 placeholder="0.00"
                 className="h-14 rounded-2xl border-white/10 bg-[#18181b] pl-10 text-base"
               />
@@ -165,9 +179,16 @@ export default function PricingForm({
               <Input
                 type="number"
                 value={costPrice}
-                onChange={(e) =>
-                  setCostPrice(Number(e.target.value))
-                }
+                onChange={(e) => {
+  const value = Number(e.target.value);
+
+  setCostPrice(value);
+
+  setValue("pricing.costPrice", value, {
+    shouldValidate: true,
+    shouldDirty: true,
+  });
+}}
                 placeholder="0.00"
                 className="h-14 rounded-2xl border-white/10 bg-[#18181b] pl-10 text-base"
               />
@@ -190,9 +211,13 @@ export default function PricingForm({
 
             <Select
               value={String(taxRate)}
-              onValueChange={(value) =>
-                setTaxRate(Number(value))
-              }
+              onValueChange={(value) => {
+  const tax = Number(value);
+
+  setTaxRate(tax);
+
+  setValue("pricing.taxClass", `GST ${tax}%`);
+}}
             >
 
               <SelectTrigger className="h-14 rounded-2xl border-white/10 bg-[#18181b]">
@@ -225,9 +250,11 @@ export default function PricingForm({
 
             <Select
               value={discountType}
-              onValueChange={(value) =>
-                setDiscountType(value as "percentage" | "fixed")
-              }
+              onValueChange={(value) => {
+  setDiscountType(value as "percentage" | "fixed");
+
+  setValue("pricing.discountType", value);
+}}
             >
 
               <SelectTrigger className="h-14 rounded-2xl border-white/10 bg-[#18181b]">
@@ -263,9 +290,13 @@ export default function PricingForm({
             <Input
               type="number"
               value={discountValue}
-              onChange={(e) =>
-                setDiscountValue(Number(e.target.value))
-              }
+              onChange={(e) => {
+  const value = Number(e.target.value);
+
+  setDiscountValue(value);
+
+  setValue("pricing.discountValue", value);
+}}
               placeholder="0"
               className="h-14 rounded-2xl border-white/10 bg-[#18181b] text-base"
             />

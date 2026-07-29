@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { useFormContext } from "react-hook-form";
 import type { ProductFormValues } from "@/lib/validations/product.schema";
 
@@ -14,8 +15,10 @@ import ImagePreviewModal from "./ImagePreviewModal";
 import { useProductImages } from "./hooks/useProductImages";
 
 export default function ProductImages() {
-  const { watch } =
-  useFormContext<ProductFormValues>();
+  const {
+  watch,
+  setValue,
+} = useFormContext<ProductFormValues>();
 
 const {
   images,
@@ -47,6 +50,20 @@ const colors =
 
     console.log("Variants:", variants);
 console.log("Colors:", colors);
+
+useEffect(() => {
+  const uploadedImages = images
+    .filter((image) => image.uploaded && image.url)
+    .map((image, index) => ({
+      url: image.url!,
+      color: image.color,
+      alt: "",
+      isCover: image.isCover,
+      order: index,
+    }));
+
+  setValue("images", uploadedImages);
+}, [images, setValue]);
 
   async function uploadImages() {
     for (const image of images) {

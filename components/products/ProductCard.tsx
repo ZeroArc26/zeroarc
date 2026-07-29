@@ -6,13 +6,24 @@ import { Heart, ShoppingBag } from "lucide-react";
 
 type Product = {
   _id: string;
-  title: string;
-  slug: string;
-  price: number;
-  comparePrice?: number;
-  images: string[];
-  bestseller?: boolean;
-  newArrival?: boolean;
+  basicInfo: {
+    title: string;
+    slug: string;
+  };
+
+  pricing: {
+    sellingPrice: number;
+    comparePrice: number;
+  };
+
+  images: {
+    url: string;
+    alt: string;
+  }[];
+
+  publish: {
+    featured: boolean;
+  };
 };
 
 export default function ProductCard({
@@ -23,29 +34,17 @@ export default function ProductCard({
   return (
     <div className="group overflow-hidden rounded-3xl border border-white/10 bg-zinc-950 transition duration-300 hover:-translate-y-1 hover:border-purple-500/50">
 
-      <Link href={`/products/${product.slug}`}>
+      <Link href={`/products/${product.basicInfo.slug}`}>
 
         <div className="relative aspect-square overflow-hidden bg-zinc-900">
 
           <Image
-            src={product.images?.[0] || "/products/default.webp"}
-            alt={product.title}
+            src={product.images?.[0]?.url || "/products/default.webp"}
+            alt={product.basicInfo.title}
             fill
             sizes="(max-width:768px) 100vw, 25vw"
             className="object-cover transition duration-500 group-hover:scale-110"
           />
-
-          {product.newArrival && (
-            <span className="absolute left-4 top-4 rounded-full bg-purple-600 px-3 py-1 text-xs font-bold text-white">
-              NEW
-            </span>
-          )}
-
-          {product.bestseller && (
-            <span className="absolute right-4 top-4 rounded-full bg-yellow-500 px-3 py-1 text-xs font-bold text-black">
-              BEST
-            </span>
-          )}
 
         </div>
 
@@ -54,18 +53,18 @@ export default function ProductCard({
       <div className="space-y-3 p-5">
 
         <h3 className="line-clamp-1 text-lg font-bold text-white">
-          {product.title}
+          {product.basicInfo.title}
         </h3>
 
         <div className="flex items-center gap-3">
 
           <span className="text-xl font-bold text-white">
-            ₹{product.price}
+            ₹{product.pricing.sellingPrice}
           </span>
 
-          {product.comparePrice && (
+          {product.pricing.comparePrice > 0 && (
             <span className="text-sm text-zinc-500 line-through">
-              ₹{product.comparePrice}
+              ₹{product.pricing.comparePrice}
             </span>
           )}
 
