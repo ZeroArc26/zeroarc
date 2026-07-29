@@ -226,7 +226,7 @@ export const productSchema = z.object({
    Types
 ----------------------------------------- */
 
-export type ProductFormValues = z.input<
+export type ProductFormValues = z.infer<
   typeof productSchema
 >;
 

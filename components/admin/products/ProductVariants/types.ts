@@ -22,14 +22,26 @@ export type VariantPreset =
   | "full"
   | "custom";
 
+/* -------------------------------- */
+/* Shared Setter Type               */
+/* -------------------------------- */
+
+export type SetVariants = (
+  value: Variant[] | ((prev: Variant[]) => Variant[])
+) => void;
+
+/* -------------------------------- */
+/* Component Props                  */
+/* -------------------------------- */
+
 export interface VariantGeneratorProps {
   variants: Variant[];
-  setVariants: React.Dispatch<React.SetStateAction<Variant[]>>;
+  setVariants: SetVariants;
 }
 
 export interface VariantTableProps {
   variants: Variant[];
-  setVariants: React.Dispatch<React.SetStateAction<Variant[]>>;
+  setVariants: SetVariants;
 }
 
 export interface VariantSummaryProps {

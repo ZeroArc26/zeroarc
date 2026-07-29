@@ -3,6 +3,7 @@ import {
   Package,
   ShoppingCart,
   Users,
+  FolderTree,
 } from "lucide-react";
 
 import RevenueAnalytics from "@/components/admin/dashboard/RevenueAnalytics";
@@ -12,8 +13,10 @@ import TopProducts from "@/components/admin/dashboard/TopProducts";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import LowStockProducts from "@/components/admin/dashboard/LowStockProducts";
 import ActivityFeed from "@/components/admin/dashboard/ActivityFeed";
+import { getDashboardStats } from "@/lib/actions/dashboard/getDashboardStats";
 
-export default function AdminDashboardPage() {
+export default async function AdminDashboardPage() {
+  const stats = await getDashboardStats();
   return (
     <div className="space-y-8">
       <PageHeader
@@ -24,17 +27,17 @@ export default function AdminDashboardPage() {
       {/* Stats Cards */}
       <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
-          title="Revenue"
-          value="₹84,250"
-          description="Total Revenue"
-          icon={IndianRupee}
-          trend="+12.4%"
-          trendUp
-        />
+  title="Revenue"
+  value={`₹${stats.revenue}`}
+  description="Total Revenue"
+  icon={IndianRupee}
+  trend="+12.4%"
+  trendUp
+/>
 
         <StatsCard
           title="Orders"
-          value={156}
+          value={stats.orders}
           description="Total Orders"
           icon={ShoppingCart}
           trend="+8.2%"
@@ -43,7 +46,7 @@ export default function AdminDashboardPage() {
 
         <StatsCard
           title="Products"
-          value={48}
+          value={stats.products}
           description="Products Available"
           icon={Package}
           trend="+4"
@@ -52,24 +55,35 @@ export default function AdminDashboardPage() {
 
         <StatsCard
           title="Customers"
-          value={1294}
+          value={stats.customers}
           description="Registered Users"
           icon={Users}
           trend="+18.7%"
           trendUp
         />
+
+        <StatsCard
+  title="Categories"
+  value={stats.categories}
+  description="Total Categories"
+  icon={FolderTree}
+  trend="+1"
+  trendUp
+/>
       </section>
 
       {/* Analytics + Orders */}
       <section className="grid gap-6 xl:grid-cols-3">
   <div className="space-y-6 xl:col-span-2">
     <RevenueAnalytics />
-    <TopProducts />
+    <TopProducts products={stats.topProducts} />
   </div>
 
   <div className="space-y-6">
     <RecentOrders />
-    <LowStockProducts />
+    <LowStockProducts
+  products={stats.lowStockProducts}
+/>
   </div>
 </section>
 

@@ -93,11 +93,12 @@ export default function VariantGenerator({
 
   const handleGenerate = () => {
     const generated = generateVariants(
-      selectedColors,
-      selectedSizes,
-      Number(price),
-      Number(stock)
-    );
+  selectedColors,
+  selectedSizes,
+  Number(price),
+  Number(stock),
+  DEFAULT_COLORS
+);
 
     setVariants(generated);
   };

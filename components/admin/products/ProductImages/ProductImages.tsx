@@ -12,7 +12,7 @@ import ImageDropzone from "./ImageDropzone";
 import ImageGrid from "./ImageGrid";
 import ImagePreviewModal from "./ImagePreviewModal";
 
-import { useProductImages } from "./hooks/useProductImages";
+import { useProductImages } from "./hooks/useImageUploader";
 
 export default function ProductImages() {
   const {
@@ -46,7 +46,7 @@ const colors =
             .filter(Boolean)
         ),
       ]
-    : ["Black", "White", "Beige"];
+    : [];
 
     console.log("Variants:", variants);
 console.log("Colors:", colors);
@@ -115,6 +115,18 @@ useEffect(() => {
   return (
     <>
       <div className="space-y-8">
+
+        {colors.length === 0 && (
+  <div className="rounded-2xl border border-dashed border-zinc-700 p-10 text-center">
+    <h3 className="text-lg font-semibold text-white">
+      No Variants Generated
+    </h3>
+
+    <p className="mt-2 text-sm text-zinc-400">
+      Generate product variants first to upload color-wise images.
+    </p>
+  </div>
+)}
 
       {colors.map((color) => (
   <div

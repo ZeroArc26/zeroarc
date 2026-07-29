@@ -20,8 +20,12 @@ export async function uploadImage(
   onProgress(80);
 
   if (!response.ok) {
-    throw new Error("Upload failed.");
-  }
+  const errorText = await response.text();
+
+  console.log("UPLOAD ERROR RESPONSE:", errorText);
+
+  throw new Error(errorText || "Upload failed.");
+}
 
   const data = await response.json();
 

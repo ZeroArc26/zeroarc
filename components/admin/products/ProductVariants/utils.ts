@@ -31,7 +31,11 @@ export function generateVariants(
   colors: string[],
   sizes: string[],
   price: number,
-  stock: number
+  stock: number,
+  colorList: {
+    name: string;
+    hex: string;
+  }[]
 ): Variant[] {
   const variants: Variant[] = [];
 
@@ -39,13 +43,18 @@ export function generateVariants(
 
   colors.forEach((color) => {
     sizes.forEach((size) => {
+
+      const colorInfo = colorList.find(
+  (item) => item.name === color
+);
+
       variants.push({
         id: crypto.randomUUID(),
 
         color,
         size,
 
-        colorHex: "",
+        colorHex: colorInfo?.hex ?? "#000000",
 
         sku: generateVariantSKU(color, size, index),
         barcode: generateVariantBarcode(index),

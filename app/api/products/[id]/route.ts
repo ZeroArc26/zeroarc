@@ -155,3 +155,67 @@ export async function PUT(
     );
   }
 }
+
+/* ----------------------------------------
+   DELETE Product
+----------------------------------------- */
+
+export async function DELETE(
+  req: Request,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    await connectDB();
+
+    const { id } = await params;
+
+    if (!Types.ObjectId.isValid(id)) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Invalid product ID.",
+        },
+        {
+          status: 400,
+        }
+      );
+    }
+
+    const deletedProduct =
+      await Product.findByIdAndDelete(id);
+
+    if (!deletedProduct) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Product not found.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Product deleted successfully.",
+      },
+      {
+        status: 200,
+      }
+    );
+  } catch (error) {
+    console.error("DELETE Product Error:", error);
+
+    return NextResponse.json(
+      {
+        success: false,
+        message: "Internal server error.",
+      },
+      {
+        status: 500,
+      }
+    );
+  }
+}

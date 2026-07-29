@@ -1,9 +1,12 @@
 import mongoose from "mongoose";
 
-const MONGODB_URI = process.env.MONGODB_URI;
+const MONGODB_URI: string =
+  process.env.MONGODB_URI || "";
 
 if (!MONGODB_URI) {
-  throw new Error("Please define the MONGODB_URI environment variable.");
+  throw new Error(
+    "Please define the MONGODB_URI environment variable."
+  );
 }
 
 declare global {
@@ -16,22 +19,38 @@ declare global {
 }
 
 const cached =
-  global.mongooseCache ??
+  global.mongooseCache ||
   (global.mongooseCache = {
     conn: null,
     promise: null,
   });
 
 export default async function connectDB() {
-  if (cached.conn) return cached.conn;
-
-  if (!cached.promise) {
-    cached.promise = mongoose.connect(MONGODB_URI!, {
-      dbName: "zeroarc",
-    });
+  if (cached.conn) {
+    return cached.conn;
   }
 
-  cached.conn = await cached.promise;
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(
+      MONGODB_URI,
+      {
+        dbName: "zeroarc",
+      }
+    );
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null;
+
+    console.error(
+      "MongoDB Connection Failed:",
+      error
+    );
+
+    throw error;
+  }
 
   return cached.conn;
 }

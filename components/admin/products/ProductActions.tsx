@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   MoreHorizontal,
   Eye,
@@ -31,15 +32,33 @@ export default function ProductActions({
   productId,
   productName = "this product",
 }: ProductActionsProps) {
+  const router = useRouter();
+
   const [open, setOpen] = useState(false);
 
-  const handleDelete = () => {
-    console.log("Delete Product:", productId);
+  const handleDelete = async () => {
+    try {
+      const response = await fetch(
+        `/api/products/${productId}`,
+        {
+          method: "DELETE",
+        }
+      );
 
-    // TODO:
-    // await deleteProduct(productId)
+      const result = await response.json();
 
-    setOpen(false);
+      if (!response.ok) {
+        throw new Error(result.message);
+      }
+
+      setOpen(false);
+
+      router.refresh();
+    } catch (error) {
+      console.error("Delete Product Error:", error);
+
+      alert("Failed to delete product.");
+    }
   };
 
   return (
