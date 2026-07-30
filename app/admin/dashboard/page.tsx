@@ -76,14 +76,12 @@ export default async function AdminDashboardPage() {
       <section className="grid gap-6 xl:grid-cols-3">
   <div className="space-y-6 xl:col-span-2">
     <RevenueAnalytics />
-    <TopProducts products={stats.topProducts} />
+    <TopProducts />
   </div>
 
   <div className="space-y-6">
     <RecentOrders />
-    <LowStockProducts
-  products={stats.lowStockProducts}
-/>
+    <LowStockProducts />
   </div>
 </section>
 

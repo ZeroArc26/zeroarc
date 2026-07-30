@@ -2,10 +2,7 @@ import Link from "next/link";
 import { AlertTriangle } from "lucide-react";
 
 import DashboardSection from "@/components/admin/shared/DashboardSection";
-
-interface LowStockProductsProps {
-  products: any[];
-}
+import { getLowStockProducts } from "@/lib/actions/dashboard/getLowStockProducts";
 
 
 function getBadgeStyle(stock: number) {
@@ -21,9 +18,8 @@ function getBadgeStyle(stock: number) {
 }
 
 
-export default function LowStockProducts({
-  products,
-}: LowStockProductsProps) {
+export default async function LowStockProducts() {
+  const lowStockProducts = await getLowStockProducts();
 
   return (
     <DashboardSection
@@ -38,66 +34,57 @@ export default function LowStockProducts({
         </Link>
       }
     >
-
       <div className="space-y-4">
 
-        {products.length === 0 ? (
-          <p className="text-sm text-zinc-400">
+        {lowStockProducts.length === 0 ? (
+          <p className="text-sm text-zinc-500">
             No low stock products.
           </p>
         ) : (
 
-          products.map((product) => {
+          lowStockProducts.map((product) => (
+            <div
+              key={product.id}
+              className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950/50 p-4 transition-all duration-300 hover:border-red-500/30 hover:bg-zinc-900"
+            >
 
-            const stock =
-              product.inventory.quantity;
+              <div className="flex items-center gap-3">
 
-
-            return (
-              <div
-                key={product._id}
-                className="flex items-center justify-between rounded-2xl border border-zinc-800 bg-zinc-950/50 p-4 transition-all duration-300 hover:border-red-500/30 hover:bg-zinc-900"
-              >
-
-                <div className="flex items-center gap-3">
-
-                  <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500/10">
-                    <AlertTriangle className="h-5 w-5 text-red-400" />
-                  </div>
-
-
-                  <div>
-
-                    <h3 className="font-medium text-white">
-                      {product.basicInfo.title}
-                    </h3>
-
-
-                    <p className="text-xs text-zinc-500">
-                      Inventory Alert
-                    </p>
-
-                  </div>
-
+                {/* Alert Icon */}
+                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-red-500/10">
+                  <AlertTriangle className="h-5 w-5 text-red-400" />
                 </div>
 
 
-                <span
-                  className={`rounded-full px-3 py-1 text-xs font-medium ${getBadgeStyle(
-                    stock
-                  )}`}
-                >
-                  Only {stock} Left
-                </span>
+                {/* Product Info */}
+                <div>
+                  <h3 className="font-medium text-white">
+                    {product.name}
+                  </h3>
 
+                  <p className="text-xs text-zinc-500">
+                    Inventory Alert
+                  </p>
+                </div>
 
               </div>
-            );
-          })
+
+
+              {/* Stock Badge */}
+              <span
+                className={`rounded-full px-3 py-1 text-xs font-medium ${getBadgeStyle(
+                  product.stock
+                )}`}
+              >
+                Only {product.stock} Left
+              </span>
+
+            </div>
+          ))
+
         )}
 
       </div>
-
     </DashboardSection>
   );
 }
