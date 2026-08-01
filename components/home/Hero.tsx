@@ -1,11 +1,17 @@
+"use client";
+
 import Image from "next/image";
+import { useState } from "react";
+import { ChevronDown } from "lucide-react";
+
+const SLIDES = ["01", "02", "03", "04"];
 
 export default function Hero() {
+  const [active, setActive] = useState(0);
+
   return (
-    <section className="relative min-h-[800px] h-[calc(100vh-120px)] overflow-hidden bg-black text-white">
-
+    <section className="relative min-h-[650px] h-[calc(100vh-140px)] overflow-hidden bg-black text-white">
       {/* Background */}
-
       <div className="absolute inset-0">
         <Image
           src="/images/hero/hero-bg.png"
@@ -14,112 +20,97 @@ export default function Hero() {
           priority
           className="object-cover opacity-40"
         />
-
-        <div className="absolute inset-0 bg-gradient-to-r from-black/75 via-black/45 to-black/10" />
+        <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/10" />
       </div>
 
-      {/* Main Container */}
-
-      <div className="relative z-10 mx-auto flex h-full max-w-[1700px] px-10 xl:px-20">
-
+      <div className="relative z-10 mx-auto flex h-full max-w-[1700px] items-center px-10 xl:px-20">
         {/* ================= LEFT ================= */}
+        <div className="flex w-[45%] flex-col justify-center">
+          <p className="mb-4 text-[20px] tracking-[0.28em] text-violet-500">
+            次の物語を、着よう
+          </p>
 
-        <div className="flex w-[45%] items-center justify-start pb-12">
-
-          <div className="max-w-[720px]">
-
-            {/* Japanese */}
-
-            <p className="mb-6 -mt-20 text-[22px] tracking-[0.28em] text-violet-500">
-              次の物語を、着よう
-            </p>
-
-            {/* Heading */}
-
-            <h1
-              className="
-                font-[family:var(--font-space)]
-                uppercase
-                font-bold
-                leading-[0.84]
-                tracking-[-0.08em]
-                text-[clamp(7.2rem,8vw,10.5rem)]
-              "
-            >
-              WEAR YOUR
-              <br />
-              NEXT ARC
-            </h1>
-
-            {/* Description */}
-
-            <p className="mt-6 max-w-[520px] text-[23px] leading-[2.1rem] text-zinc-300">
-              Premium streetwear inspired by anime,
-              <br />
-              culture and limitless imagination.
-            </p>
-
-            {/* Buttons */}
-
-            <div className="mt-8 flex gap-6">
-
-              <button className="rounded-xl bg-violet-600 px-12 py-5 text-sm font-semibold tracking-[0.08em] transition hover:bg-violet-500">
-                SHOP MEN →
-              </button>
-
-              <button className="rounded-xl border border-zinc-600 px-12 py-5 text-sm font-semibold tracking-[0.08em] transition hover:bg-white hover:text-black">
-                SHOP WOMEN →
-              </button>
-
-            </div>
-
-          </div>
-
-        </div>
-
-        {/* ================= RIGHT ================= */}
-
-        <div className="relative flex w-[55%] items-center justify-center">
-
-          <div
+          <h1
             className="
-              relative
-              h-full
-              w-full
-              flex
-              items-center
-              justify-center
+              font-[family:var(--font-space)]
+              uppercase
+              font-bold
+              leading-[0.92]
+              tracking-[-0.05em]
+              text-[clamp(3.5rem,5.2vw,5.5rem)]
             "
           >
+            WEAR YOUR
+            <br />
+            NEXT ARC
+          </h1>
 
-            <Image
-  src="/images/hero/featured-shirt.png"
-  alt="ZeroArc Featured"
-  width={1200}
-  height={1200}
-  priority
-  className="
-    w-[1750px]
-    max-w-none
-    object-contain
-    translate-x-12
-    -translate-y-10
-    drop-shadow-[0_70px_160px_rgba(168,85,247,0.55)]
-    pointer-events-none
-    select-none
-  "
-/>
+          <p className="mt-6 max-w-[460px] text-[17px] leading-[1.7] text-zinc-300">
+            Premium streetwear inspired by anime,
+            <br />
+            culture and limitless imagination.
+          </p>
 
+          <div className="mt-8 flex gap-5">
+            <button className="rounded-xl bg-violet-600 px-8 py-4 text-sm font-semibold tracking-[0.08em] transition hover:bg-violet-500">
+              SHOP MEN →
+            </button>
+            <button className="rounded-xl border border-zinc-600 px-8 py-4 text-sm font-semibold tracking-[0.08em] transition hover:bg-white hover:text-black">
+              SHOP WOMEN →
+            </button>
           </div>
-
         </div>
 
+        {/* ================= RIGHT (layered model) ================= */}
+        <div className="relative flex h-full w-[55%] items-center justify-center">
+  <div className="relative h-[78%] aspect-[1024/1536] -translate-y-2">
+            <Image
+              src="/images/hero/hero-smoke.png"
+              alt=""
+              fill
+              className="object-contain"
+            />
+            <Image
+              src="/images/hero/hero-ring.png"
+              alt=""
+              fill
+              className="object-contain"
+            />
+            <Image
+              src="/images/hero/hero-model-1.png"
+              alt="ZeroArc model"
+              fill
+              priority
+              className="object-contain drop-shadow-[0_40px_100px_rgba(168,85,247,0.5)]"
+            />
+          </div>
+        </div>
+
+        {/* Slide numbers */}
+        <div className="absolute right-6 top-[18%] hidden flex-col items-end gap-6 xl:flex">
+          {SLIDES.map((num, i) => (
+            <button
+              key={num}
+              onClick={() => setActive(i)}
+              className={`flex items-center gap-3 text-sm font-semibold tracking-widest transition ${
+                active === i ? "text-white" : "text-zinc-600"
+              }`}
+            >
+              {active === i && <span className="h-[2px] w-6 bg-violet-500" />}
+              {num}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Bottom Fade */}
+      {/* Scroll down */}
+      <div className="absolute bottom-10 right-10 z-10 hidden items-center gap-2 text-xs tracking-[0.2em] text-zinc-400 xl:flex">
+        SCROLL DOWN
+        <ChevronDown className="h-4 w-4 animate-bounce" />
+      </div>
 
+      {/* Bottom fade */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-black via-black/60 to-transparent" />
-
     </section>
   );
 }
