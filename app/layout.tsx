@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter, Space_Grotesk } from "next/font/google";
+import { Inter, Space_Grotesk, Anton } from "next/font/google";
 
 import "./globals.css";
 
@@ -15,6 +15,12 @@ const spaceGrotesk = Space_Grotesk({
   variable: "--font-space",
 });
 
+const anton = Anton({
+  subsets: ["latin"],
+  weight: "400",
+  variable: "--font-anton",
+});
+
 export const metadata: Metadata = {
   title: "ZeroArc | Wear Your Next Story",
   description: "Premium Anime Streetwear Brand",
@@ -28,10 +34,8 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body
-        className={`${inter.variable} ${spaceGrotesk.variable} antialiased`}
+        className={`${inter.variable} ${spaceGrotesk.variable} ${anton.variable} antialiased`}
       >
-        
-
         <Toaster
           richColors
           position="top-right"

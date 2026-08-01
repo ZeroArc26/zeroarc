@@ -1,154 +1,107 @@
-"use client";
+import { getCustomers } from "@/lib/actions/customers/getCustomers";
+import { ICustomer } from "@/models/Customer";
+import { getCustomerStats } from "@/lib/actions/customers/getCustomerStats";
 
-import { useEffect, useState } from "react";
-import Link from "next/link";
+import CustomerHeader from "@/components/admin/customers/CustomerHeader";
+import CustomerStats from "@/components/admin/customers/CustomerStats";
+import CustomerToolbar from "@/components/admin/customers/CustomerToolbar";
+import CustomerTable from "@/components/admin/customers/CustomerTable";
 
-interface Customer {
-  customer: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    phone: string;
-  };
 
-  totalOrders: number;
+type CustomersPageProps = {
+  searchParams: Promise<{
+    search?: string;
+    status?: "active" | "blocked";
+    page?: string;
+  }>;
+};
 
-  totalSpent: number;
+export default async function CustomersPage({
+  searchParams,
+}: CustomersPageProps) {
 
-  lastOrder: string;
+  const params = await searchParams;
 
-  firstOrder: string;
-}
+const search = params.search ?? "";
 
-export default function CustomersPage() {
-  const [customers, setCustomers] = useState<Customer[]>([]);
+const status = params.status;
 
-  const [loading, setLoading] = useState(true);
+const page = Number(params.page ?? "1");
 
-  useEffect(() => {
-    fetchCustomers();
-  }, []);
+const limit = 10;
 
-  async function fetchCustomers() {
-    try {
-      const res = await fetch("/api/customers");
+  const result = await getCustomers({
+  search,
+  status,
+  page,
+  limit,
+});
+  const statsResult = await getCustomerStats();
 
-      const data = await res.json();
+  const customers: ICustomer[] =
+  result.success && result.data
+    ? (result.data as ICustomer[])
+    : [];
 
-      if (data.success) {
-        setCustomers(data.customers);
-      }
+    const pagination =
+  result.success && result.pagination
+    ? result.pagination
+    : {
+        total: 0,
+        page: 1,
+        limit: 10,
+        totalPages: 1,
+      };
 
-    } catch (error) {
-      console.error(error);
+    const stats = statsResult.success
+  ? statsResult.data
+  : {
+      totalCustomers: 0,
+      newCustomers: 0,
+      returningCustomers: 0,
+      totalRevenue: 0,
+    };
 
-    } finally {
-      setLoading(false);
-    }
-  }
+  return (
+    <div className="space-y-8">
 
-  if (loading) {
-    return (
-      <main className="min-h-screen bg-[#09090B] flex items-center justify-center text-white">
-        <h1 className="text-4xl font-bold">
-          Loading Customers...
-        </h1>
-      </main>
-    );
-  }
+      <CustomerHeader />
 
-    return (
-    <main className="min-h-screen bg-[#09090B] py-32 text-white">
+      <CustomerStats
+  totalCustomers={stats.totalCustomers}
+  newCustomers={stats.newCustomers}
+  returningCustomers={stats.returningCustomers}
+  totalRevenue={stats.totalRevenue}
+/>
 
-      <div className="mx-auto max-w-7xl px-6">
+      <CustomerToolbar />
+          {customers.length === 0 ? (
 
-        <div className="flex items-center justify-between">
+        <div className="flex min-h-[400px] items-center justify-center rounded-3xl border border-dashed bg-card">
 
-          <div>
+          <div className="space-y-3 text-center">
 
-            <h1 className="text-5xl font-black">
-              Customers
-            </h1>
+            <h2 className="text-2xl font-semibold">
+              No Customers Found
+            </h2>
 
-            <p className="mt-3 text-zinc-400">
-              Manage all your customers.
+            <p className="text-muted-foreground">
+              Your store doesn't have any customers yet.
             </p>
 
           </div>
 
         </div>
 
-        <div className="mt-12 grid gap-8 md:grid-cols-2 xl:grid-cols-3">
+      ) : (
 
-          {customers.length === 0 ? (
+        <CustomerTable
+  customers={customers}
+  pagination={pagination}
+/>
 
-            <div className="col-span-full rounded-3xl border border-zinc-800 bg-zinc-900/40 p-12 text-center">
+      )}
 
-              <h2 className="text-3xl font-bold">
-                No Customers Found
-              </h2>
-
-            </div>
-
-          ) : (
-
-            customers.map((item) => (
-                              <div
-                key={item.customer.email}
-                className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 transition hover:border-violet-500"
-              >
-
-                <h2 className="text-2xl font-bold">
-                  {item.customer.firstName} {item.customer.lastName}
-                </h2>
-
-                <p className="mt-2 text-zinc-400">
-                  {item.customer.email}
-                </p>
-
-                <p className="text-zinc-500">
-                  {item.customer.phone}
-                </p>
-
-                <div className="mt-6 space-y-2">
-
-                  <div className="flex justify-between">
-                    <span>Total Orders</span>
-                    <span>{item.totalOrders}</span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span>Total Spent</span>
-                    <span className="font-bold text-violet-400">
-                      ₹{item.totalSpent}
-                    </span>
-                  </div>
-
-                  <div className="flex justify-between">
-                    <span>Last Order</span>
-                    <span>
-                      {new Date(item.lastOrder).toLocaleDateString()}
-                    </span>
-                  </div>
-
-                </div>
-
-                <Link
-                  href={`/admin/customers/${encodeURIComponent(item.customer.email)}`}
-                  className="mt-8 block rounded-xl bg-violet-600 py-3 text-center font-bold transition hover:bg-violet-700"
-                >
-                  View Profile
-                </Link>
-
-              </div>
-                          ))
-
-          )}
-
-        </div>
-
-      </div>
-
-    </main>
+    </div>
   );
 }
