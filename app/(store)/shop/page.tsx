@@ -6,8 +6,8 @@ export default async function ShopPage() {
   await connectDB();
 
   const products = await Product.find({
-    active: true,
-  }).lean();
+  "publish.status": "active",
+}).lean();
 
   return (
     <main className="min-h-screen bg-black pt-28">

@@ -42,6 +42,7 @@ export default function ProductForm({
         description: "",
         brand: "",
         category: "",
+        audience: "unisex",
         tags: [],
       },
 

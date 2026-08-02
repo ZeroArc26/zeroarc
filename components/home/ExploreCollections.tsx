@@ -15,10 +15,10 @@ const COLLECTIONS = [
     href: "/collections/oversized",
   },
   {
-    name: "Minimal",
+    name: "Regular",
     subtitle: "Collection",
     image: "/images/collections/collection-minimal.png",
-    href: "/collections/minimal",
+    href: "/collections/regular",
   },
 ];
 

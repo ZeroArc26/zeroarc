@@ -19,8 +19,8 @@ export async function GET(
     const { slug } = await params;
 
     const product = await Product.findOne({
-      slug,
-      active: true,
+      "basicInfo.slug": slug,
+      "publish.status": "active",
     });
 
     if (!product) {

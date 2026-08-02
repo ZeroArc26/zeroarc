@@ -45,6 +45,8 @@ export interface ProductBasicInfo {
 
   category: string;
 
+  audience: "men" | "women" | "unisex";
+
   tags: string[];
 }
 

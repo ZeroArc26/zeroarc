@@ -81,6 +81,8 @@ export const basicInfoSchema = z.object({
     .min(2)
     .max(60),
 
+  audience: z.enum(["men", "women", "unisex"]),
+
   tags: z
     .array(z.string().trim())
     .default([]),
@@ -226,10 +228,6 @@ export const productSchema = z.object({
    Types
 ----------------------------------------- */
 
-export type ProductFormValues = z.infer<
-  typeof productSchema
->;
+export type ProductFormValues = z.infer<typeof productSchema>;
 
-export type Product = z.output<
-  typeof productSchema
->;
+export type Product = z.output<typeof productSchema>;

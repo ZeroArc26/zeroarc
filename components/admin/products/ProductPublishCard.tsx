@@ -7,6 +7,7 @@ import {
   CheckCircle2,
   AlertCircle,
 } from "lucide-react";
+import { useFormContext } from "react-hook-form";
 
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
@@ -25,6 +26,10 @@ type ProductPublishCardProps = {
 export default function ProductPublishCard({
   mode = "create",
 }: ProductPublishCardProps) {
+  const { setValue, watch } = useFormContext();
+
+  const status = watch("publish.status");
+
   const completed = 2;
   const total = 5;
   const progress = (completed / total) * 100;
@@ -121,7 +126,15 @@ export default function ProductPublishCard({
         <div className="space-y-2">
           <Label>Status</Label>
 
-          <Select defaultValue="draft">
+          <Select
+            value={status}
+            onValueChange={(value) =>
+              setValue("publish.status", value, {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
+            }
+          >
             <SelectTrigger className="rounded-xl">
               <SelectValue />
             </SelectTrigger>
@@ -193,6 +206,9 @@ export default function ProductPublishCard({
       type="submit"
       variant="secondary"
       className="w-full gap-2 rounded-xl"
+      onClick={() =>
+        setValue("publish.status", "draft", { shouldValidate: true })
+      }
     >
       <Save size={16} />
       Save Draft
@@ -201,6 +217,9 @@ export default function ProductPublishCard({
     <Button
       type="submit"
       className="w-full gap-2 rounded-xl"
+      onClick={() =>
+        setValue("publish.status", "active", { shouldValidate: true })
+      }
     >
       <Globe size={16} />
       Publish Product

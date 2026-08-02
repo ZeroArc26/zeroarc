@@ -13,6 +13,13 @@ import {
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 export default function ProductBasicInfo() {
   const {
@@ -28,6 +35,7 @@ export default function ProductBasicInfo() {
   const metaTitle = watch("seo.metaTitle") ?? "";
   const metaDescription = watch("seo.metaDescription") ?? "";
   const sku = watch("inventory.sku") ?? "";
+  const audience = watch("basicInfo.audience") ?? "unisex";
 
   /* ------------------------------------------ */
   /* Auto Slug                                  */
@@ -215,7 +223,7 @@ useEffect(() => {
         </div>
                 {/* Brand & Category */}
 
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-3">
 
           {/* Brand */}
 
@@ -269,6 +277,49 @@ useEffect(() => {
 
             <p className="mt-2 text-xs text-zinc-500">
               Categories help customers browse products more easily.
+            </p>
+
+          </div>
+
+          {/* Audience */}
+
+          <div>
+
+            <div className="mb-2 flex items-center justify-between">
+
+              <Label htmlFor="audience">
+                Audience
+              </Label>
+
+              <span className="text-xs text-red-400">
+                Required
+              </span>
+
+            </div>
+
+            <Select
+              value={audience}
+              onValueChange={(value) =>
+                setValue("basicInfo.audience", value as "men" | "women" | "unisex", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+            >
+              <SelectTrigger id="audience">
+                <SelectValue placeholder="Select audience" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="men">Men</SelectItem>
+                <SelectItem value="women">Women</SelectItem>
+                <SelectItem value="unisex">Unisex</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <p className="mt-2 text-xs text-zinc-500">
+              Decides whether this product shows up on the Men&apos;s or
+              Women&apos;s collection page.
             </p>
 
           </div>
