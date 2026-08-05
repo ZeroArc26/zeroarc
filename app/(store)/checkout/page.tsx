@@ -84,8 +84,7 @@ export default function CheckoutPage() {
   const cartItems = mounted ? items : [];
   const totalItems = cartItems.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const shipping =
-    SHIPPING_METHODS.find((m) => m.id === shippingMethod)?.price ?? 0;
+  const shipping = paymentMethod === "cod" ? 99 : 0;
   const total = Math.max(subtotal + shipping - appliedDiscount, 0);
 
   useEffect(() => {
@@ -189,7 +188,6 @@ export default function CheckoutPage() {
       }
 
       toast.success("Order Placed Successfully!");
-      clearCart();
       router.push(`/order-success?orderId=${data.order._id}`);
     } catch (error) {
       console.error(error);
@@ -370,57 +368,13 @@ export default function CheckoutPage() {
               </div>
             </div>
 
-            {/* 2. Shipping Method */}
-            <div className="rounded-2xl border border-zinc-200 p-6">
-              <h2 className="mb-5 flex items-center gap-2 font-bold text-black">
-                <Truck className="h-4 w-4 text-violet-600" />
-                2. Shipping Method
-              </h2>
-
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                {SHIPPING_METHODS.map((method) => (
-                  <label
-                    key={method.id}
-                    className={`flex cursor-pointer items-center justify-between rounded-xl border p-4 transition ${
-                      shippingMethod === method.id
-                        ? "border-violet-600 bg-violet-50"
-                        : "border-zinc-200 hover:border-violet-300"
-                    }`}
-                  >
-                    <div className="flex items-center gap-3">
-                      <input
-                        type="radio"
-                        name="shippingMethod"
-                        checked={shippingMethod === method.id}
-                        onChange={() => setShippingMethod(method.id)}
-                        className="h-4 w-4 accent-violet-600"
-                      />
-                      <Truck className="h-4 w-4 text-zinc-500" />
-                      <div>
-                        <p className="text-sm font-semibold text-black">
-                          {method.label}
-                        </p>
-                        <p className="text-xs text-zinc-500">{method.meta}</p>
-                      </div>
-                    </div>
-                    <span
-                      className={`text-sm font-bold ${
-                        method.price === 0 ? "text-emerald-600" : "text-black"
-                      }`}
-                    >
-                      {method.price === 0 ? "FREE" : `₹${method.price}`}
-                    </span>
-                  </label>
-                ))}
-              </div>
-            </div>
 
             {/* 3. Payment Method */}
             <div className="rounded-2xl border border-zinc-200 p-6">
-              <h2 className="mb-5 flex items-center gap-2 font-bold text-black">
-                <CreditCard className="h-4 w-4 text-violet-600" />
-                3. Payment Method
-              </h2>
+<h2 className="mb-5 flex items-center gap-2 font-bold text-black">
+  <CreditCard className="h-4 w-4 text-violet-600" />
+  2. Payment Method
+</h2>
 
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
                 {PAYMENT_METHODS.map(({ id, label, icon: Icon }) => (
@@ -620,8 +574,8 @@ export default function CheckoutPage() {
             </div>
 
             {/* Promo banner */}
-            <div className="relative overflow-hidden rounded-2xl bg-violet-50 p-6">
-              <div className="pointer-events-none absolute -right-6 bottom-0 h-full w-40">
+            <div className="relative min-h-[280px] overflow-hidden rounded-2xl bg-violet-50 p-6">
+              <div className="pointer-events-none absolute -right-10 bottom-0 h-[260px] w-56">
                 <Image
                   src="/images/checkout/male-model.png"
                   alt=""
@@ -632,7 +586,7 @@ export default function CheckoutPage() {
 
               <div className="relative z-10 max-w-[130px]">
                 <h3 className="text-lg font-black uppercase leading-tight text-black">
-                  Wear Your <span className="text-violet-600">Next Story</span>
+                  Wear Your <span className="text-violet-600">Next Arc</span>
                 </h3>
                 <p className="mt-3 text-xs text-zinc-600">
                   Premium Anime Streetwear for Dreamers &amp; Rebels.

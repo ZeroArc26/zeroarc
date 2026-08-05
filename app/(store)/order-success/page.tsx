@@ -7,7 +7,7 @@ export default function OrderSuccessPage() {
   return (
     <Suspense
       fallback={
-        <main className="min-h-screen flex items-center justify-center bg-[#09090B] text-white">
+        <main className="flex min-h-screen items-center justify-center bg-white text-zinc-500">
           Loading...
         </main>
       }
