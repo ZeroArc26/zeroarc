@@ -1,21 +1,15 @@
-import { getInventory } from "@/lib/actions/inventory/getInventory";
-
 import InventoryHeader from "@/components/admin/inventory/dashboard/InventoryHeader";
-import InventoryTable from "@/components/admin/inventory/table/InventoryTable";
-import InventoryTableToolbar from "@/components/admin/inventory/table/InventoryTableToolbar";
+import InventoryListClient from "@/components/admin/inventory/table/InventoryListClient";
+
+import { getProductVariantInventory } from "@/lib/actions/inventory/getProductVariantInventory";
 
 export default async function InventoryListPage() {
-  const result = await getInventory();
-
-  const inventory = result.success ? result.data : [];
+  const { rows } = await getProductVariantInventory();
 
   return (
     <div className="space-y-6 p-6">
-      <InventoryHeader showManageButton={false} />
-
-      <InventoryTableToolbar />
-
-      <InventoryTable inventory={inventory} />
+      <InventoryHeader showManageButton={false} rows={rows} />
+      <InventoryListClient rows={rows} />
     </div>
   );
 }

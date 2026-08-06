@@ -6,6 +6,7 @@ import Product from "@/models/Product";
 import Customer from "@/models/Customer";
 import { getCurrentUser } from "@/lib/auth";
 import mongoose from "mongoose";
+import { getStoreSettings } from "@/lib/settings";
 
 // ======================
 // Helpers
@@ -54,6 +55,7 @@ export async function POST(req: Request) {
       shipping = 0,
       discount = 0,
       total = 0,
+      couponCode,
     } = body;
 
     const fullName = [customer?.firstName, customer?.lastName]
@@ -65,7 +67,8 @@ export async function POST(req: Request) {
     const taxableAmount = round2(priceAfterDiscount / 1.18);
     const totalTax = round2(priceAfterDiscount - taxableAmount);
 
-    const COMPANY_STATE = "West Bengal";
+    const settings = await getStoreSettings();
+    const COMPANY_STATE = settings.tax?.companyState || "West Bengal";
     const isInterState =
       (shippingAddress?.state || "").trim().toLowerCase() !==
       COMPANY_STATE.toLowerCase();
@@ -210,8 +213,8 @@ export async function POST(req: Request) {
         } else {
           await Customer.create({
             userId: currentUser?.id
-  ? new mongoose.Types.ObjectId(currentUser.id)
-  : undefined,
+              ? new mongoose.Types.ObjectId(currentUser.id)
+              : undefined,
             name: fullName || "Guest",
             email: customerEmail,
             phone: customer?.phone || "",
@@ -224,6 +227,34 @@ export async function POST(req: Request) {
       }
     } catch (customerSyncError) {
       console.error("Customer sync failed:", customerSyncError);
+    }
+
+    // ------------------------------------------------------------
+    // Track coupon usage. Best-effort — never blocks order creation.
+    // ------------------------------------------------------------
+    if (couponCode) {
+      try {
+        const Coupon = (await import("@/models/Coupon")).default;
+        const coupon = await Coupon.findOne({ code: couponCode.toUpperCase() });
+
+        if (coupon) {
+          coupon.usedCount += 1;
+
+          const email = (customer?.email || "").toLowerCase();
+          if (email) {
+            const usage = coupon.usedBy.find((u: any) => u.email === email);
+            if (usage) {
+              usage.count += 1;
+            } else {
+              coupon.usedBy.push({ email, count: 1 });
+            }
+          }
+
+          await coupon.save();
+        }
+      } catch (couponError) {
+        console.error("Coupon usage tracking failed:", couponError);
+      }
     }
 
     return NextResponse.json({

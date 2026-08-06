@@ -5,32 +5,29 @@ import CategoryStockChart from "@/components/admin/inventory/dashboard/CategoryS
 import LowStockWidget from "@/components/admin/inventory/dashboard/LowStockWidget";
 import RecentStockActivity from "@/components/admin/inventory/dashboard/RecentStockActivity";
 
-export default function InventoryDashboardPage() {
-  const inventoryStats = {
-    totalSkus: 325,
-    totalUnits: 12846,
-    lowStock: 8,
-    outOfStock: 3,
-  };
+import { getProductVariantInventory } from "@/lib/actions/inventory/getProductVariantInventory";
+
+export default async function InventoryDashboardPage() {
+  const { rows, stats, categoryBreakdown } = await getProductVariantInventory();
 
   return (
     <div className="space-y-8 p-6">
-      <InventoryHeader showManageButton />
+      <InventoryHeader showManageButton rows={rows} />
 
       <InventoryStats
-        totalSkus={inventoryStats.totalSkus}
-        totalUnits={inventoryStats.totalUnits}
-        lowStock={inventoryStats.lowStock}
-        outOfStock={inventoryStats.outOfStock}
+        totalSkus={stats.totalSkus}
+        totalUnits={stats.totalUnits}
+        lowStock={stats.lowStock}
+        outOfStock={stats.outOfStock}
       />
 
       <div className="grid gap-6 lg:grid-cols-2">
         <InventoryTrendChart />
-        <CategoryStockChart />
+        <CategoryStockChart data={categoryBreakdown} />
       </div>
 
       <div className="grid gap-6 lg:grid-cols-2">
-        <LowStockWidget />
+        <LowStockWidget rows={rows} />
         <RecentStockActivity />
       </div>
     </div>

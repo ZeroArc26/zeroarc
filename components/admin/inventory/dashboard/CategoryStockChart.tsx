@@ -1,109 +1,44 @@
 "use client";
 
 import {
-  PieChart,
-  Pie,
-  Cell,
+  Bar,
+  BarChart,
+  CartesianGrid,
   ResponsiveContainer,
   Tooltip,
+  XAxis,
+  YAxis,
 } from "recharts";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-const data = [
-  {
-    name: "Anime",
-    value: 420,
-  },
-  {
-    name: "Oversized",
-    value: 280,
-  },
-  {
-    name: "Minimal",
-    value: 180,
-  },
-  {
-    name: "Limited",
-    value: 120,
-  },
-];
+interface Props {
+  data: { category: string; units: number }[];
+}
 
-const COLORS = [
-  "#7C3AED",
-  "#A855F7",
-  "#C084FC",
-  "#DDD6FE",
-];
-
-export default function CategoryStockChart() {
+export default function CategoryStockChart({ data }: Props) {
   return (
     <Card>
-
       <CardHeader>
-
-        <CardTitle>
-          Category Distribution
-        </CardTitle>
-
+        <CardTitle>Stock by Category</CardTitle>
       </CardHeader>
 
-      <CardContent className="h-[350px]">
-
-                <ResponsiveContainer width="100%" height="100%">
-          <PieChart>
-            <Pie
-              data={data}
-              dataKey="value"
-              nameKey="name"
-              innerRadius={70}
-              outerRadius={110}
-              paddingAngle={4}
-            >
-              {data.map((_, index) => (
-                <Cell
-                  key={index}
-                  fill={COLORS[index % COLORS.length]}
-                />
-              ))}
-            </Pie>
-
-            <Tooltip />
-          </PieChart>
-        </ResponsiveContainer>
-
-        <div className="mt-6 grid grid-cols-2 gap-3">
-          {data.map((item, index) => (
-            <div
-              key={item.name}
-              className="flex items-center justify-between rounded-lg border p-3"
-            >
-              <div className="flex items-center gap-2">
-                <span
-                  className="h-3 w-3 rounded-full"
-                  style={{
-                    backgroundColor:
-                      COLORS[index % COLORS.length],
-                  }}
-                />
-
-                <span className="text-sm font-medium">
-                  {item.name}
-                </span>
-              </div>
-
-              <span className="text-sm text-muted-foreground">
-                {item.value}
-              </span>
-            </div>
-          ))}
-        </div>
-
+      <CardContent>
+        {data.length === 0 ? (
+          <div className="flex h-64 items-center justify-center text-sm text-muted-foreground">
+            No stock data yet.
+          </div>
+        ) : (
+          <ResponsiveContainer width="100%" height={260}>
+            <BarChart data={data}>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} />
+              <XAxis dataKey="category" tick={{ fontSize: 12 }} />
+              <YAxis tick={{ fontSize: 12 }} />
+              <Tooltip />
+              <Bar dataKey="units" fill="#8b5cf6" radius={[6, 6, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        )}
       </CardContent>
     </Card>
   );

@@ -1,10 +1,7 @@
 "use client";
 
+import Image from "next/image";
 import { Badge } from "@/components/ui/badge";
-
-import { Button } from "@/components/ui/button";
-
-import { Boxes } from "lucide-react";
 
 import {
   Table,
@@ -15,100 +12,79 @@ import {
   TableRow,
 } from "@/components/ui/table";
 
-import { InventoryDocument } from "@/lib/types/inventory";
-
-import EditInventoryDialog from "../dialogs/EditInventoryDialog";
-import DeleteInventoryDialog from "../dialogs/DeleteInventoryDialog";
-
+import type { VariantInventoryRow } from "@/lib/actions/inventory/getProductVariantInventory";
+import EditVariantStockDialog from "../dialogs/EditVariantStockDialog";
 
 interface InventoryTableProps {
-  inventory: InventoryDocument[];
+  rows: VariantInventoryRow[];
 }
 
-export default function InventoryTable({
-  inventory,
-}: InventoryTableProps) {
+export default function InventoryTable({ rows }: InventoryTableProps) {
   return (
     <div className="rounded-xl border bg-background overflow-hidden">
       <Table>
         <TableHeader>
           <TableRow>
             <TableHead>Product</TableHead>
+            <TableHead>Variant</TableHead>
             <TableHead>SKU</TableHead>
-            <TableHead>Warehouse</TableHead>
-            <TableHead>Available</TableHead>
-            <TableHead>Reserved</TableHead>
-            <TableHead>Incoming</TableHead>
+            <TableHead>Stock</TableHead>
+            <TableHead>Low Stock At</TableHead>
             <TableHead>Status</TableHead>
             <TableHead className="text-right">Actions</TableHead>
           </TableRow>
         </TableHeader>
 
         <TableBody>
-          {inventory.length === 0 ? (
+          {rows.length === 0 ? (
             <TableRow>
-              <TableCell
-                colSpan={8}
-                className="text-center py-10 text-muted-foreground"
-              >
+              <TableCell colSpan={7} className="text-center py-10 text-muted-foreground">
                 No inventory found.
               </TableCell>
             </TableRow>
           ) : (
-            inventory.map((item) => (
-              <TableRow key={item._id.toString()}>
+            rows.map((row) => (
+              <TableRow key={`${row.productId}-${row.variantId}`}>
                 <TableCell>
-                  {(item.productId as any)?.title ?? "-"}
+                  <div className="flex items-center gap-3">
+                    {row.productImage ? (
+                      <Image
+                        src={row.productImage}
+                        alt={row.productTitle}
+                        width={40}
+                        height={40}
+                        className="rounded-lg border object-cover"
+                      />
+                    ) : (
+                      <div className="h-10 w-10 rounded-lg border bg-muted" />
+                    )}
+                    <span>{row.productTitle}</span>
+                  </div>
                 </TableCell>
 
                 <TableCell>
-                  {item.variants[0]?.sku ?? "-"}
+                  {row.color} • {row.size}
                 </TableCell>
 
-                <TableCell>
-                  {item.warehouse}
-                </TableCell>
+                <TableCell className="font-mono text-xs">{row.sku}</TableCell>
+
+                <TableCell>{row.stock}</TableCell>
+
+                <TableCell>{row.lowStockThreshold}</TableCell>
 
                 <TableCell>
-                  {item.variants[0]?.availableStock}
+                  {row.stock === 0 ? (
+                    <Badge variant="destructive">Out of Stock</Badge>
+                  ) : row.stock <= row.lowStockThreshold ? (
+                    <Badge variant="secondary">Low Stock</Badge>
+                  ) : (
+                    <Badge>In Stock</Badge>
+                  )}
                 </TableCell>
-
-                <TableCell>
-                  {item.variants[0]?.reservedStock}
-                </TableCell>
-
-                <TableCell>
-                  {item.variants[0]?.incomingStock}
-                </TableCell>
-
-                <TableCell>
-  {item.variants[0]?.availableStock === 0 ? (
-    <Badge variant="destructive">
-      Out of Stock
-    </Badge>
-  ) : item.variants[0]?.availableStock <=
-    item.variants[0]?.lowStockThreshold ? (
-    <Badge variant="secondary">
-      Low Stock
-    </Badge>
-  ) : (
-    <Badge>
-      In Stock
-    </Badge>
-  )}
-</TableCell>
 
                 <TableCell className="text-right">
-  <div className="flex items-center justify-end gap-2">
-    <EditInventoryDialog inventory={item} />
-
-    <Button variant="ghost" size="icon" disabled>
-      <Boxes className="h-4 w-4" />
-    </Button>
-
-    <DeleteInventoryDialog inventory={item} />
-  </div>
-</TableCell>
+                  <EditVariantStockDialog row={row} />
+                </TableCell>
               </TableRow>
             ))
           )}

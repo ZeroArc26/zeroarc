@@ -5,6 +5,7 @@ import {
   Warehouse,
   ShoppingCart,
   Users,
+  Ticket,
   BarChart3,
   MessageSquare,
   Settings,
@@ -69,6 +70,11 @@ export const adminNavItems: AdminNavItem[] = [
         href: "/admin/dashboard/customers",
         icon: Users,
       },
+      {
+        title: "Coupons",
+        href: "/admin/dashboard/coupons",
+        icon: Ticket,
+      },
     ],
   },
 
@@ -77,12 +83,6 @@ export const adminNavItems: AdminNavItem[] = [
     href: "/admin/dashboard/analytics",
     icon: BarChart3,
     section: "INSIGHTS",
-  },
-
-  {
-    title: "Reviews",
-    href: "/admin/dashboard/reviews",
-    icon: MessageSquare,
   },
 
   {

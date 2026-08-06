@@ -5,6 +5,7 @@ export async function POST(request: Request) {
     const formData = await request.formData();
 
     const file = formData.get("file") as File;
+    const folder = (formData.get("folder") as string) || "products";
 
     if (!file) {
       return NextResponse.json(
@@ -17,59 +18,38 @@ export async function POST(request: Request) {
       );
     }
 
-    const buffer = Buffer.from(
-      await file.arrayBuffer()
-    );
+    const buffer = Buffer.from(await file.arrayBuffer());
 
     const filename = `${crypto.randomUUID()}-${file.name}`;
 
-
     const response = await fetch(
-      `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/products/${filename}`,
+      `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${folder}/${filename}`,
       {
         method: "PUT",
         headers: {
-          AccessKey:
-            process.env.BUNNY_STORAGE_API_KEY!,
-          "Content-Type":
-            file.type,
+          AccessKey: process.env.BUNNY_STORAGE_API_KEY!,
+          "Content-Type": file.type,
         },
         body: buffer,
       }
     );
 
-
     if (!response.ok) {
       const errorText = await response.text();
 
-      console.log(
-        "BUNNY UPLOAD ERROR:",
-        errorText
-      );
+      console.log("BUNNY UPLOAD ERROR:", errorText);
 
-      throw new Error(
-        "Bunny upload failed"
-      );
+      throw new Error("Bunny upload failed");
     }
 
-
-    const url =
-  `${process.env.BUNNY_CDN_URL}/products/${filename}`;
-
+    const url = `${process.env.BUNNY_CDN_URL}/${folder}/${filename}`;
 
     return NextResponse.json({
       success: true,
       url,
     });
-
-
   } catch (error) {
-
-    console.error(
-      "UPLOAD ERROR:",
-      error
-    );
-
+    console.error("UPLOAD ERROR:", error);
 
     return NextResponse.json(
       {

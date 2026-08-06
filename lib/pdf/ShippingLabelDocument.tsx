@@ -12,7 +12,6 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
-import { COMPANY } from "./company";
 import PseudoBarcode from "./PseudoBarcode";
 
 const styles = StyleSheet.create({
@@ -486,12 +485,30 @@ interface ShippingLabelDocumentProps {
   order: any;
   qrDataUrl: string;
   logoDataUrl?: string;
+  company: {
+    name: string;
+    tagline: string;
+    website: string;
+    phone: string;
+    email: string;
+    gstin: string;
+    state: string;
+    address?: {
+      line1: string;
+      line2: string;
+      city: string;
+      state: string;
+      pincode: string;
+      country: string;
+    };
+  };
 }
 
 export default function ShippingLabelDocument({
   order,
   qrDataUrl,
   logoDataUrl,
+  company,
 }: ShippingLabelDocumentProps) {
   const label = order.shippingLabel || {};
   const receiver = label.receiver || {};
@@ -513,13 +530,13 @@ export default function ShippingLabelDocument({
             )}
 
             <View>
-              <Text style={styles.brandName}>{COMPANY.name.replace(" CO.", "")}</Text>
-              <Text style={styles.brandTagline}>{COMPANY.tagline}</Text>
+              <Text style={styles.brandName}>{company.name.replace(" CO.", "")}</Text>
+              <Text style={styles.brandTagline}>{company.tagline}</Text>
 
               <View style={styles.contactRow}>
                 <View style={styles.contactItem}>
                   <IconGlobe />
-                  <Text style={styles.contactText}>{COMPANY.website}</Text>
+                  <Text style={styles.contactText}>{company.website}</Text>
                 </View>
               </View>
             </View>
@@ -594,19 +611,33 @@ export default function ShippingLabelDocument({
               </View>
               <Text style={styles.bodyLine}>FROM:</Text>
             </View>
-            <Text style={styles.boldName}>{COMPANY.name}</Text>
-            <Text style={styles.bodyLine}>GSTIN : {COMPANY.gstin}</Text>
-            <Text style={styles.bodyLine}>Phone : {COMPANY.phone}</Text>
-            <Text style={styles.bodyLine}>Website : {COMPANY.website}</Text>
+            <Text style={styles.boldName}>{company.name}</Text>
+            <Text style={styles.bodyLine}>GSTIN : {company.gstin}</Text>
+            <Text style={styles.bodyLine}>Phone : {company.phone}</Text>
+            <Text style={styles.bodyLine}>Website : {company.website}</Text>
             <Text style={[styles.bodyLine, { marginTop: 4, fontFamily: "Helvetica-Bold" }]}>
               ADDRESS :
             </Text>
-            <Text style={styles.addressDashLine}>
-              -----------------------------------------
-            </Text>
-            <Text style={styles.addressDashLine}>
-              -----------------------------------------
-            </Text>
+            {company.address?.line1 ? (
+              <>
+                <Text style={styles.bodyLine}>{company.address.line1}</Text>
+                {company.address.line2 && (
+                  <Text style={styles.bodyLine}>{company.address.line2}</Text>
+                )}
+                <Text style={styles.bodyLine}>
+                  {company.address.city}, {company.address.state} - {company.address.pincode}
+                </Text>
+              </>
+            ) : (
+              <>
+                <Text style={styles.addressDashLine}>
+                  -----------------------------------------
+                </Text>
+                <Text style={styles.addressDashLine}>
+                  -----------------------------------------
+                </Text>
+              </>
+            )}
           </View>
 
           <View style={styles.colHalf}>
@@ -751,7 +782,7 @@ export default function ShippingLabelDocument({
           <IconHeart />
           <View style={{ alignItems: "center" }}>
             <Text style={styles.footerText}>THANK YOU FOR CHOOSING ZEROARC</Text>
-            <Text style={styles.footerSub}>{COMPANY.tagline}</Text>
+            <Text style={styles.footerSub}>{company.tagline}</Text>
           </View>
         </View>
       </Page>

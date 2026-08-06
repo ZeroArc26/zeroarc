@@ -4,9 +4,7 @@ import connectDB from "@/lib/mongodb";
 import Admin from "@/models/Admin";
 
 import { requireAdmin } from "@/lib/auth/admin";
-import {
-  updateAdminProfileSchema,
-} from "@/lib/validations/admin-profile";
+import { updateAdminProfileSchema } from "@/lib/validations/admin-profile";
 
 export async function PATCH(req: NextRequest) {
   try {
@@ -22,7 +20,7 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: parsed.error.issues[0]?.message ?? "Validation failed."
+          message: parsed.error.issues[0]?.message ?? "Validation failed.",
         },
         { status: 400 }
       );
@@ -32,6 +30,7 @@ export async function PATCH(req: NextRequest) {
       currentAdmin._id,
       {
         name: parsed.data.name,
+        ...(parsed.data.avatar !== undefined && { avatar: parsed.data.avatar }),
       },
       {
         new: true,
@@ -51,9 +50,7 @@ export async function PATCH(req: NextRequest) {
         success: false,
         message: "Something went wrong.",
       },
-      {
-        status: 500,
-      }
+      { status: 500 }
     );
   }
 }

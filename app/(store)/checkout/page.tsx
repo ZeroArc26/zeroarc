@@ -29,14 +29,10 @@ import Navbar from "@/components/home/Navbar";
 import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
 
-// TODO (before launch): replace this hardcoded promo code with a real
-// coupon-validation API call.
-const DEMO_PROMO = { code: "ZERO300", discount: 300 };
-
 const SHIPPING_METHODS = [
-  { id: "standard", label: "Standard Delivery", meta: "3 – 5 business days", price: 0 },
-  { id: "express", label: "Express Delivery", meta: "1 – 2 business days", price: 149 },
-] as const;
+  { id: "standard" as const, label: "Standard Delivery", meta: "3 – 5 business days" },
+  { id: "express" as const, label: "Express Delivery", meta: "1 – 2 business days" },
+];
 
 const PAYMENT_METHODS = [
   { id: "upi", label: "UPI", icon: Smartphone },
@@ -54,6 +50,15 @@ export default function CheckoutPage() {
 
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    fetch("/api/settings/public")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) setStoreSettings(data.shipping);
+      })
+      .catch(() => {});
+  }, []);
 
   const [loading, setLoading] = useState(false);
 
@@ -77,14 +82,34 @@ export default function CheckoutPage() {
 
   const [upiId, setUpiId] = useState("");
 
+  const [storeSettings, setStoreSettings] = useState<{
+    freeShippingThreshold: number;
+    standardShippingRate: number;
+    expressShippingRate: number;
+    codCharge: number;
+    codAvailable: boolean;
+  } | null>(null);
+
   const [promoInput, setPromoInput] = useState("");
   const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [appliedCouponCode, setAppliedCouponCode] = useState("");
+  const [applyingPromo, setApplyingPromo] = useState(false);
   const [promoError, setPromoError] = useState("");
 
   const cartItems = mounted ? items : [];
   const totalItems = cartItems.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
-  const shipping = paymentMethod === "cod" ? 99 : 0;
+  const freeShippingThreshold = storeSettings?.freeShippingThreshold ?? 999;
+  const baseShippingRate =
+    shippingMethod === "express"
+      ? storeSettings?.expressShippingRate ?? 149
+      : storeSettings?.standardShippingRate ?? 0;
+  const codCharge = storeSettings?.codCharge ?? 99;
+
+  const shipping =
+    subtotal >= freeShippingThreshold
+      ? 0
+      : baseShippingRate + (paymentMethod === "cod" ? codCharge : 0);
   const total = Math.max(subtotal + shipping - appliedDiscount, 0);
 
   useEffect(() => {
@@ -100,13 +125,38 @@ export default function CheckoutPage() {
     setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
-  function handleApplyPromo() {
-    if (promoInput.trim().toUpperCase() === DEMO_PROMO.code) {
-      setAppliedDiscount(DEMO_PROMO.discount);
+  async function handleApplyPromo() {
+    if (!promoInput.trim()) return;
+
+    setApplyingPromo(true);
+    try {
+      const res = await fetch("/api/coupons/validate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          code: promoInput.trim(),
+          subtotal,
+          email: formData.email,
+        }),
+      });
+
+      const data = await res.json();
+
+      if (!data.success) {
+        setAppliedDiscount(0);
+        setAppliedCouponCode("");
+        setPromoError(data.message || "Invalid promo code");
+        return;
+      }
+
+      setAppliedDiscount(data.discount);
+      setAppliedCouponCode(data.code);
       setPromoError("");
-    } else {
-      setAppliedDiscount(0);
-      setPromoError("Invalid promo code");
+    } catch (error) {
+      console.error(error);
+      setPromoError("Failed to apply promo code.");
+    } finally {
+      setApplyingPromo(false);
     }
   }
 
@@ -178,6 +228,7 @@ export default function CheckoutPage() {
           shipping,
           discount: appliedDiscount,
           total,
+          couponCode: appliedCouponCode || undefined,
         }),
       });
 
@@ -440,9 +491,10 @@ export default function CheckoutPage() {
                   <button
                     type="button"
                     onClick={handleApplyPromo}
-                    className="shrink-0 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500"
+                    disabled={applyingPromo}
+                    className="shrink-0 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500 disabled:opacity-60"
                   >
-                    Apply
+                    {applyingPromo ? "Applying..." : "Apply"}
                   </button>
                 </div>
               </div>

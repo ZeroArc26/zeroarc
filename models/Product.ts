@@ -99,6 +99,12 @@ const VariantSchema = new Schema(
       min: 0,
     },
 
+    lowStockThreshold: {
+      type: Number,
+      default: 5,
+      min: 0,
+    },
+
     image: {
       type: String,
       default: "",

@@ -12,7 +12,7 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
-import { COMPANY } from "./company";
+import PseudoBarcode from "./PseudoBarcode";
 
 const styles = StyleSheet.create({
   page: {
@@ -502,12 +502,22 @@ interface InvoiceDocumentProps {
   order: any;
   qrDataUrl: string;
   logoDataUrl?: string;
+  company: {
+    name: string;
+    tagline: string;
+    website: string;
+    phone: string;
+    email: string;
+    gstin: string;
+    state: string;
+  };
 }
 
 export default function InvoiceDocument({
   order,
   qrDataUrl,
   logoDataUrl,
+  company,
 }: InvoiceDocumentProps) {
   const address = order.customer?.shippingAddress || {};
   const billing = order.customer?.billingAddress || address;
@@ -530,12 +540,12 @@ export default function InvoiceDocument({
             )}
 
             <View>
-              <Text style={styles.brandName}>{COMPANY.name}</Text>
-              <Text style={styles.brandTagline}>{COMPANY.tagline}</Text>
+              <Text style={styles.brandName}>{company.name}</Text>
+              <Text style={styles.brandTagline}>{company.tagline}</Text>
 
               <View style={styles.contactRow}>
-                <Text style={styles.contactText}>{COMPANY.website}</Text>
-                <Text style={styles.contactText}>{COMPANY.email}</Text>
+                <Text style={styles.contactText}>{company.website}</Text>
+                <Text style={styles.contactText}>{company.email}</Text>
               </View>
             </View>
           </View>
@@ -576,7 +586,7 @@ export default function InvoiceDocument({
           </View>
         </View>
 
-        <Text style={styles.gstin}>GSTIN : {COMPANY.gstin}</Text>
+        <Text style={styles.gstin}>GSTIN : {company.gstin}</Text>
 
         <View style={styles.divider} />
 
@@ -785,8 +795,8 @@ export default function InvoiceDocument({
               <IconCalendar />
               <Text style={styles.packageTitle}>SOLD BY</Text>
             </View>
-            <Text style={styles.packageLine}>{COMPANY.name}</Text>
-            <Text style={styles.packageLine}>GSTIN: {COMPANY.gstin}</Text>
+            <Text style={styles.packageLine}>{company.name}</Text>
+            <Text style={styles.packageLine}>GSTIN: {company.gstin}</Text>
           </View>
         </View>
 
@@ -837,7 +847,7 @@ export default function InvoiceDocument({
           <Text style={styles.footerLine1}>
             THANK YOU FOR CHOOSING ZEROARC
           </Text>
-          <Text style={styles.footerLine2}>{COMPANY.tagline}</Text>
+          <Text style={styles.footerLine2}>{company.tagline}</Text>
         </View>
       </Page>
     </Document>

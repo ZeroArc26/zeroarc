@@ -1,5 +1,6 @@
 "use client";
 
+import Image from "next/image";
 import useCurrentAdmin from "@/hooks/useCurrentAdmin";
 
 import ProfileForm from "@/components/admin/profile/ProfileForm";
@@ -29,8 +30,12 @@ export default function AdminProfilePage() {
       {/* Profile Card */}
       <div className="rounded-3xl border border-zinc-800 bg-zinc-900 p-8">
         <div className="mb-10 flex items-center gap-6">
-          <div className="flex h-24 w-24 items-center justify-center rounded-full bg-violet-600 text-3xl font-bold text-white">
-            {admin?.name?.charAt(0).toUpperCase()}
+          <div className="relative flex h-24 w-24 items-center justify-center overflow-hidden rounded-full bg-violet-600 text-3xl font-bold text-white">
+            {admin?.avatar ? (
+              <Image src={admin.avatar} alt={admin.name} fill className="object-cover" />
+            ) : (
+              admin?.name?.charAt(0).toUpperCase()
+            )}
           </div>
 
           <div>

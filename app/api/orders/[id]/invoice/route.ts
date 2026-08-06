@@ -7,6 +7,7 @@ import path from "path";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import InvoiceDocument from "@/lib/pdf/InvoiceDocument";
+import { getStoreSettings } from "@/lib/settings";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -44,6 +45,18 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
+    const settings = await getStoreSettings();
+
+    const company = {
+      name: settings.store?.name || "ZEROARC CO.",
+      tagline: settings.store?.tagline || "WEAR YOUR NEXT ARC",
+      website: settings.store?.website || "",
+      phone: settings.store?.phone || "",
+      email: settings.store?.email || "",
+      gstin: settings.tax?.gstin || "",
+      state: settings.tax?.companyState || "West Bengal",
+    };
+
     const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL || ""}/account/orders/${order.orderInfo?.orderNumber}`;
 
     const qrDataUrl = await QRCode.toDataURL(trackingUrl, {
@@ -54,7 +67,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     const logoDataUrl = loadLogoDataUrl();
 
     const buffer = await renderToBuffer(
-      InvoiceDocument({ order, qrDataUrl, logoDataUrl }) as any
+      InvoiceDocument({ order, qrDataUrl, logoDataUrl, company }) as any
     );
 
     const { searchParams } = new URL(request.url);
