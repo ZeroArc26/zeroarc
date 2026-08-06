@@ -25,7 +25,7 @@ export default function Hero() {
 
       <div className="relative z-10 mx-auto flex h-full max-w-[1700px] items-center px-10 xl:px-20">
         {/* ================= LEFT ================= */}
-        <div className="flex w-[45%] flex-col justify-center">
+        <div className="flex w-full max-w-2xl flex-col justify-center">
           <p className="mb-4 text-[20px] tracking-[0.28em] text-violet-500">
             次の物語を、着よう
           </p>
@@ -62,29 +62,7 @@ export default function Hero() {
         </div>
 
         {/* ================= RIGHT (layered model) ================= */}
-        <div className="relative flex h-full w-[55%] items-center justify-center">
-  <div className="relative h-[78%] aspect-[1024/1536] -translate-y-2">
-            <Image
-              src="/images/hero/hero-smoke.png"
-              alt=""
-              fill
-              className="object-contain"
-            />
-            <Image
-              src="/images/hero/hero-ring.png"
-              alt=""
-              fill
-              className="object-contain"
-            />
-            <Image
-              src="/images/hero/hero-model-1.png"
-              alt="ZeroArc model"
-              fill
-              priority
-              className="object-contain drop-shadow-[0_40px_100px_rgba(168,85,247,0.5)]"
-            />
-          </div>
-        </div>
+        
 
         {/* Slide numbers */}
         <div className="absolute right-6 top-[18%] hidden flex-col items-end gap-6 xl:flex">
