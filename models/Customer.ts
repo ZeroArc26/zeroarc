@@ -1,9 +1,20 @@
 import mongoose, { Schema, Document, Model } from "mongoose";
 
+export interface ICustomerAddress {
+  _id?: mongoose.Types.ObjectId;
+  label: string;
+  name: string;
+  phone: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  country: string;
+  isDefault: boolean;
+}
+
 export interface ICustomer extends Document {
-
   _id: mongoose.Types.ObjectId;
-
   userId?: mongoose.Types.ObjectId;
 
   name: string;
@@ -11,6 +22,8 @@ export interface ICustomer extends Document {
   phone: string;
   avatar?: string;
 
+  // Latest shipping address auto-synced from the most recent order —
+  // kept separate from the user-managed addresses[] book below.
   address: {
     address: string;
     city: string;
@@ -18,6 +31,8 @@ export interface ICustomer extends Document {
     pincode: string;
     country: string;
   };
+
+  addresses: mongoose.Types.DocumentArray<ICustomerAddress>;
 
   status: "active" | "blocked";
 
@@ -28,6 +43,21 @@ export interface ICustomer extends Document {
   createdAt: Date;
   updatedAt: Date;
 }
+
+const AddressSchema = new Schema<ICustomerAddress>(
+  {
+    label: { type: String, required: true, trim: true, maxlength: 40 },
+    name: { type: String, required: true, trim: true },
+    phone: { type: String, required: true, trim: true },
+    address: { type: String, required: true, trim: true },
+    city: { type: String, required: true, trim: true },
+    state: { type: String, required: true, trim: true },
+    pincode: { type: String, required: true, trim: true },
+    country: { type: String, default: "India" },
+    isDefault: { type: Boolean, default: false },
+  },
+  { _id: true }
+);
 
 const CustomerSchema = new Schema<ICustomer>(
   {
@@ -69,30 +99,16 @@ const CustomerSchema = new Schema<ICustomer>(
     },
 
     address: {
-      address: {
-        type: String,
-        default: "",
-      },
+      address: { type: String, default: "" },
+      city: { type: String, default: "" },
+      state: { type: String, default: "" },
+      pincode: { type: String, default: "" },
+      country: { type: String, default: "India" },
+    },
 
-      city: {
-        type: String,
-        default: "",
-      },
-
-      state: {
-        type: String,
-        default: "",
-      },
-
-      pincode: {
-        type: String,
-        default: "",
-      },
-
-      country: {
-        type: String,
-        default: "India",
-      },
+    addresses: {
+      type: [AddressSchema],
+      default: [],
     },
 
     status: {

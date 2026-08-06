@@ -3,6 +3,9 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import Product from "@/models/Product";
+import Customer from "@/models/Customer";
+import { getCurrentUser } from "@/lib/auth";
+import mongoose from "mongoose";
 
 // ======================
 // Helpers
@@ -58,26 +61,15 @@ export async function POST(req: Request) {
       .join(" ")
       .trim();
 
-    // ------------------------------------------------------------
-    // Prices are GST-INCLUSIVE (confirmed): the number the customer
-    // sees/pays already contains 18% GST. So we back-calculate the
-    // taxable (pre-GST) base from the final price instead of adding
-    // GST on top of it.
-    // ------------------------------------------------------------
     const priceAfterDiscount = Math.max(subtotal - discount, 0);
     const taxableAmount = round2(priceAfterDiscount / 1.18);
     const totalTax = round2(priceAfterDiscount - taxableAmount);
 
-    // Interstate vs intrastate: compares customer's shipping state to
-    // the company's registered state (see lib/pdf/company.ts -> state).
     const COMPANY_STATE = "West Bengal";
     const isInterState =
       (shippingAddress?.state || "").trim().toLowerCase() !==
       COMPANY_STATE.toLowerCase();
 
-    // Build items: look up each variant's SKU from the Product's
-    // variants[] array (SKU lives on the product, not the cart item),
-    // and copy color/size straight from the cart item.
     const items = await Promise.all(
       products.map(async (item: any) => {
         let sku = "";
@@ -111,6 +103,8 @@ export async function POST(req: Request) {
         };
       })
     );
+
+    const grandTotal = total || round2(priceAfterDiscount + shipping);
 
     const orderDoc = {
       orderInfo: {
@@ -164,9 +158,7 @@ export async function POST(req: Request) {
         sgst: isInterState ? 0 : round2(totalTax / 2),
         igst: isInterState ? totalTax : 0,
         totalTax,
-        // Shipping is added on top; GST is already embedded inside
-        // priceAfterDiscount, so we don't add totalTax again here.
-        grandTotal: total || round2(priceAfterDiscount + shipping),
+        grandTotal,
       },
 
       payment: {
@@ -176,6 +168,63 @@ export async function POST(req: Request) {
     };
 
     const order = await Order.create(orderDoc);
+
+    // ------------------------------------------------------------
+    // Sync the Customer collection. If the shopper is logged in,
+    // link via userId; otherwise match/create by email. This never
+    // blocks order creation — a Customer-sync failure is logged but
+    // the order itself has already been placed successfully.
+    // ------------------------------------------------------------
+    try {
+      const currentUser = await getCurrentUser();
+      const customerEmail = (customer?.email || "").toLowerCase();
+
+      if (customerEmail || customer?.phone) {
+        const existing = await Customer.findOne(
+          customerEmail
+            ? { email: customerEmail }
+            : { phone: customer?.phone }
+        );
+
+        const addressUpdate = {
+          address: [shippingAddress?.address, shippingAddress?.landmark]
+            .filter(Boolean)
+            .join(", "),
+          city: shippingAddress?.city,
+          state: shippingAddress?.state,
+          pincode: shippingAddress?.pincode,
+          country: shippingAddress?.country || "India",
+        };
+
+        if (existing) {
+          existing.name = fullName || existing.name;
+          existing.phone = customer?.phone || existing.phone;
+          existing.address = addressUpdate;
+          existing.totalOrders = (existing.totalOrders || 0) + 1;
+          existing.totalSpent = (existing.totalSpent || 0) + grandTotal;
+          existing.lastOrderAt = new Date();
+          if (currentUser?.id && !existing.userId) {
+            existing.userId = new mongoose.Types.ObjectId(currentUser.id);
+          }
+          await existing.save();
+        } else {
+          await Customer.create({
+            userId: currentUser?.id
+  ? new mongoose.Types.ObjectId(currentUser.id)
+  : undefined,
+            name: fullName || "Guest",
+            email: customerEmail,
+            phone: customer?.phone || "",
+            address: addressUpdate,
+            totalOrders: 1,
+            totalSpent: grandTotal,
+            lastOrderAt: new Date(),
+          });
+        }
+      }
+    } catch (customerSyncError) {
+      console.error("Customer sync failed:", customerSyncError);
+    }
 
     return NextResponse.json({
       success: true,

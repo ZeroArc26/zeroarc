@@ -2,7 +2,8 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useState } from "react";
 import {
   LayoutDashboard,
   Package,
@@ -12,7 +13,6 @@ import {
   MapPin,
   User,
   ShieldCheck,
-  Bell,
   Gift,
   HelpCircle,
   LogOut,
@@ -22,21 +22,32 @@ const MAIN_LINKS = [
   { label: "Dashboard", href: "/account", icon: LayoutDashboard },
   { label: "Orders", href: "/account/orders", icon: Package },
   { label: "Wishlist", href: "/account/wishlist", icon: Heart },
-  { label: "Arc Points", href: "/account/points", icon: Star },
-  { label: "Wallet", href: "/account/wallet", icon: Wallet },
-  { label: "Addresses", href: "/account/addresses", icon: MapPin },
-  { label: "Profile Information", href: "/account/profile", icon: User },
-  { label: "Security", href: "/account/security", icon: ShieldCheck },
+  { label: "Arc Points", href: "#", icon: Star, disabled: true },
+  { label: "Wallet", href: "#", icon: Wallet, disabled: true },
+  { label: "Addresses", href: "/account", icon: MapPin },
+  { label: "Security", href: "/account", icon: ShieldCheck },
 ];
 
 const MORE_LINKS = [
-  { label: "Notifications", href: "/account/notifications", icon: Bell },
-  { label: "Refer & Earn", href: "/account/refer", icon: Gift },
-  { label: "Help & Support", href: "/account/help", icon: HelpCircle },
+  { label: "Refer & Earn", href: "#", icon: Gift, disabled: true },
+  { label: "Help & Support", href: "/contact", icon: HelpCircle },
 ];
 
 export default function AccountSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  async function handleLogout() {
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      router.push("/login");
+      router.refresh();
+    } finally {
+      setLoggingOut(false);
+    }
+  }
 
   return (
     <aside className="w-full lg:w-[260px] shrink-0">
@@ -48,19 +59,25 @@ export default function AccountSidebar() {
         <nav className="space-y-1">
           {MAIN_LINKS.map((link) => {
             const Icon = link.icon;
-            const active = pathname === link.href;
+            const active = pathname === link.href && !link.disabled;
             return (
               <Link
-                key={link.href}
-                href={link.href}
+                key={link.label}
+                href={link.disabled ? "#" : link.href}
+                onClick={(e) => link.disabled && e.preventDefault()}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  active
+                  link.disabled
+                    ? "cursor-not-allowed text-zinc-300"
+                    : active
                     ? "bg-violet-50 text-violet-700"
                     : "text-zinc-600 hover:bg-zinc-50"
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 {link.label}
+                {link.disabled && (
+                  <span className="ml-auto text-[10px] uppercase text-zinc-300">Soon</span>
+                )}
               </Link>
             );
           })}
@@ -77,48 +94,33 @@ export default function AccountSidebar() {
             const Icon = link.icon;
             return (
               <Link
-                key={link.href}
-                href={link.href}
-                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50"
+                key={link.label}
+                href={link.disabled ? "#" : link.href}
+                onClick={(e) => link.disabled && e.preventDefault()}
+                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
+                  link.disabled
+                    ? "cursor-not-allowed text-zinc-300"
+                    : "text-zinc-600 hover:bg-zinc-50"
+                }`}
               >
                 <Icon className="h-4 w-4" />
                 {link.label}
+                {link.disabled && (
+                  <span className="ml-auto text-[10px] uppercase text-zinc-300">Soon</span>
+                )}
               </Link>
             );
           })}
 
-          <button className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-50">
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
+            className="flex w-full items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-red-500 transition hover:bg-red-50 disabled:opacity-60"
+          >
             <LogOut className="h-4 w-4" />
-            Logout
+            {loggingOut ? "Logging out..." : "Logout"}
           </button>
         </nav>
-      </div>
-
-      {/* Arc Member promo card */}
-      <div className="relative mt-4 overflow-hidden rounded-2xl bg-black p-6">
-        <div className="absolute -right-6 -bottom-6 h-40 w-32 opacity-80">
-          <Image
-            src="/images/profile/profile-avatar-women.png"
-            alt=""
-            fill
-            className="object-contain object-bottom"
-          />
-        </div>
-
-        <span className="relative z-10 inline-block rounded-md bg-violet-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-          Arc Member+
-        </span>
-
-        <p className="relative z-10 mt-3 max-w-[140px] text-sm text-zinc-300">
-          You&apos;re earning exclusive rewards and early access to new drops!
-        </p>
-
-        <Link
-          href="/account/points"
-          className="relative z-10 mt-4 inline-block text-sm font-semibold text-violet-400 hover:underline"
-        >
-          Explore Benefits →
-        </Link>
       </div>
     </aside>
   );

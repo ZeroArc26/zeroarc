@@ -160,9 +160,12 @@ router.replace("/");
       </div>
 
       <button
-        type="button"
-        className="flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-950 py-4 font-medium transition hover:border-purple-500"
-      >
+  type="button"
+  onClick={() => {
+    window.location.href = "/api/auth/google";
+  }}
+  className="flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-950 py-4 font-medium transition hover:border-purple-500"
+>
         <img
           src="https://www.svgrepo.com/show/475656/google-color.svg"
           alt="Google"

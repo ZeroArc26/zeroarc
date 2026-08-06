@@ -1,34 +1,16 @@
-import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
+import { getUserCookie } from "@/lib/auth/cookies";
+import { verifyUserToken, UserJWTPayload } from "@/lib/auth/jwt";
 
-type UserPayload = {
-  id: string;
-  email: string;
-  fullName: string;
-};
-
-export async function getCurrentUser(): Promise<UserPayload | null> {
-  const cookieStore = await cookies();
-
-  const token = cookieStore.get("token")?.value;
-
-  console.log("TOKEN =", token);
+export async function getCurrentUser(): Promise<UserJWTPayload | null> {
+  const token = await getUserCookie();
 
   if (!token) {
     return null;
   }
 
   try {
-    const user = jwt.verify(
-      token,
-      process.env.JWT_SECRET!
-    ) as UserPayload;
-
-    console.log("USER =", user);
-
-    return user;
-  } catch (err) {
-    console.log("JWT ERROR =", err);
+    return verifyUserToken(token);
+  } catch {
     return null;
   }
 }
