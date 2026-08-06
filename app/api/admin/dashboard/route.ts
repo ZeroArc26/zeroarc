@@ -13,24 +13,22 @@ export async function GET() {
     const totalOrders = await Order.countDocuments();
 
     const pendingOrders = await Order.countDocuments({
-      status: "Pending",
+      "orderInfo.status": "pending",
     });
 
     const revenueResult = await Order.aggregate([
-  {
-    $group: {
-      _id: null,
-      totalRevenue: {
-        $sum: "$total",
+      {
+        $group: {
+          _id: null,
+          totalRevenue: {
+            $sum: "$pricing.grandTotal",
+          },
+        },
       },
-    },
-  },
-]);
+    ]);
 
     const totalRevenue =
-      revenueResult.length > 0
-        ? revenueResult[0].totalRevenue
-        : 0;
+      revenueResult.length > 0 ? revenueResult[0].totalRevenue : 0;
 
     return NextResponse.json({
       success: true,

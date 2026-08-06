@@ -29,10 +29,23 @@ export default function ProductPublishCard({
   const { setValue, watch } = useFormContext();
 
   const status = watch("publish.status");
+  const title = watch("basicInfo.title");
+  const slug = watch("basicInfo.slug");
+  const images = watch("images");
+  const sellingPrice = watch("pricing.sellingPrice");
+  const quantity = watch("inventory.quantity");
 
-  const completed = 2;
-  const total = 5;
-  const progress = (completed / total) * 100;
+  const checklist = [
+    { label: "Product Name", done: Boolean(title?.trim()) },
+    { label: "Slug", done: Boolean(slug?.trim()) },
+    { label: "Images Required", done: Boolean(images?.length) },
+    { label: "Pricing", done: Boolean(sellingPrice > 0) },
+    { label: "Inventory", done: Boolean(quantity >= 0 && quantity !== undefined && quantity !== null && quantity !== "") },
+  ];
+
+  const completed = checklist.filter((item) => item.done).length;
+  const total = checklist.length;
+  const progress = Math.round((completed / total) * 100);
 
   return (
     <div className="rounded-3xl border border-zinc-800 bg-zinc-900/40 p-6 backdrop-blur-xl">
@@ -60,9 +73,17 @@ export default function ProductPublishCard({
             Current Status
           </span>
 
-          <div className="flex items-center gap-2 rounded-full border border-yellow-500/30 bg-yellow-500/10 px-3 py-1 text-xs font-medium text-yellow-400">
+          <div
+            className={`flex items-center gap-2 rounded-full border px-3 py-1 text-xs font-medium capitalize ${
+              status === "active"
+                ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
+                : status === "archived"
+                ? "border-red-500/30 bg-red-500/10 text-red-400"
+                : "border-yellow-500/30 bg-yellow-500/10 text-yellow-400"
+            }`}
+          >
             <CircleDashed size={14} />
-            Draft
+            {status || "Draft"}
           </div>
         </div>
       </div>
@@ -94,30 +115,21 @@ export default function ProductPublishCard({
         </h3>
 
         <div className="space-y-3 text-sm">
-          <div className="flex items-center gap-2 text-emerald-400">
-            <CheckCircle2 size={16} />
-            Product Name
-          </div>
-
-          <div className="flex items-center gap-2 text-emerald-400">
-            <CheckCircle2 size={16} />
-            Slug
-          </div>
-
-          <div className="flex items-center gap-2 text-yellow-400">
-            <AlertCircle size={16} />
-            Images Required
-          </div>
-
-          <div className="flex items-center gap-2 text-yellow-400">
-            <AlertCircle size={16} />
-            Pricing
-          </div>
-
-          <div className="flex items-center gap-2 text-yellow-400">
-            <AlertCircle size={16} />
-            Inventory
-          </div>
+          {checklist.map((item) => (
+            <div
+              key={item.label}
+              className={`flex items-center gap-2 ${
+                item.done ? "text-emerald-400" : "text-yellow-400"
+              }`}
+            >
+              {item.done ? (
+                <CheckCircle2 size={16} />
+              ) : (
+                <AlertCircle size={16} />
+              )}
+              {item.label}
+            </div>
+          ))}
         </div>
       </div>
 

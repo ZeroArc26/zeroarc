@@ -155,6 +155,10 @@ const OrderSchema = new Schema(
 
         sku: String,
 
+        size: String,
+
+        color: String,
+
 
         hsnCode: {
 
@@ -414,6 +418,20 @@ const OrderSchema = new Schema(
 
 
       trackingId: String,
+
+      courierPartner: String,
+
+        awbNumber: String,
+
+        weight: Number, // in KG
+
+        dimensions: {
+          length: Number, // cm
+          width: Number,
+          height: Number,
+        },
+
+        packageType: String,
 
 
 

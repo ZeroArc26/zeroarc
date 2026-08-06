@@ -13,10 +13,16 @@ import TopProducts from "@/components/admin/dashboard/TopProducts";
 import PageHeader from "@/components/admin/shared/PageHeader";
 import LowStockProducts from "@/components/admin/dashboard/LowStockProducts";
 import ActivityFeed from "@/components/admin/dashboard/ActivityFeed";
+
 import { getDashboardStats } from "@/lib/actions/dashboard/getDashboardStats";
+import { getRevenueAnalytics } from "@/lib/actions/dashboard/getRevenueAnalytics";
 
 export default async function AdminDashboardPage() {
-  const stats = await getDashboardStats();
+  const [stats, revenue] = await Promise.all([
+    getDashboardStats(),
+    getRevenueAnalytics(),
+  ]);
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -27,21 +33,17 @@ export default async function AdminDashboardPage() {
       {/* Stats Cards */}
       <section className="grid gap-6 sm:grid-cols-2 xl:grid-cols-4">
         <StatsCard
-  title="Revenue"
-  value={`₹${stats.revenue}`}
-  description="Total Revenue"
-  icon={IndianRupee}
-  trend="+12.4%"
-  trendUp
-/>
+          title="Revenue"
+          value={`₹${stats.revenue.toLocaleString("en-IN")}`}
+          description="Total Revenue"
+          icon={IndianRupee}
+        />
 
         <StatsCard
           title="Orders"
           value={stats.orders}
           description="Total Orders"
           icon={ShoppingCart}
-          trend="+8.2%"
-          trendUp
         />
 
         <StatsCard
@@ -49,44 +51,40 @@ export default async function AdminDashboardPage() {
           value={stats.products}
           description="Products Available"
           icon={Package}
-          trend="+4"
-          trendUp
         />
 
         <StatsCard
           title="Customers"
           value={stats.customers}
-          description="Registered Users"
+          description="Unique Customers"
           icon={Users}
-          trend="+18.7%"
-          trendUp
         />
 
         <StatsCard
-  title="Categories"
-  value={stats.categories}
-  description="Total Categories"
-  icon={FolderTree}
-  trend="+1"
-  trendUp
-/>
+          title="Categories"
+          value={stats.categories}
+          description="Total Categories"
+          icon={FolderTree}
+        />
       </section>
 
       {/* Analytics + Orders */}
       <section className="grid gap-6 xl:grid-cols-3">
-  <div className="space-y-6 xl:col-span-2">
-    <RevenueAnalytics />
-    <TopProducts />
-  </div>
+        <div className="space-y-6 xl:col-span-2">
+          <RevenueAnalytics
+            data={revenue.data}
+            totalRevenue={revenue.totalRevenue}
+          />
+          <TopProducts />
+        </div>
 
-  <div className="space-y-6">
-    <RecentOrders />
-    <LowStockProducts />
-  </div>
-</section>
+        <div className="space-y-6">
+          <RecentOrders />
+          <LowStockProducts />
+        </div>
+      </section>
 
-    <ActivityFeed />
-
+      <ActivityFeed />
     </div>
   );
 }

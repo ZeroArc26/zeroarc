@@ -11,46 +11,33 @@ import {
 
 import DashboardSection from "@/components/admin/shared/DashboardSection";
 
-const revenueData = [
-  { name: "Mon", revenue: 4200 },
-  { name: "Tue", revenue: 5800 },
-  { name: "Wed", revenue: 4900 },
-  { name: "Thu", revenue: 7200 },
-  { name: "Fri", revenue: 6800 },
-  { name: "Sat", revenue: 9100 },
-  { name: "Sun", revenue: 8400 },
-];
+interface RevenueAnalyticsProps {
+  data: { name: string; revenue: number }[];
+  totalRevenue: number;
+}
 
-export default function RevenueAnalytics() {
+export default function RevenueAnalytics({
+  data,
+  totalRevenue,
+}: RevenueAnalyticsProps) {
   return (
     <DashboardSection
       title="Revenue Analytics"
       description="Track your revenue over the last 7 days."
-      action={
-        <select className="rounded-xl border border-zinc-700 bg-zinc-900 px-3 py-2 text-sm text-zinc-300 outline-none">
-          <option>7 Days</option>
-          <option>30 Days</option>
-          <option>90 Days</option>
-        </select>
-      }
     >
       <div className="mb-8 flex items-center justify-between">
         <div>
-          <p className="text-sm text-zinc-400">Total Revenue</p>
+          <p className="text-sm text-zinc-400">Total Revenue (7 days)</p>
 
           <h2 className="mt-2 text-4xl font-bold text-white">
-            ₹84,250
+            ₹{totalRevenue.toLocaleString("en-IN")}
           </h2>
-
-          <p className="mt-2 text-sm font-medium text-emerald-400">
-            ▲ +12.4% from last week
-          </p>
         </div>
       </div>
 
       <div className="h-80">
         <ResponsiveContainer width="100%" height="100%">
-          <AreaChart data={revenueData}>
+          <AreaChart data={data}>
             <defs>
               <linearGradient
                 id="revenueGradient"
@@ -92,6 +79,7 @@ export default function RevenueAnalytics() {
                 borderRadius: 12,
                 color: "#fff",
               }}
+              formatter={(value: any) => [`₹${Number(value).toLocaleString("en-IN")}`, "Revenue"]}
             />
 
             <Area
