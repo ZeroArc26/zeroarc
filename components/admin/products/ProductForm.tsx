@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import {
   productSchema,
   type ProductFormValues,
+  type ProductFormInput,
 } from "@/lib/validations/product.schema";
 
 import ProductBasicInfo from "./ProductBasicInfo";
@@ -30,7 +31,7 @@ export default function ProductForm({
   initialData,
 }: ProductFormProps) {
   const router = useRouter();
-  const methods = useForm<ProductFormValues>({
+  const methods = useForm<ProductFormInput, any, ProductFormValues>({
     resolver: zodResolver(productSchema),
     mode: "onChange",
     shouldFocusError: true,

@@ -1,66 +1,30 @@
 import { z } from "zod";
 
 export const categorySchema = z.object({
-  name: z
-    .string()
-    .trim()
-    .min(2, "Category name is required")
-    .max(100),
+  name: z.string().min(1, "Name is required").max(100),
 
-  slug: z
-    .string()
-    .trim()
-    .min(2)
-    .max(120),
+  slug: z.string().min(1, "Slug is required"),
 
-  description: z
-    .string()
-    .max(1000)
-    .optional()
-    .or(z.literal("")),
+  description: z.string().max(1000).optional().default(""),
 
-  image: z
-    .string()
-    .optional()
-    .or(z.literal("")),
+  image: z.object({
+    url: z.string().optional().default(""),
+    alt: z.string().optional().default(""),
+  }),
 
-  parentCategory: z
-    .string()
-    .optional()
-    .or(z.literal("")),
+  parentCategory: z.string().nullable().optional(),
 
-  featured: z
-    .boolean()
-    .default(false),
+  featured: z.boolean().default(false),
 
-  status: z.enum([
-    "active",
-    "inactive",
-  ]),
+  status: z.enum(["draft", "published", "archived"]).default("draft"),
 
-  sortOrder: z
-    .number()
-    .min(0)
-    .default(0),
+  sortOrder: z.number().min(0).default(0),
 
   seo: z.object({
-    metaTitle: z
-      .string()
-      .max(60)
-      .optional()
-      .or(z.literal("")),
-
-    metaDescription: z
-      .string()
-      .max(160)
-      .optional()
-      .or(z.literal("")),
-
-    metaKeywords: z
-      .array(z.string())
-      .default([]),
+    metaTitle: z.string().optional().default(""),
+    metaDescription: z.string().optional().default(""),
+    index: z.boolean().default(true),
   }),
 });
 
-export type CategoryFormValues =
-  z.infer<typeof categorySchema>;
+export type CategoryFormValues = z.infer<typeof categorySchema>;
