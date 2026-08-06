@@ -1,8 +1,13 @@
 import PageHeader from "@/components/admin/shared/PageHeader";
-import ProductToolbar from "@/components/admin/products/ProductToolbar";
-import ProductTable from "@/components/admin/products/ProductTable";
+import ProductsPageClient from "@/components/admin/products/ProductsPageClient";
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
 
-export default function ProductsPage() {
+export default async function ProductsPage() {
+  await connectDB();
+
+  const products = await Product.find().sort({ createdAt: -1 }).lean();
+
   return (
     <div className="space-y-8">
       <PageHeader
@@ -10,9 +15,7 @@ export default function ProductsPage() {
         description="Manage your products, inventory and pricing."
       />
 
-      <ProductToolbar />
-
-      <ProductTable />
+      <ProductsPageClient products={JSON.parse(JSON.stringify(products))} />
     </div>
   );
 }
