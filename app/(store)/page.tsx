@@ -9,7 +9,11 @@ import Testimonials from "@/components/home/Testimonials";
 import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
 
-export default function Home() {
+import { getNewArrivalProducts } from "@/lib/actions/products/getNewArrivalProducts";
+
+export default async function Home() {
+  const products = await getNewArrivalProducts(10);
+
   return (
     <>
       <AnnouncementBar />
@@ -17,7 +21,7 @@ export default function Home() {
 
       <Hero />
       <MenWomenSplit />
-      <NewArrivals />
+      <NewArrivals products={products} />
       <ExploreCollections />
       <FeaturesBar />
       <Testimonials />

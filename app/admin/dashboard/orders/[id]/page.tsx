@@ -133,7 +133,10 @@ export default async function OrderDetailsPage({
           <ShippingLabelActions
   orderId={order.id}
   trackingId={order.shippingLabel?.trackingId}
-  hasShippingLabel={!!order.shippingLabel}
+  hasShippingLabel={!!order.shippingLabel?.awbNumber}
+  courierPartner={order.shippingLabel?.courierPartner}
+  awbNumber={order.shippingLabel?.awbNumber}
+  isProvisionalAwb={order.shippingLabel?.isProvisionalAwb}
 />
 
 

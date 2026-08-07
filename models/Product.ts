@@ -157,6 +157,43 @@ const BasicInfoSchema = new Schema(
       trim: true,
     },
 
+    audience: {
+      type: String,
+      enum: ["men", "women", "unisex"],
+      required: true,
+      default: "unisex",
+    },
+
+    fitType: {
+      type: String,
+      enum: ["slim", "regular", "oversized"],
+    },
+
+    fabric: {
+      type: String,
+      trim: true,
+    },
+
+    sleeveType: {
+      type: String,
+      trim: true,
+    },
+
+    neckType: {
+      type: String,
+      trim: true,
+    },
+
+    printType: {
+      type: String,
+      trim: true,
+    },
+
+    washCare: {
+      type: String,
+      trim: true,
+    },
+
     tags: [
       {
         type: String,

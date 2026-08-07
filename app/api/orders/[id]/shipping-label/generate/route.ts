@@ -3,15 +3,10 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import { getStoreSettings } from "@/lib/settings";
+import { createDelhiveryShipment } from "@/lib/delhivery";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
-}
-
-function generateAwbNumber() {
-  const timestamp = Date.now().toString().slice(-9);
-  const random = Math.floor(100 + Math.random() * 900);
-  return `${timestamp}${random}`;
 }
 
 function generateTrackingId() {
@@ -23,6 +18,12 @@ function generateShippingId() {
   const timestamp = Date.now().toString().slice(-8);
   const random = Math.floor(1000 + Math.random() * 9000);
   return `SHIP${timestamp}${random}`;
+}
+
+function generateProvisionalAwb() {
+  const timestamp = Date.now().toString().slice(-9);
+  const random = Math.floor(100 + Math.random() * 900);
+  return `${timestamp}${random}`;
 }
 
 function estimatePackage(itemCount: number) {
@@ -71,9 +72,8 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     const estimate = estimatePackage(itemCount || 1);
     const address = order.customer?.shippingAddress || {};
-    const existing: any = order.shippingLabel || {};
 
-    const warehouseAddressLine = [
+    const sellerAddressLine = [
       settings.address?.line1,
       settings.address?.line2,
       settings.address?.city,
@@ -83,11 +83,52 @@ export async function POST(request: Request, { params }: RouteParams) {
       .filter(Boolean)
       .join(", ");
 
+    // Try real Delhivery first. If their API is unavailable (their
+    // account setup is currently blocked as of this note), fall back
+    // to a provisional AWB so the admin workflow isn't blocked — this
+    // will start returning real waybills automatically the moment
+    // Delhivery's side is fixed, with no code change needed.
+    const delhiveryResult = await createDelhiveryShipment({
+      orderNumber: order.orderInfo?.orderNumber,
+      customerName: order.customer?.name,
+      customerPhone: order.customer?.phone,
+      address: address.address,
+      city: address.city,
+      state: address.state,
+      pincode: address.pincode,
+      paymentMode: order.payment?.method === "cod" ? "cod" : "prepaid",
+      codAmount: order.payment?.method === "cod" ? order.pricing?.grandTotal || 0 : 0,
+      totalAmount: order.pricing?.grandTotal || 0,
+      weightGrams: Math.round(estimate.weight * 1000),
+      dimensions: estimate.dimensions,
+      productsDesc: (order.items || []).map((i: any) => i.name).join(", "),
+      quantity: itemCount,
+      sellerName: settings.store?.name || "ZEROARC CO.",
+      sellerAddress: sellerAddressLine,
+    });
+
+    let awbNumber: string;
+    let isProvisional = false;
+
+    if (delhiveryResult.success && delhiveryResult.waybill) {
+      awbNumber = delhiveryResult.waybill;
+    } else {
+      console.error(
+        "Delhivery shipment failed, falling back to provisional AWB:",
+        delhiveryResult.message
+      );
+      awbNumber = generateProvisionalAwb();
+      isProvisional = true;
+    }
+
+    const existing: any = order.shippingLabel || {};
+
     order.shippingLabel = {
       shippingId: existing.shippingId || generateShippingId(),
       trackingId: existing.trackingId || generateTrackingId(),
-      courierPartner: "Delhivery", // provisional until real API is connected
-      awbNumber: generateAwbNumber(),
+      courierPartner: "Delhivery",
+      awbNumber,
+      isProvisionalAwb: isProvisional,
       weight: estimate.weight,
       dimensions: estimate.dimensions,
       packageType: estimate.packageType,
@@ -101,7 +142,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       },
       warehouse: {
         name: settings.store?.name || "ZEROARC CO.",
-        address: warehouseAddressLine,
+        address: sellerAddressLine,
         phone: settings.store?.phone || "",
       },
       qrCode: existing.qrCode || "",
@@ -109,7 +150,13 @@ export async function POST(request: Request, { params }: RouteParams) {
 
     await order.save();
 
-    return NextResponse.json({ success: true, order });
+    return NextResponse.json({
+      success: true,
+      order,
+      warning: isProvisional
+        ? `Delhivery API unavailable (${delhiveryResult.message}). Used a provisional AWB — this is NOT trackable with Delhivery yet.`
+        : undefined,
+    });
   } catch (error) {
     console.error(error);
 

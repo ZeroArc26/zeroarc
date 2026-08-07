@@ -36,6 +36,7 @@ export default function ProductBasicInfo() {
   const metaDescription = watch("seo.metaDescription") ?? "";
   const sku = watch("inventory.sku") ?? "";
   const audience = watch("basicInfo.audience") ?? "unisex";
+  const fitType = watch("basicInfo.fitType") ?? "";
 
   /* ------------------------------------------ */
   /* Auto Slug                                  */
@@ -321,6 +322,119 @@ useEffect(() => {
               Decides whether this product shows up on the Men&apos;s or
               Women&apos;s collection page.
             </p>
+
+          </div>
+
+        </div>
+
+        {/* Fit Type */}
+
+        <div className="grid gap-6 md:grid-cols-3">
+
+          <div>
+
+            <div className="mb-2 flex items-center justify-between">
+
+              <Label htmlFor="fitType">
+                Fit Type
+              </Label>
+
+              <span className="text-xs text-zinc-500">
+                Optional
+              </span>
+
+            </div>
+
+            <Select
+              value={fitType}
+              onValueChange={(value) =>
+                setValue("basicInfo.fitType", value as "slim" | "regular" | "oversized", {
+                  shouldDirty: true,
+                  shouldValidate: true,
+                })
+              }
+            >
+              <SelectTrigger id="fitType">
+                <SelectValue placeholder="Select fit type" />
+              </SelectTrigger>
+
+              <SelectContent>
+                <SelectItem value="slim">Slim</SelectItem>
+                <SelectItem value="regular">Regular</SelectItem>
+                <SelectItem value="oversized">Oversized</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <p className="mt-2 text-xs text-zinc-500">
+              Powers the visual fit-scale shown on the product page.
+            </p>
+
+          </div>
+
+        </div>
+
+        {/* Product Specifications */}
+
+        <div>
+
+          <p className="mb-4 text-sm font-semibold text-white">
+            Product Specifications
+            <span className="ml-2 text-xs font-normal text-zinc-500">
+              (Optional — shown in the &quot;Details&quot; tab on the product page)
+            </span>
+          </p>
+
+          <div className="grid gap-6 md:grid-cols-3">
+
+            <div>
+              <Label htmlFor="fabric">Fabric</Label>
+              <Input
+                id="fabric"
+                placeholder="240 GSM Premium Cotton"
+                className="mt-2"
+                {...register("basicInfo.fabric")}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="sleeveType">Sleeve Type</Label>
+              <Input
+                id="sleeveType"
+                placeholder="Half Sleeve, Drop Shoulder"
+                className="mt-2"
+                {...register("basicInfo.sleeveType")}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="neckType">Neck Type</Label>
+              <Input
+                id="neckType"
+                placeholder="Round Neck"
+                className="mt-2"
+                {...register("basicInfo.neckType")}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="printType">Print Type</Label>
+              <Input
+                id="printType"
+                placeholder="High Quality, Long-lasting"
+                className="mt-2"
+                {...register("basicInfo.printType")}
+              />
+            </div>
+
+            <div>
+              <Label htmlFor="washCare">Wash Care</Label>
+              <Input
+                id="washCare"
+                placeholder="Pre-shrunk, Machine Washable"
+                className="mt-2"
+                {...register("basicInfo.washCare")}
+              />
+            </div>
 
           </div>
 

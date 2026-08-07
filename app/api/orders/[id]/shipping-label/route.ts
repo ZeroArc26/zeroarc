@@ -30,6 +30,23 @@ function loadLogoDataUrl() {
   }
 }
 
+function loadDelhiveryLogoDataUrl() {
+  try {
+    const logoPath = path.join(
+      process.cwd(),
+      "public",
+      "images",
+      "shipping-label",
+      "delhivery-logo.png"
+    );
+    const buffer = fs.readFileSync(logoPath);
+    return `data:image/png;base64,${buffer.toString("base64")}`;
+  } catch (err) {
+    console.error("Could not load Delhivery logo:", err);
+    return "";
+  }
+}
+
 export async function GET(request: Request, { params }: RouteParams) {
   try {
     await connectDB();
@@ -83,9 +100,16 @@ export async function GET(request: Request, { params }: RouteParams) {
     });
 
     const logoDataUrl = loadLogoDataUrl();
+    const delhiveryLogoDataUrl = loadDelhiveryLogoDataUrl();
 
     const buffer = await renderToBuffer(
-      ShippingLabelDocument({ order, qrDataUrl, logoDataUrl, company }) as any
+      ShippingLabelDocument({
+        order,
+        qrDataUrl,
+        logoDataUrl,
+        delhiveryLogoDataUrl,
+        company,
+      }) as any
     );
 
     const { searchParams } = new URL(request.url);

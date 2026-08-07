@@ -82,6 +82,12 @@ export const basicInfoSchema = z.object({
     .max(60),
 
   audience: z.enum(["men", "women", "unisex"]),
+  fitType: z.enum(["slim", "regular", "oversized"]).optional(),
+  fabric: z.string().trim().optional(),
+  sleeveType: z.string().trim().optional(),
+  neckType: z.string().trim().optional(),
+  printType: z.string().trim().optional(),
+  washCare: z.string().trim().optional(),
 
   tags: z
     .array(z.string().trim())

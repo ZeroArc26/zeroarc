@@ -423,6 +423,8 @@ const OrderSchema = new Schema(
 
         awbNumber: String,
 
+        isProvisionalAwb: Boolean,
+
         weight: Number, // in KG
 
         dimensions: {

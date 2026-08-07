@@ -44,6 +44,12 @@ export default function ProductForm({
         brand: "",
         category: "",
         audience: "unisex",
+        fitType: undefined,
+        fabric: "",
+        sleeveType: "",
+        neckType: "",
+        printType: "",
+        washCare: "",
         tags: [],
       },
 

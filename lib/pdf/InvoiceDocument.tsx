@@ -502,6 +502,7 @@ interface InvoiceDocumentProps {
   order: any;
   qrDataUrl: string;
   logoDataUrl?: string;
+  delhiveryLogoDataUrl?: string;
   company: {
     name: string;
     tagline: string;
@@ -517,6 +518,7 @@ export default function InvoiceDocument({
   order,
   qrDataUrl,
   logoDataUrl,
+  delhiveryLogoDataUrl,
   company,
 }: InvoiceDocumentProps) {
   const address = order.customer?.shippingAddress || {};
@@ -779,7 +781,11 @@ export default function InvoiceDocument({
 
           <View style={styles.packageCol}>
             <View style={styles.packageColHeader}>
-              <IconTruck />
+              {order.shippingLabel?.courierPartner === "Delhivery" && delhiveryLogoDataUrl ? (
+                <Image src={delhiveryLogoDataUrl} style={{ width: 40, height: 15 }} />
+              ) : (
+                <IconTruck />
+              )}
               <Text style={styles.packageTitle}>SHIPPED VIA</Text>
             </View>
             <Text style={styles.packageLine}>

@@ -395,17 +395,6 @@ function IconGlobe({ size = 9 }: { size?: number }) {
   );
 }
 
-function IconPhone({ size = 9 }: { size?: number }) {
-  return (
-    <Svg width={size} height={size} viewBox="0 0 24 24">
-      <Path
-        d="M6 3h3l1.5 4-2 1.5a12 12 0 006 6l1.5-2 4 1.5v3c0 1.1-1 2-2.2 1.8C10.5 18 6 13.5 4.2 6.2 4 5 4.9 3 6 3z"
-        fill="#333333"
-      />
-    </Svg>
-  );
-}
-
 function IconFragile({ size = 16 }: { size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24">
@@ -485,6 +474,7 @@ interface ShippingLabelDocumentProps {
   order: any;
   qrDataUrl: string;
   logoDataUrl?: string;
+  delhiveryLogoDataUrl?: string;
   company: {
     name: string;
     tagline: string;
@@ -508,6 +498,7 @@ export default function ShippingLabelDocument({
   order,
   qrDataUrl,
   logoDataUrl,
+  delhiveryLogoDataUrl,
   company,
 }: ShippingLabelDocumentProps) {
   const label = order.shippingLabel || {};
@@ -586,9 +577,13 @@ export default function ShippingLabelDocument({
 
           <View style={styles.colHalf}>
             <View style={styles.iconTagRow}>
-              <View style={styles.iconSquare}>
-                <IconTruckSolid />
-              </View>
+              {label.courierPartner === "Delhivery" && delhiveryLogoDataUrl ? (
+                <Image src={delhiveryLogoDataUrl} style={{ width: 60, height: 22 }} />
+              ) : (
+                <View style={styles.iconSquare}>
+                  <IconTruckSolid />
+                </View>
+              )}
               <Text style={styles.bodyLine}>COURIER PARTNER</Text>
             </View>
             <Text style={styles.courierName}>{label.courierPartner || "To be assigned"}</Text>

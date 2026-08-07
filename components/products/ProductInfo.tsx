@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Star, ShoppingBag, Heart, Truck, ChevronRight } from "lucide-react";
+import { Star, ShoppingBag, Heart, Truck, ChevronRight, Check, Minus, Plus, ShieldCheck } from "lucide-react";
 
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
@@ -58,21 +58,22 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const [selectedColor, setSelectedColor] = useState(colors[0]?.color ?? "");
 
   const sizesForColor = useMemo(() => {
-    return product.variants
-      .filter((v) => v.color === selectedColor)
-      .map((v) => v.size);
+    return product.variants.filter((v) => v.color === selectedColor);
   }, [product.variants, selectedColor]);
 
-  const [selectedSize, setSelectedSize] = useState(sizesForColor[0] ?? "");
+  const [selectedSize, setSelectedSize] = useState(sizesForColor[0]?.size ?? "");
   const [quantity, setQuantity] = useState(1);
   const [mounted, setMounted] = useState(false);
+  const [justAdded, setJustAdded] = useState(false);
 
   useEffect(() => setMounted(true), []);
 
   useEffect(() => {
-    if (!sizesForColor.includes(selectedSize)) {
-      setSelectedSize(sizesForColor[0] ?? "");
+    const stillAvailable = sizesForColor.find((v) => v.size === selectedSize);
+    if (!stillAvailable) {
+      setSelectedSize(sizesForColor[0]?.size ?? "");
     }
+    setQuantity(1);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedColor]);
 
@@ -81,6 +82,7 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   );
 
   const stock = activeVariant?.stock ?? 0;
+  const isLowStock = stock > 0 && stock <= 5;
 
   const addToCart = useCartStore((state) => state.addToCart);
   const addToWishlist = useWishlistStore((state) => state.addToWishlist);
@@ -96,6 +98,35 @@ export default function ProductInfo({ product }: ProductInfoProps) {
 
   const rating = product.averageRating ?? 0;
   const reviewCount = product.reviewCount ?? 0;
+
+  const discountPercent = product.pricing.comparePrice
+    ? Math.round(
+        ((product.pricing.comparePrice - product.pricing.sellingPrice) /
+          product.pricing.comparePrice) *
+          100
+      )
+    : 0;
+
+  function handleAddToCart() {
+    if (stock <= 0) return;
+
+    addToCart({
+      productId: product._id,
+      slug: product.basicInfo.slug,
+      title: product.basicInfo.title,
+      image: coverImage,
+      color: selectedColor,
+      size: selectedSize,
+      price: product.pricing.sellingPrice,
+      quantity,
+      stock,
+      addedAt: new Date().toISOString(),
+    });
+
+    toast.success("Added to Cart 🛒");
+    setJustAdded(true);
+    setTimeout(() => setJustAdded(false), 1200);
+  }
 
   return (
     <div>
@@ -139,6 +170,12 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             ₹{product.pricing.comparePrice}
           </span>
         )}
+
+        {discountPercent > 0 && (
+          <span className="rounded-md bg-emerald-100 px-2.5 py-1 text-xs font-bold text-emerald-700">
+            {discountPercent}% OFF
+          </span>
+        )}
       </div>
       <p className="text-xs text-zinc-400">Inclusive of all taxes</p>
 
@@ -157,14 +194,23 @@ export default function ProductInfo({ product }: ProductInfoProps) {
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
-                className={`h-9 w-9 rounded-full border-2 transition ${
+                className={`relative flex h-9 w-9 items-center justify-center rounded-full border-2 transition ${
                   selectedColor === color
-                    ? "border-violet-600"
-                    : "border-zinc-200"
+                    ? "border-violet-600 ring-2 ring-violet-200"
+                    : "border-zinc-200 hover:border-zinc-300"
                 }`}
                 style={{ backgroundColor: colorHex || "#000" }}
                 title={color}
-              />
+              >
+                {selectedColor === color && (
+                  <Check
+                    className="h-4 w-4 drop-shadow"
+                    style={{
+                      color: colorHex && isLightColor(colorHex) ? "#000" : "#fff",
+                    }}
+                  />
+                )}
+              </button>
             ))}
           </div>
         </div>
@@ -182,46 +228,86 @@ export default function ProductInfo({ product }: ProductInfoProps) {
             </button>
           </div>
           <div className="flex flex-wrap gap-3">
-            {sizesForColor.map((size) => (
-              <button
-                key={size}
-                onClick={() => setSelectedSize(size)}
-                className={`flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-semibold transition ${
-                  selectedSize === size
-                    ? "border-violet-600 bg-violet-600 text-white"
-                    : "border-zinc-300 text-zinc-700 hover:border-violet-400"
-                }`}
-              >
-                {size}
-              </button>
-            ))}
+            {sizesForColor.map((variant) => {
+              const outOfStock = variant.stock <= 0;
+              return (
+                <button
+                  key={variant.size}
+                  disabled={outOfStock}
+                  onClick={() => setSelectedSize(variant.size)}
+                  title={outOfStock ? "Out of stock" : undefined}
+                  className={`relative flex h-11 w-11 items-center justify-center rounded-xl border text-sm font-semibold transition ${
+                    outOfStock
+                      ? "cursor-not-allowed border-zinc-200 text-zinc-300"
+                      : selectedSize === variant.size
+                      ? "border-violet-600 bg-violet-600 text-white"
+                      : "border-zinc-300 text-zinc-700 hover:border-violet-400"
+                  }`}
+                >
+                  {variant.size}
+                  {outOfStock && (
+                    <span className="absolute inset-0 flex items-center justify-center">
+                      <span className="h-[1.5px] w-8 rotate-[-20deg] bg-zinc-300" />
+                    </span>
+                  )}
+                </button>
+              );
+            })}
           </div>
         </div>
       )}
+
+      {isLowStock && (
+        <p className="mt-3 flex items-center gap-1.5 text-sm font-semibold text-red-500">
+          <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-red-500" />
+          Only {stock} left in this size — order soon
+        </p>
+      )}
+
+      {/* Quantity */}
+      <div className="mt-7">
+        <p className="mb-3 text-sm font-semibold text-black">Quantity</p>
+        <div className="inline-flex items-center rounded-xl border border-zinc-300">
+          <button
+            onClick={() => setQuantity((q) => Math.max(1, q - 1))}
+            disabled={quantity <= 1}
+            className="flex h-11 w-11 items-center justify-center text-zinc-600 transition hover:text-black disabled:opacity-30"
+          >
+            <Minus className="h-4 w-4" />
+          </button>
+          <span className="w-10 text-center text-sm font-bold text-black">
+            {quantity}
+          </span>
+          <button
+            onClick={() => setQuantity((q) => Math.min(stock || 1, q + 1))}
+            disabled={quantity >= stock}
+            className="flex h-11 w-11 items-center justify-center text-zinc-600 transition hover:text-black disabled:opacity-30"
+          >
+            <Plus className="h-4 w-4" />
+          </button>
+        </div>
+      </div>
 
       {/* Actions */}
       <div className="mt-8 flex gap-3">
         <button
           disabled={stock <= 0}
-          onClick={() => {
-            addToCart({
-              productId: product._id,
-              slug: product.basicInfo.slug,
-              title: product.basicInfo.title,
-              image: coverImage,
-              color: selectedColor,
-              size: selectedSize,
-              price: product.pricing.sellingPrice,
-              quantity,
-              stock,
-              addedAt: new Date().toISOString(),
-            });
-            toast.success("Added to Cart 🛒");
-          }}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 font-semibold text-white transition hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-300"
+          onClick={handleAddToCart}
+          className={`flex flex-1 items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 font-semibold text-white transition-all duration-200 hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-300 ${
+            justAdded ? "scale-[0.98]" : ""
+          }`}
         >
-          <ShoppingBag className="h-5 w-5" />
-          {stock > 0 ? "ADD TO CART" : "OUT OF STOCK"}
+          {justAdded ? (
+            <>
+              <Check className="h-5 w-5" />
+              ADDED
+            </>
+          ) : (
+            <>
+              <ShoppingBag className="h-5 w-5" />
+              {stock > 0 ? "ADD TO CART" : "OUT OF STOCK"}
+            </>
+          )}
         </button>
 
         <button
@@ -270,6 +356,25 @@ export default function ProductInfo({ product }: ProductInfoProps) {
         </div>
         <ChevronRight className="h-4 w-4 text-zinc-400" />
       </div>
+
+      <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
+        <ShieldCheck className="h-4 w-4 text-emerald-500" />
+        100% authentic — every ZeroArc piece ships sealed and QC-checked.
+      </div>
+
+      {activeVariant?.sku && (
+        <p className="mt-4 text-xs text-zinc-400">SKU: {activeVariant.sku}</p>
+      )}
     </div>
   );
+}
+
+function isLightColor(hex: string) {
+  const c = hex.replace("#", "");
+  if (c.length !== 6) return false;
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+  return brightness > 180;
 }
