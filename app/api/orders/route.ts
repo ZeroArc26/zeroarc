@@ -56,6 +56,7 @@ export async function POST(req: Request) {
       discount = 0,
       total = 0,
       couponCode,
+      paymentResult,
     } = body;
 
     const fullName = [customer?.firstName, customer?.lastName]
@@ -166,7 +167,8 @@ export async function POST(req: Request) {
 
       payment: {
         method: mapPaymentMethod(paymentMethod),
-        status: "pending",
+        status: paymentResult?.razorpayPaymentId ? "paid" : "pending",
+        transactionId: paymentResult?.razorpayPaymentId || undefined,
       },
     };
 

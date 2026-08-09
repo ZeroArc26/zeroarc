@@ -92,7 +92,14 @@ export async function GET(request: Request, { params }: RouteParams) {
       },
     };
 
-    const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL || ""}/account/orders/${order.orderInfo?.orderNumber}`;
+    const isRealDelhiveryAwb =
+      order.shippingLabel?.courierPartner === "Delhivery" &&
+      order.shippingLabel?.awbNumber &&
+      !order.shippingLabel?.isProvisionalAwb;
+
+    const trackingUrl = isRealDelhiveryAwb
+      ? `https://www.delhivery.com/track/package/${order.shippingLabel.awbNumber}`
+      : `${process.env.NEXT_PUBLIC_APP_URL || ""}/account/orders/${order.orderInfo?.orderNumber}`;
 
     const qrDataUrl = await QRCode.toDataURL(trackingUrl, {
       margin: 1,

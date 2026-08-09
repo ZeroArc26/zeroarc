@@ -37,6 +37,9 @@ export async function getOrderById(
     shippingLabel:
       order.shippingLabel,
 
+    returnInfo:
+      order.returnInfo,
+
     timeline:
       order.timeline || [],
 

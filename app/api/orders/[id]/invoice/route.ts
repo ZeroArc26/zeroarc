@@ -8,6 +8,9 @@ import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import InvoiceDocument from "@/lib/pdf/InvoiceDocument";
 import { getStoreSettings } from "@/lib/settings";
+import { getCurrentUser } from "@/lib/auth";
+import { getAdminCookie } from "@/lib/auth/cookies";
+import { verifyAdminToken } from "@/lib/auth/jwt";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -62,6 +65,29 @@ export async function GET(request: Request, { params }: RouteParams) {
       );
     }
 
+    // ---- Ownership check: only the order's own customer, or an admin, can access this invoice ----
+    const currentUser = await getCurrentUser();
+    const isOwner =
+      currentUser?.email?.toLowerCase() === order.customer?.email?.toLowerCase();
+
+    let isAdmin = false;
+    try {
+      const adminToken = await getAdminCookie();
+      if (adminToken) {
+        verifyAdminToken(adminToken);
+        isAdmin = true;
+      }
+    } catch {
+      isAdmin = false;
+    }
+
+    if (!isOwner && !isAdmin) {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized." },
+        { status: 403 }
+      );
+    }
+
     const settings = await getStoreSettings();
 
     const company = {
@@ -74,7 +100,21 @@ export async function GET(request: Request, { params }: RouteParams) {
       state: settings.tax?.companyState || "West Bengal",
     };
 
-    const trackingUrl = `${process.env.NEXT_PUBLIC_APP_URL || ""}/account/orders/${order.orderInfo?.orderNumber}`;
+    // ------------------------------------------------------------
+    // If this order has a REAL Delhivery AWB (not a provisional
+    // fallback), the invoice's QR code points straight to
+    // Delhivery's own public tracking page for that AWB. Otherwise
+    // it falls back to ZeroArc's own order-tracking page — so the
+    // QR always works, never a dead/broken link.
+    // ------------------------------------------------------------
+    const isRealDelhiveryAwb =
+      order.shippingLabel?.courierPartner === "Delhivery" &&
+      order.shippingLabel?.awbNumber &&
+      !order.shippingLabel?.isProvisionalAwb;
+
+    const trackingUrl = isRealDelhiveryAwb
+      ? `https://www.delhivery.com/track/package/${order.shippingLabel.awbNumber}`
+      : `${process.env.NEXT_PUBLIC_APP_URL || ""}/account/orders/${order.orderInfo?.orderNumber}`;
 
     const qrDataUrl = await QRCode.toDataURL(trackingUrl, {
       margin: 1,

@@ -13,6 +13,7 @@ import OrderActions from "@/components/admin/orders/OrderActions";
 import InvoiceActions from "@/components/admin/orders/InvoiceActions";
 import OrderSummary from "@/components/admin/orders/OrderSummary";
 import ShippingLabelActions from "@/components/admin/orders/ShippingLabelActions";
+import ReturnManagementCard from "@/components/admin/orders/ReturnManagementCard";
 
 
 type Props = {
@@ -99,6 +100,14 @@ export default async function OrderDetailsPage({
             }
 
           />
+
+          {order.returnInfo && order.returnInfo.status !== "none" && (
+  <ReturnManagementCard
+    orderId={order.id}
+    returnInfo={order.returnInfo}
+    grandTotal={order.pricing.grandTotal}
+  />
+)}
 
 
         </div>

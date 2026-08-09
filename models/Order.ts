@@ -483,6 +483,39 @@ const OrderSchema = new Schema(
 
     },
 
+    returnInfo: {
+      status: {
+        type: String,
+        enum: [
+          "none",
+          "requested",
+          "approved",
+          "rejected",
+          "pickup_scheduled",
+          "picked_up",
+          "refunded",
+        ],
+        default: "none",
+      },
+      reason: {
+        type: String,
+        trim: true,
+      },
+      comments: {
+        type: String,
+        trim: true,
+      },
+      images: [String],
+      requestedAt: Date,
+      pickupDate: Date,
+      refundAmount: Number,
+      refundedAt: Date,
+      adminNotes: {
+        type: String,
+        trim: true,
+      },
+    },
+
 
 
 
