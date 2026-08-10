@@ -13,6 +13,11 @@ import ProductTabs from "@/components/products/ProductTabs";
 import ProductPromoBanner from "@/components/products/ProductPromoBanner";
 import RelatedProducts from "@/components/products/RelatedProducts";
 
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
+
+export const dynamic = "force-dynamic";
+
 interface ProductPageProps {
   params: Promise<{
     slug: string;
@@ -20,33 +25,30 @@ interface ProductPageProps {
 }
 
 async function getProduct(slug: string) {
-  const res = await fetch(
-    `${process.env.NEXT_PUBLIC_APP_URL}/api/products/slug/${slug}`,
-    { cache: "no-store" }
-  );
+  await connectDB();
 
-  if (!res.ok) return null;
+  const product: any = await Product.findOne({
+    "basicInfo.slug": slug,
+    "publish.status": "active",
+  }).lean();
 
-  const data = await res.json();
-  return data.product;
+  if (!product) return null;
+
+  return { ...product, _id: product._id.toString() };
 }
 
 async function getRelatedProducts(category: string, excludeSlug: string) {
-  const res = await fetch(`${process.env.NEXT_PUBLIC_APP_URL}/api/products`, {
-    cache: "no-store",
-  });
+  await connectDB();
 
-  if (!res.ok) return [];
+  const raw = await Product.find({
+    "publish.status": "active",
+    "basicInfo.category": category,
+    "basicInfo.slug": { $ne: excludeSlug },
+  })
+    .limit(5)
+    .lean();
 
-  const data = await res.json();
-
-  return (data.products || [])
-    .filter(
-      (p: any) =>
-        p.basicInfo.category === category &&
-        p.basicInfo.slug !== excludeSlug
-    )
-    .slice(0, 5);
+  return raw.map((p: any) => ({ ...p, _id: p._id.toString() }));
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {
