@@ -11,11 +11,12 @@ import {
   Heart,
   ShoppingBag,
   X,
+  Menu,
+  ChevronDown,
 } from "lucide-react";
 
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
-import { DUMMY_PRODUCTS } from "@/constants/dummy-products";
 
 export default function Navbar() {
   const router = useRouter();
@@ -26,8 +27,6 @@ export default function Navbar() {
   const cartItems = useCartStore((state) => state.items);
   const wishlistItems = useWishlistStore((state) => state.items);
 
-  // Persisted stores only exist in localStorage, so gate real counts
-  // behind `mounted` to avoid a server/client hydration mismatch.
   const cartCount = mounted
     ? cartItems.reduce((total, item) => total + item.quantity, 0)
     : 0;
@@ -38,12 +37,72 @@ export default function Navbar() {
   const [query, setQuery] = useState("");
   const searchRef = useRef<HTMLDivElement>(null);
 
-  const results =
-    query.trim().length > 0
-      ? DUMMY_PRODUCTS.filter((p) =>
-          p.basicInfo.title.toLowerCase().includes(query.trim().toLowerCase())
-        ).slice(0, 5)
-      : [];
+  const [results, setResults] = useState<any[]>([]);
+  const [searchLoading, setSearchLoading] = useState(false);
+
+  useEffect(() => {
+    const trimmed = query.trim();
+    if (!trimmed) {
+      setResults([]);
+      return;
+    }
+
+    setSearchLoading(true);
+    const timeout = setTimeout(async () => {
+      try {
+        const res = await fetch(
+          `/api/products/search?q=${encodeURIComponent(trimmed)}`
+        );
+        const data = await res.json();
+        setResults(data.success ? data.products : []);
+      } catch (err) {
+        console.error(err);
+        setResults([]);
+      } finally {
+        setSearchLoading(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(timeout);
+  }, [query]);
+
+  // Mobile menu
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [mobileCategoryOpen, setMobileCategoryOpen] = useState(false);
+
+  // Desktop category dropdown
+  const [categoryOpen, setCategoryOpen] = useState(false);
+  const categoryRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    document.body.style.overflow = mobileMenuOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileMenuOpen]);
+
+  useEffect(() => {
+    function handleClickOutsideCategory(e: MouseEvent) {
+      if (categoryRef.current && !categoryRef.current.contains(e.target as Node)) {
+        setCategoryOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutsideCategory);
+    return () => document.removeEventListener("mousedown", handleClickOutsideCategory);
+  }, []);
+
+  const categoryLinks = [
+    { href: "/men", label: "MENS" },
+    { href: "/women", label: "WOMENS" },
+    { href: "/unisex", label: "UNISEX" },
+  ];
+
+  const navLinks = [
+    { href: "/", label: "HOME" },
+    { href: "/collections", label: "COLLECTIONS" },
+    { href: "/new-arrivals", label: "NEW ARRIVALS" },
+    { href: "/about", label: "ABOUT US" },
+  ];
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -65,25 +124,63 @@ export default function Navbar() {
   };
 
   return (
+    <>
     <header className="sticky top-0 z-50 border-b border-zinc-200 bg-white">
       <div className="mx-auto flex h-20 max-w-[1600px] items-center justify-between px-8 lg:px-12 xl:px-16">
-        {/* Logo */}
-        <Link href="/" className="flex shrink-0 items-center">
-          <Image
-            src="/images/logo/zeroarc-logo.png"
-            alt="ZeroArc"
-            width={165}
-            height={52}
-            priority
-            className="h-auto w-auto"
-          />
-        </Link>
+        {/* Hamburger (mobile) + Logo */}
+        <div className="flex shrink-0 items-center gap-3">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            aria-label="Open menu"
+            className="-ml-1 p-1 text-zinc-900 transition hover:text-violet-600 lg:hidden"
+          >
+            <Menu className="h-6 w-6" />
+          </button>
+
+          <Link href="/" className="flex shrink-0 items-center">
+            <Image
+              src="/images/logo/zeroarc-logo.png"
+              alt="ZeroArc"
+              width={165}
+              height={52}
+              priority
+              className="h-auto w-auto"
+            />
+          </Link>
+        </div>
 
         {/* Navigation */}
         <nav className="hidden flex-1 items-center justify-center gap-12 lg:flex">
           <Link href="/" className="text-[13px] font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600">HOME</Link>
-          <Link href="/men" className="text-[13px] font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600">MEN</Link>
-          <Link href="/women" className="text-[13px] font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600">WOMEN</Link>
+
+          {/* Category dropdown */}
+          <div className="relative" ref={categoryRef}>
+            <button
+              onClick={() => setCategoryOpen((prev) => !prev)}
+              className="flex items-center gap-1 text-[13px] font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600"
+            >
+              CATEGORY
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${categoryOpen ? "rotate-180" : ""}`}
+              />
+            </button>
+
+            {categoryOpen && (
+              <div className="absolute left-1/2 top-10 w-44 -translate-x-1/2 rounded-2xl border border-zinc-200 bg-white p-2 shadow-xl">
+                {categoryLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setCategoryOpen(false)}
+                    className="block rounded-xl px-4 py-3 text-[13px] font-semibold tracking-[0.1em] text-zinc-900 transition hover:bg-zinc-50 hover:text-violet-600"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            )}
+          </div>
+
           <Link href="/collections" className="text-[13px] font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600">
             COLLECTIONS
           </Link>
@@ -162,7 +259,11 @@ export default function Navbar() {
                   </div>
                 )}
 
-                {query.trim().length > 0 && results.length === 0 && (
+                {searchLoading && (
+                  <p className="mt-3 text-sm text-zinc-400">Searching...</p>
+                )}
+
+                {!searchLoading && query.trim().length > 0 && results.length === 0 && (
                   <p className="mt-3 text-sm text-zinc-400">
                     No products found.
                   </p>
@@ -198,5 +299,114 @@ export default function Navbar() {
         </div>
       </div>
     </header>
+
+    {/* Mobile menu backdrop */}
+    <div
+      onClick={() => setMobileMenuOpen(false)}
+      className={`fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
+        mobileMenuOpen ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    />
+
+    {/* Mobile menu drawer */}
+    <div
+      className={`fixed left-0 top-0 z-[70] h-full w-[80%] max-w-xs bg-white shadow-2xl transition-transform duration-300 ease-out lg:hidden ${
+        mobileMenuOpen ? "translate-x-0" : "-translate-x-full"
+      }`}
+    >
+      <div className="flex h-20 items-center justify-between border-b border-zinc-200 px-6">
+        <Image
+          src="/images/logo/zeroarc-logo.png"
+          alt="ZeroArc"
+          width={140}
+          height={44}
+          className="h-auto w-auto"
+        />
+        <button
+          onClick={() => setMobileMenuOpen(false)}
+          aria-label="Close menu"
+          className="p-1 text-zinc-900 transition hover:text-violet-600"
+        >
+          <X className="h-6 w-6" />
+        </button>
+      </div>
+
+      <nav className="flex flex-col px-6 py-4">
+        <Link
+          href="/"
+          onClick={() => setMobileMenuOpen(false)}
+          className="border-b border-zinc-100 py-4 text-sm font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600"
+        >
+          HOME
+        </Link>
+
+        {/* Category accordion */}
+        <div className="border-b border-zinc-100">
+          <button
+            onClick={() => setMobileCategoryOpen((prev) => !prev)}
+            className="flex w-full items-center justify-between py-4 text-sm font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600"
+          >
+            CATEGORY
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${mobileCategoryOpen ? "rotate-180" : ""}`}
+            />
+          </button>
+
+          {mobileCategoryOpen && (
+            <div className="flex flex-col pb-3 pl-4">
+              {categoryLinks.map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="py-3 text-sm font-medium tracking-[0.1em] text-zinc-600 transition-colors hover:text-violet-600"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {navLinks
+          .filter((link) => link.href !== "/")
+          .map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileMenuOpen(false)}
+              className="border-b border-zinc-100 py-4 text-sm font-semibold tracking-[0.12em] text-zinc-900 transition-colors hover:text-violet-600"
+            >
+              {link.label}
+            </Link>
+          ))}
+      </nav>
+
+      <div className="flex items-center gap-6 px-6 py-5">
+        <Link
+          href="/account"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-2 text-sm text-zinc-700 transition hover:text-violet-600"
+        >
+          <User className="h-5 w-5" />
+          Account
+        </Link>
+
+        <Link
+          href="/account/wishlist"
+          onClick={() => setMobileMenuOpen(false)}
+          className="flex items-center gap-2 text-sm text-zinc-700 transition hover:text-violet-600"
+        >
+          <Heart className="h-5 w-5" />
+          Wishlist
+          {wishlistCount > 0 && (
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-violet-600 text-[10px] font-bold text-white">
+              {wishlistCount}
+            </span>
+          )}
+        </Link>
+      </div>
+    </div>
+    </>
   );
 }

@@ -43,6 +43,7 @@ export default function ProductTable({
     }
     alt={product.basicInfo.title}
     fill
+    sizes="48px"
     className="object-cover"
   />
 </div>

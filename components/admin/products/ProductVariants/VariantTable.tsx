@@ -2,9 +2,7 @@
 
 import {
   Copy,
-  Edit,
   Trash2,
-  MoreHorizontal,
 } from "lucide-react";
 
 import {
@@ -25,6 +23,7 @@ import {
 
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 import { VariantTableProps } from "./types";
 
@@ -52,6 +51,20 @@ export default function VariantTable({
         sku: `${variant.sku}-COPY`,
       },
     ]);
+  };
+
+  const handleStockChange = (id: string, value: string) => {
+    const stock = Math.max(0, Number(value) || 0);
+    setVariants((prev) =>
+      prev.map((v) => (v.id === id ? { ...v, stock } : v))
+    );
+  };
+
+  const handlePriceChange = (id: string, value: string) => {
+    const price = Math.max(0, Number(value) || 0);
+    setVariants((prev) =>
+      prev.map((v) => (v.id === id ? { ...v, price } : v))
+    );
   };
 
   if (!variants.length) {
@@ -161,23 +174,35 @@ export default function VariantTable({
                 {/* Price */}
 
                 <TableCell>
-                  ₹{variant.price}
+                  <Input
+                    type="number"
+                    min={0}
+                    value={variant.price}
+                    onChange={(e) =>
+                      handlePriceChange(variant.id, e.target.value)
+                    }
+                    className="w-24"
+                  />
                 </TableCell>
 
                 {/* Stock */}
 
                 <TableCell>
+                  <div className="flex items-center gap-2">
+                    <Input
+                      type="number"
+                      min={0}
+                      value={variant.stock}
+                      onChange={(e) =>
+                        handleStockChange(variant.id, e.target.value)
+                      }
+                      className="w-20"
+                    />
 
-                  <Badge
-                    variant={
-                      variant.stock <= 10
-                        ? "destructive"
-                        : "secondary"
-                    }
-                  >
-                    {variant.stock}
-                  </Badge>
-
+                    {variant.stock <= 10 && (
+                      <Badge variant="destructive">Low</Badge>
+                    )}
+                  </div>
                 </TableCell>
 
                 {/* Status */}
@@ -219,13 +244,6 @@ export default function VariantTable({
                     <Button
                       variant="ghost"
                       size="icon"
-                    >
-                      <Edit className="h-4 w-4" />
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
                       onClick={() =>
                         handleDelete(
                           variant.id
@@ -233,13 +251,6 @@ export default function VariantTable({
                       }
                     >
                       <Trash2 className="h-4 w-4 text-red-500" />
-                    </Button>
-
-                    <Button
-                      variant="ghost"
-                      size="icon"
-                    >
-                      <MoreHorizontal className="h-4 w-4" />
                     </Button>
 
                   </div>

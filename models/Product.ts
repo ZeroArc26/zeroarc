@@ -461,10 +461,6 @@ ProductSchema.index(
 );
 
 ProductSchema.index({
-  "publish.status": 1,
-});
-
-ProductSchema.index({
   "publish.featured": 1,
 });
 

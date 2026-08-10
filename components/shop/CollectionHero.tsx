@@ -26,6 +26,7 @@ export default function CollectionHero({
           src={image}
           alt=""
           fill
+          sizes="100vw"
           priority
           className={`object-cover opacity-90 ${imagePosition}`}
         />

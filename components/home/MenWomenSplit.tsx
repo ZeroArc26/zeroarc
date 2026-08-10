@@ -7,7 +7,7 @@ export default function MenWomenSplit() {
       {/* ================= MEN ================= */}
       <Link
         href="/men"
-        className="group relative block min-h-[420px] overflow-hidden md:min-h-[520px]"
+        className="group relative block aspect-[3/2] w-full overflow-hidden md:aspect-auto md:min-h-[520px]"
       >
         <Image
           src="/images/banners/mens-banner.png"
@@ -20,7 +20,7 @@ export default function MenWomenSplit() {
       {/* ================= WOMEN ================= */}
       <Link
         href="/women"
-        className="group relative block min-h-[420px] overflow-hidden md:min-h-[520px]"
+        className="group relative block aspect-[3/2] w-full overflow-hidden md:aspect-auto md:min-h-[520px]"
       >
         <Image
           src="/images/banners/women-banner.png"

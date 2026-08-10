@@ -11,6 +11,7 @@ import {
   MAX_IMAGES,
   generateImageId,
   getImageDimensions,
+  compressImage,
 } from "./image-utils";
 
 import type { ProductImage } from "./image-types";
@@ -48,7 +49,8 @@ export default function ImageDropzone({
       });
 
       const newImages: ProductImage[] = await Promise.all(
-        acceptedFiles.map(async (file, index) => {
+        acceptedFiles.map(async (rawFile, index) => {
+          const file = await compressImage(rawFile);
           const preview = URL.createObjectURL(file);
 
           const { width, height } = await getImageDimensions(file);

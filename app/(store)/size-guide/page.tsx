@@ -20,7 +20,6 @@ import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
 
 const SIZE_CHART = [
-  { size: "XS", chest: 36, length: 26, shoulder: 16, sleeve: 7.5, weight: "45-55 kg" },
   { size: "S", chest: 38, length: 27, shoulder: 17, sleeve: 8, weight: "55-65 kg" },
   { size: "M", chest: 40, length: 28, shoulder: 18, sleeve: 8.5, weight: "65-75 kg" },
   { size: "L", chest: 42, length: 29, shoulder: 19, sleeve: 9, weight: "75-85 kg" },
@@ -31,7 +30,7 @@ const SIZE_CHART = [
 
 // Midpoint of each size's weight band, used for nearest-match calculation.
 const WEIGHT_MIDPOINTS = [50, 60, 70, 80, 90, 102.5, 117.5];
-const SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+const SIZES = ["S", "M", "L", "XL", "XXL", "XXXL"];
 
 const MEASURE_STEPS = [
   {

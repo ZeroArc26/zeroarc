@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import { Package2, CheckCircle2 } from "lucide-react";
 
@@ -29,6 +29,17 @@ export default function ProductBasicInfo() {
   } = useFormContext<ProductFormValues>();
 
   const tags = watch("basicInfo.tags") ?? [];
+
+  // Tags input is kept as a separate local string so the user can type a
+  // trailing comma/space to start the next tag without it being stripped
+  // out immediately by the tags-array filter on every keystroke.
+  const [tagsInput, setTagsInput] = useState(tags.join(", "));
+
+  useEffect(() => {
+    setTagsInput(tags.join(", "));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
   const title = watch("basicInfo.title") ?? "";
   const slug = watch("basicInfo.slug") ?? "";
   const description = watch("basicInfo.description") ?? "";
@@ -460,11 +471,14 @@ useEffect(() => {
           <Input
   id="tags"
   placeholder="Anime, Naruto, Oversized"
-  value={tags.join(", ")}
+  value={tagsInput}
   onChange={(e) => {
+    const raw = e.target.value;
+    setTagsInput(raw);
+
     setValue(
       "basicInfo.tags",
-      e.target.value
+      raw
         .split(",")
         .map((t) => t.trim())
         .filter(Boolean),
@@ -473,6 +487,11 @@ useEffect(() => {
         shouldValidate: true,
       }
     );
+  }}
+  onBlur={() => {
+    // Tidy up the display once the user is done typing (collapses
+    // stray commas/spaces), without affecting the array while typing.
+    setTagsInput(tags.join(", "));
   }}
 />
 

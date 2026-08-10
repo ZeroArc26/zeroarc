@@ -22,7 +22,6 @@ const DEFAULT_COLORS = [
 ];
 
 const DEFAULT_SIZES = [
-  "XS",
   "S",
   "M",
   "L",
@@ -85,7 +84,7 @@ export default function VariantGenerator({
   "Green",
   "Brown",
 ]);
-      setSelectedSizes(["XS", "S", "M", "L", "XL", "XXL", "XXXL"]);
+      setSelectedSizes(["S", "M", "L", "XL", "XXL", "XXXL"]);
     } else {
       setSelectedColors([]);
       setSelectedSizes([]);

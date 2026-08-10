@@ -12,12 +12,12 @@ import Product from "@/models/Product";
 
 export const dynamic = "force-dynamic";
 
-export default async function WomenCollectionPage() {
+export default async function UnisexCollectionPage() {
   await connectDB();
 
   const raw = await Product.find({
     "publish.status": "active",
-    "basicInfo.audience": { $in: ["women", "unisex"] },
+    "basicInfo.audience": "unisex",
   })
     .sort({ createdAt: -1 })
     .lean();
@@ -33,12 +33,11 @@ export default async function WomenCollectionPage() {
       <Navbar />
 
       <CollectionHero
-  title="Collection"
-  highlight="Women"
-  subtitle="Style that empowers, you every day. Anime-inspired pieces with an edge."
-  image="/images/newsletter/newsletter-character.png"
-  imagePosition="object-[75%_20%]"
-/>
+        title="Collection"
+        highlight="Unisex"
+        subtitle="One story, worn by everyone. Anime-inspired streetwear made to fit every identity."
+        image="/images/hero/hero-model-1.png"
+      />
 
       <CollectionClient products={products} />
 

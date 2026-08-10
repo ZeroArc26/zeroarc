@@ -8,36 +8,7 @@ import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
 import CollectionHero from "@/components/shop/CollectionHero";
 
-const COLLECTIONS = [
-  {
-    name: "Anime",
-    subtitle: "Collection",
-    description: "Bold anime graphics for true otaku energy.",
-    image: "/images/collections/collection-anime.png",
-    href: "/collections/anime",
-  },
-  {
-    name: "Oversized",
-    subtitle: "Collection",
-    description: "Relaxed, drop-shoulder fits built for comfort.",
-    image: "/images/collections/collection-oversized.png",
-    href: "/collections/oversized",
-  },
-  {
-    name: "Minimal",
-    subtitle: "Collection",
-    description: "Clean, understated designs for everyday wear.",
-    image: "/images/collections/collection-minimal.png",
-    href: "/collections/minimal",
-  },
-  {
-    name: "Limited",
-    subtitle: "Edition",
-    description: "Rare drops. Once they're gone, they're gone.",
-    image: "/images/hero/hero-model-1.png",
-    href: "/collections/limited",
-  },
-];
+import { COLLECTIONS } from "@/constants/collections";
 
 export default function CollectionsPage() {
   return (
@@ -57,8 +28,8 @@ export default function CollectionsPage() {
         <div className="grid grid-cols-1 gap-8 sm:grid-cols-2">
           {COLLECTIONS.map((col) => (
             <Link
-              key={col.name}
-              href={col.href}
+              key={col.slug}
+              href={`/collections/${col.slug}`}
               className="group relative flex h-[420px] items-end overflow-hidden rounded-2xl bg-zinc-900"
             >
               <Image
