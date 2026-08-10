@@ -23,6 +23,17 @@ export default function Hero() {
         <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-black/10" />
       </div>
 
+      {/* Layered model cutout */}
+      <div className="absolute inset-y-0 right-0 hidden w-[60%] lg:block">
+        <Image
+          src="/images/hero/hero-main.png"
+          alt="ZeroArc models"
+          fill
+          priority
+          className="object-cover object-top"
+        />
+      </div>
+
       <div className="relative z-10 mx-auto flex h-full max-w-[1700px] items-center px-10 xl:px-20">
         {/* ================= LEFT ================= */}
         <div className="flex w-full max-w-2xl flex-col justify-center">
@@ -60,9 +71,6 @@ export default function Hero() {
             </button>
           </div>
         </div>
-
-        {/* ================= RIGHT (layered model) ================= */}
-        
 
         {/* Slide numbers */}
         <div className="absolute right-6 top-[18%] hidden flex-col items-end gap-6 xl:flex">
