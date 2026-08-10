@@ -21,13 +21,8 @@ export async function sendPasswordResetEmail(
 
             <!-- Header -->
             <tr>
-              <td style="background-color:#0a0a0a; padding: 32px 40px; text-align:center;">
-                <img
-                  src="https://zeroarc.in/images/logo/zeroarc-logo.png"
-                  alt="ZeroArc"
-                  width="130"
-                  style="display:block; margin:0 auto; height:auto;"
-                />
+              <td style="background-color:#ffffff; padding: 32px 40px; text-align:center; border-bottom:1px solid #f0f0f2;">
+                <img src="https://zeroarc.in/images/logo/zeroarc-logo1.png" alt="ZeroArc" width="130" style="display:block; margin:0 auto; height:auto;" />
               </td>
             </tr>
 
@@ -55,13 +50,8 @@ export async function sendPasswordResetEmail(
 
                 <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 0 0 28px;">
                   <tr>
-                    <td style="border-radius:12px; background: linear-gradient(90deg, #7c3aed, #a855f7);">
-                      
-                        href="${resetUrl}"
-                        style="display:inline-block; padding:15px 36px; font-size:14px; font-weight:700; color:#ffffff; text-decoration:none; letter-spacing:0.03em;"
-                      >
-                        Reset Password
-                      </a>
+                    <td style="border-radius:12px; background-color:#7c3aed;">
+                      <a href="${resetUrl}" style="display:inline-block; padding:15px 36px; font-size:14px; font-weight:700; color:#ffffff; text-decoration:none; letter-spacing:0.03em;">Reset Password</a>
                     </td>
                   </tr>
                 </table>
