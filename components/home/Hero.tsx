@@ -24,7 +24,7 @@ export default function Hero() {
       </div>
 
       {/* Layered model cutout */}
-      <div className="absolute inset-x-0 bottom-0 h-[45%] w-full opacity-60 lg:inset-y-0 lg:right-0 lg:top-0 lg:h-full lg:w-[60%] lg:opacity-100">
+      <div className="absolute inset-x-0 bottom-0 h-[45%] w-full opacity-60 lg:left-auto lg:right-0 lg:top-0 lg:h-full lg:w-[60%] lg:opacity-100">
         <Image
           src="/images/hero/hero-main.png"
           alt="ZeroArc models"
