@@ -1,5 +1,8 @@
 import Image from "next/image";
 import Link from "next/link";
+
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
 function InstagramIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="h-5 w-5">
@@ -62,10 +65,10 @@ const FOOTER_LINKS = {
 export default function Footer() {
   return (
     <footer className="bg-black text-zinc-400">
-      <div className="mx-auto max-w-[1700px] px-6 py-16 md:px-14">
+      <StaggerGroup gap={0.04} className="mx-auto max-w-[1700px] px-6 py-16 md:px-14">
         <div className="grid grid-cols-2 gap-10 md:grid-cols-5">
           {/* Brand */}
-          <div className="col-span-2">
+          <StaggerItem className="col-span-2">
             <Image
               src="/images/logo/zeroarc-logo.png"
               alt="ZeroArc"
@@ -80,23 +83,23 @@ export default function Footer() {
             </p>
 
             <div className="mt-6 flex gap-4">
-  <Link href="#" className="transition hover:text-white">
-    <InstagramIcon />
-  </Link>
-  <Link href="#" className="transition hover:text-white">
-    <YoutubeIcon />
-  </Link>
-  <Link href="#" className="transition hover:text-white">
-    <TwitterIcon />
-  </Link>
-  <Link href="#" className="transition hover:text-white">
-    <FacebookIcon />
-  </Link>
-</div>
-          </div>
+              <Link href="#" className="transition hover:scale-110 hover:text-white">
+                <InstagramIcon />
+              </Link>
+              <Link href="#" className="transition hover:scale-110 hover:text-white">
+                <YoutubeIcon />
+              </Link>
+              <Link href="#" className="transition hover:scale-110 hover:text-white">
+                <TwitterIcon />
+              </Link>
+              <Link href="#" className="transition hover:scale-110 hover:text-white">
+                <FacebookIcon />
+              </Link>
+            </div>
+          </StaggerItem>
 
           {/* Shop */}
-          <div>
+          <StaggerItem>
             <h4 className="mb-4 text-sm font-bold uppercase tracking-wide text-white">
               Shop
             </h4>
@@ -109,10 +112,10 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </StaggerItem>
 
           {/* Help */}
-          <div>
+          <StaggerItem>
             <h4 className="mb-4 text-sm font-bold uppercase tracking-wide text-white">
               Help
             </h4>
@@ -125,10 +128,10 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </StaggerItem>
 
           {/* About */}
-          <div>
+          <StaggerItem>
             <h4 className="mb-4 text-sm font-bold uppercase tracking-wide text-white">
               About
             </h4>
@@ -141,11 +144,11 @@ export default function Footer() {
                 </li>
               ))}
             </ul>
-          </div>
+          </StaggerItem>
         </div>
 
         {/* App download */}
-        <div className="mt-12 flex flex-col items-start justify-between gap-6 border-t border-zinc-800 pt-8 md:flex-row md:items-center">
+        <StaggerItem className="mt-12 flex flex-col items-start justify-between gap-6 border-t border-zinc-800 pt-8 md:flex-row md:items-center">
           <div>
             <h4 className="text-sm font-bold uppercase tracking-wide text-white">
               Download Our App
@@ -161,8 +164,8 @@ export default function Footer() {
               <span></span> App Store
             </div>
           </div>
-        </div>
-      </div>
+        </StaggerItem>
+      </StaggerGroup>
 
       {/* Bottom bar */}
       <div className="border-t border-zinc-900 px-6 py-6 text-center text-xs text-zinc-500 md:px-14">

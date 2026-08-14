@@ -7,6 +7,21 @@ html, body {
      max-width: 100vw;
    }
 
+/* Reduced-motion fallback for pure-CSS animations/transitions (e.g. the
+   Hero scroll indicator's Tailwind `animate-bounce`). Framer Motion's own
+   `useReducedMotion()` hook already handles every JS-driven animation in
+   the motion system separately — this covers what that hook can't reach. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {

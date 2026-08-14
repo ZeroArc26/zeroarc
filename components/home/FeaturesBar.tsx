@@ -1,5 +1,7 @@
 import { Gem, Truck, RotateCcw, ShieldCheck } from "lucide-react";
 
+import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
+
 const FEATURES = [
   {
     icon: Gem,
@@ -26,10 +28,15 @@ const FEATURES = [
 export default function FeaturesBar() {
   return (
     <section className="border-y border-zinc-200 bg-white px-6 py-10 md:px-14">
-      <div className="mx-auto grid max-w-[1700px] grid-cols-2 gap-8 md:grid-cols-4">
+      <StaggerGroup gap={0.03} className="mx-auto grid max-w-[1700px] grid-cols-2 gap-8 md:grid-cols-4 md:divide-x md:divide-zinc-200">
         {FEATURES.map(({ icon: Icon, title, subtitle }) => (
-          <div key={title} className="flex items-center gap-4">
-            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-600">
+          <StaggerItem
+            key={title}
+            y={8}
+            duration={0.35}
+            className="flex items-center gap-4 md:pl-8 md:first:pl-0"
+          >
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-violet-50 text-violet-600 transition-transform duration-300 hover:scale-110">
               <Icon className="h-6 w-6" />
             </div>
 
@@ -39,9 +46,9 @@ export default function FeaturesBar() {
               </p>
               <p className="text-xs text-zinc-500">{subtitle}</p>
             </div>
-          </div>
+          </StaggerItem>
         ))}
-      </div>
+      </StaggerGroup>
     </section>
   );
 }
