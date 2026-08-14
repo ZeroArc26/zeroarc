@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight } from "lucide-react";
 
+import Reveal from "@/components/motion/Reveal";
+
 interface CollectionHeroProps {
   title: string;
   highlight: string;
@@ -33,7 +35,12 @@ export default function CollectionHero({
         <div className="absolute inset-0 bg-gradient-to-r from-black via-black/70 to-black/20" />
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1700px] px-6 py-14 md:px-14">
+      <Reveal
+        trigger="mount"
+        y={10}
+        duration={0.4}
+        className="relative z-10 mx-auto max-w-[1700px] px-6 py-14 md:px-14"
+      >
         <nav className="mb-6 flex items-center gap-2 text-sm text-zinc-400">
           <Link href="/" className="transition hover:text-white">
             Home
@@ -49,7 +56,7 @@ export default function CollectionHero({
         </h1>
 
         <p className="mt-4 max-w-md text-zinc-400">{subtitle}</p>
-      </div>
+      </Reveal>
     </div>
   );
 }

@@ -3,7 +3,11 @@
 import { useMemo, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import { Heart, Star, ChevronLeft, ChevronRight, Grid3x3, List } from "lucide-react";
+
+import Reveal from "@/components/motion/Reveal";
+import { DURATION, EASE_OUT } from "@/components/motion/config";
 
 interface CollectionProduct {
   _id: string;
@@ -36,6 +40,8 @@ const SORT_OPTIONS = [
 const PAGE_SIZE = 12;
 
 export default function CollectionClient({ products }: CollectionClientProps) {
+  const reduceMotion = useReducedMotion();
+
   const categories = useMemo(() => {
     const map = new Map<string, number>();
     products.forEach((p) => {
@@ -128,11 +134,16 @@ export default function CollectionClient({ products }: CollectionClientProps) {
     setPage(1);
   };
 
+  // Changes whenever the *visible result set* changes (filters, sort,
+  // page, or grid/list view) — drives the crossfade below so switching
+  // filters never snaps abruptly, without touching any filtering logic.
+  const gridKey = `${selectedCategories.join(",")}|${selectedSize}|${selectedColor}|${sortBy}|${page}|${view}`;
+
   return (
     <div className="mx-auto max-w-[1700px] px-6 py-10 md:px-14">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[260px_1fr]">
         {/* Sidebar filters */}
-        <aside>
+        <Reveal as="aside">
           <div className="mb-6 flex items-center justify-between">
             <h3 className="text-sm font-bold uppercase tracking-wide text-black">
               Filters
@@ -194,8 +205,9 @@ export default function CollectionClient({ products }: CollectionClientProps) {
               </p>
               <div className="flex flex-wrap gap-2">
                 {allSizes.map((size) => (
-                  <button
+                  <motion.button
                     key={size}
+                    whileTap={{ scale: 0.92 }}
                     onClick={() => {
                       setPage(1);
                       setSelectedSize((prev) => (prev === size ? null : size));
@@ -207,7 +219,7 @@ export default function CollectionClient({ products }: CollectionClientProps) {
                     }`}
                   >
                     {size}
-                  </button>
+                  </motion.button>
                 ))}
               </div>
             </div>
@@ -221,8 +233,9 @@ export default function CollectionClient({ products }: CollectionClientProps) {
               </p>
               <div className="flex flex-wrap gap-2.5">
                 {allColors.map(([color, hex]) => (
-                  <button
+                  <motion.button
                     key={color}
+                    whileTap={{ scale: 0.88 }}
                     onClick={() => {
                       setPage(1);
                       setSelectedColor((prev) =>
@@ -241,11 +254,11 @@ export default function CollectionClient({ products }: CollectionClientProps) {
               </div>
             </div>
           )}
-        </aside>
+        </Reveal>
 
         {/* Product grid */}
         <div>
-          <div className="mb-6 flex flex-wrap items-center justify-between gap-4">
+          <Reveal className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-zinc-500">
               {filtered.length} Products
             </p>
@@ -261,7 +274,7 @@ export default function CollectionClient({ products }: CollectionClientProps) {
                       e.target.value as (typeof SORT_OPTIONS)[number]["value"]
                     );
                   }}
-                  className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-black outline-none"
+                  className="rounded-lg border border-zinc-300 bg-white px-3 py-1.5 text-sm font-medium text-black outline-none transition-colors focus:border-violet-500"
                 >
                   {SORT_OPTIONS.map((opt) => (
                     <option key={opt.value} value={opt.value}>
@@ -272,120 +285,162 @@ export default function CollectionClient({ products }: CollectionClientProps) {
               </div>
 
               <div className="flex gap-1 rounded-lg border border-zinc-300 p-1">
-                <button
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setView("grid")}
-                  className={`flex h-7 w-7 items-center justify-center rounded ${
+                  className={`flex h-7 w-7 items-center justify-center rounded transition-colors ${
                     view === "grid" ? "bg-violet-600 text-white" : "text-zinc-500"
                   }`}
                 >
                   <Grid3x3 className="h-4 w-4" />
-                </button>
-                <button
+                </motion.button>
+                <motion.button
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setView("list")}
-                  className={`flex h-7 w-7 items-center justify-center rounded ${
+                  className={`flex h-7 w-7 items-center justify-center rounded transition-colors ${
                     view === "list" ? "bg-violet-600 text-white" : "text-zinc-500"
                   }`}
                 >
                   <List className="h-4 w-4" />
-                </button>
+                </motion.button>
               </div>
             </div>
-          </div>
+          </Reveal>
 
           {paginated.length === 0 ? (
-            <p className="py-20 text-center text-zinc-500">
-              No products match these filters.
-            </p>
+            <Reveal>
+              <p className="py-20 text-center text-zinc-500">
+                No products match these filters.
+              </p>
+            </Reveal>
           ) : (
-            <div
-              className={
-                view === "grid"
-                  ? "grid grid-cols-2 gap-6 sm:grid-cols-3 xl:grid-cols-4"
-                  : "flex flex-col gap-4"
-              }
-            >
-              {paginated.map((product) => (
-                <Link
-                  key={product._id}
-                  href={`/products/${product.basicInfo.slug}`}
-                  className={`group relative ${
-                    view === "list" ? "flex gap-4" : ""
-                  }`}
-                >
-                  <div
-                    className={`relative overflow-hidden rounded-2xl bg-zinc-100 ${
-                      view === "list" ? "h-32 w-32 shrink-0" : "aspect-square"
-                    }`}
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={gridKey}
+                initial="hidden"
+                animate="show"
+                exit={{
+                  opacity: 0,
+                  transition: { duration: reduceMotion ? 0.1 : 0.15 },
+                }}
+                variants={{
+                  hidden: {},
+                  show: {
+                    transition: {
+                      staggerChildren: reduceMotion ? 0 : 0.025,
+                    },
+                  },
+                }}
+                className={
+                  view === "grid"
+                    ? "grid grid-cols-2 gap-6 sm:grid-cols-3 xl:grid-cols-4"
+                    : "flex flex-col gap-4"
+                }
+              >
+                {paginated.map((product) => (
+                  <motion.div
+                    key={product._id}
+                    variants={{
+                      hidden: { opacity: 0, y: reduceMotion ? 0 : 10 },
+                      show: {
+                        opacity: 1,
+                        y: 0,
+                        transition: {
+                          duration: reduceMotion ? 0.15 : 0.35,
+                          ease: EASE_OUT,
+                        },
+                      },
+                    }}
+                    whileHover={{ y: reduceMotion ? 0 : -3 }}
+                    transition={{ duration: DURATION.micro }}
                   >
-                    {product.publish?.featured && (
-                      <span className="absolute left-3 top-3 z-10 rounded-md bg-violet-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                        New
-                      </span>
-                    )}
-
-                    <button
-                      onClick={(e) => e.preventDefault()}
-                      className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-zinc-700 transition hover:text-pink-500"
+                    <Link
+                      href={`/products/${product.basicInfo.slug}`}
+                      className={`group relative block ${
+                        view === "list" ? "flex gap-4" : ""
+                      }`}
                     >
-                      <Heart className="h-4 w-4" />
-                    </button>
+                      <div
+                        className={`relative overflow-hidden rounded-2xl bg-zinc-100 ${
+                          view === "list" ? "h-32 w-32 shrink-0" : "aspect-square"
+                        }`}
+                      >
+                        {product.publish?.featured && (
+                          <span className="absolute left-3 top-3 z-10 rounded-md bg-violet-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
+                            New
+                          </span>
+                        )}
 
-                    <Image
-                      src={product.images[0]?.url || "/placeholder.png"}
-                      alt={product.images[0]?.alt || product.basicInfo.title}
-                      fill
-                      sizes="280px"
-                      className="object-cover transition duration-500 group-hover:scale-105"
-                    />
-                  </div>
+                        <motion.button
+                          onClick={(e) => e.preventDefault()}
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.85 }}
+                          transition={{ duration: DURATION.micro }}
+                          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-zinc-700 transition-colors hover:text-pink-500"
+                        >
+                          <Heart className="h-4 w-4" />
+                        </motion.button>
 
-                  <div className="mt-3">
-                    <h3 className="text-sm font-semibold uppercase tracking-wide text-black">
-                      {product.basicInfo.title}
-                    </h3>
-                    <p className="mt-1 text-sm font-bold text-black">
-                      ₹{product.pricing.sellingPrice}
-                    </p>
-
-                    {(product.reviewCount ?? 0) > 0 && (
-                      <div className="mt-1 flex items-center gap-1">
-                        <div className="flex text-violet-500">
-                          {Array.from({ length: 5 }).map((_, i) => (
-                            <Star
-                              key={i}
-                              className={`h-3 w-3 ${
-                                i < Math.round(product.averageRating ?? 0)
-                                  ? "fill-violet-500"
-                                  : "fill-none"
-                              }`}
-                            />
-                          ))}
-                        </div>
-                        <span className="text-xs text-zinc-400">
-                          ({product.reviewCount})
-                        </span>
+                        <Image
+                          src={product.images[0]?.url || "/placeholder.png"}
+                          alt={product.images[0]?.alt || product.basicInfo.title}
+                          fill
+                          sizes="280px"
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                        />
                       </div>
-                    )}
-                  </div>
-                </Link>
-              ))}
-            </div>
+
+                      <div className="mt-3 transition-transform duration-300 group-hover:-translate-y-0.5">
+                        <h3 className="text-sm font-semibold uppercase tracking-wide text-black">
+                          {product.basicInfo.title}
+                        </h3>
+                        <p className="mt-1 text-sm font-bold text-black">
+                          ₹{product.pricing.sellingPrice}
+                        </p>
+
+                        {(product.reviewCount ?? 0) > 0 && (
+                          <div className="mt-1 flex items-center gap-1">
+                            <div className="flex text-violet-500">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3 w-3 ${
+                                    i < Math.round(product.averageRating ?? 0)
+                                      ? "fill-violet-500"
+                                      : "fill-none"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs text-zinc-400">
+                              ({product.reviewCount})
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </AnimatePresence>
           )}
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="mt-10 flex items-center justify-center gap-2">
-              <button
+            <Reveal className="mt-10 flex items-center justify-center gap-2">
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
                 disabled={page === 1}
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-40"
               >
                 <ChevronLeft className="h-4 w-4" />
-              </button>
+              </motion.button>
 
               {Array.from({ length: totalPages }).map((_, i) => (
-                <button
+                <motion.button
                   key={i}
+                  whileTap={{ scale: 0.9 }}
                   onClick={() => setPage(i + 1)}
                   className={`flex h-9 w-9 items-center justify-center rounded-lg text-sm font-semibold transition ${
                     page === i + 1
@@ -394,17 +449,18 @@ export default function CollectionClient({ products }: CollectionClientProps) {
                   }`}
                 >
                   {i + 1}
-                </button>
+                </motion.button>
               ))}
 
-              <button
+              <motion.button
+                whileTap={{ scale: 0.9 }}
                 onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
                 disabled={page === totalPages}
                 className="flex h-9 w-9 items-center justify-center rounded-lg border border-zinc-300 text-zinc-600 transition hover:bg-zinc-100 disabled:opacity-40"
               >
                 <ChevronRight className="h-4 w-4" />
-              </button>
-            </div>
+              </motion.button>
+            </Reveal>
           )}
         </div>
       </div>

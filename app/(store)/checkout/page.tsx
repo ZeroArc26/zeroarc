@@ -10,9 +10,6 @@ import {
   Pencil,
   Truck,
   CreditCard,
-  Smartphone,
-  Landmark,
-  Wallet,
   Receipt,
   Ticket,
   Lock,
@@ -20,7 +17,6 @@ import {
   RotateCcw,
   Gem,
   Headset,
-  QrCode,
 } from "lucide-react";
 
 import { useCartStore } from "@/stores/cartStore";
@@ -36,11 +32,13 @@ const SHIPPING_METHODS = [
 ];
 
 const PAYMENT_METHODS = [
-  { id: "upi", label: "UPI", icon: Smartphone },
-  { id: "card", label: "Card", icon: CreditCard },
-  { id: "netbanking", label: "Net Banking", icon: Landmark },
-  { id: "wallets", label: "Wallets", icon: Wallet },
-  { id: "cod", label: "COD", icon: Receipt },
+  {
+    id: "online",
+    label: "Online Payment",
+    subtitle: "UPI, Card, Net Banking, Wallets",
+    icon: CreditCard,
+  },
+  { id: "cod", label: "Cash on Delivery", subtitle: "Pay at your doorstep", icon: Receipt },
 ] as const;
 
 export default function CheckoutPage() {
@@ -79,9 +77,7 @@ export default function CheckoutPage() {
     useState<(typeof SHIPPING_METHODS)[number]["id"]>("standard");
 
   const [paymentMethod, setPaymentMethod] =
-    useState<(typeof PAYMENT_METHODS)[number]["id"]>("upi");
-
-  const [upiId, setUpiId] = useState("");
+    useState<(typeof PAYMENT_METHODS)[number]["id"]>("online");
 
   const [storeSettings, setStoreSettings] = useState<{
     freeShippingThreshold: number;
@@ -524,42 +520,30 @@ export default function CheckoutPage() {
   2. Payment Method
 </h2>
 
-                <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-                  {PAYMENT_METHODS.map(({ id, label, icon: Icon }) => (
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {PAYMENT_METHODS.map(({ id, label, subtitle, icon: Icon }) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => setPaymentMethod(id)}
-                      className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition ${
+                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
                         paymentMethod === id
                           ? "border-violet-600 bg-violet-50"
                           : "border-zinc-200 hover:border-violet-300"
                       }`}
                     >
-                      <Icon className="h-5 w-5 text-zinc-600" />
-                      <span className="text-xs font-semibold text-black">
-                        {label}
+                      <Icon className="h-5 w-5 shrink-0 text-zinc-600" />
+                      <span>
+                        <span className="block text-sm font-semibold text-black">
+                          {label}
+                        </span>
+                        <span className="block text-xs text-zinc-500">
+                          {subtitle}
+                        </span>
                       </span>
                     </button>
                   ))}
                 </div>
-
-                {paymentMethod === "upi" && (
-                  <div className="mt-5">
-                    <label className="mb-1.5 block text-xs font-semibold text-zinc-500">
-                      UPI ID
-                    </label>
-                    <div className="relative">
-                      <input
-                        value={upiId}
-                        onChange={(e) => setUpiId(e.target.value)}
-                        placeholder="Enter your UPI ID (e.g. aryan@upi)"
-                        className="w-full rounded-xl border border-zinc-300 px-4 py-3 pr-12 text-sm text-black outline-none placeholder:text-zinc-400 focus:border-violet-500"
-                      />
-                      <QrCode className="absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400" />
-                    </div>
-                  </div>
-                )}
 
                 {/* Promo code */}
                 <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-violet-50 p-5 sm:flex-row sm:items-center sm:justify-between">

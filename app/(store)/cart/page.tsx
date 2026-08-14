@@ -9,7 +9,6 @@ import {
   X,
   Heart,
   Trash2,
-  Ticket,
   Lock,
   ShieldCheck,
   RotateCcw,
@@ -23,10 +22,6 @@ import AnnouncementBar from "@/components/home/AnnouncementBar";
 import Navbar from "@/components/home/Navbar";
 import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
-
-// TODO (before launch): replace this hardcoded promo code with a real
-// coupon-validation API call.
-const DEMO_PROMO = { code: "ZERO300", discount: 300 };
 
 export default function CartPage() {
   const router = useRouter();
@@ -45,27 +40,11 @@ export default function CartPage() {
   // identical to the server render, avoiding a hydration mismatch.
   const items = mounted ? storeItems : [];
 
-  const [promoInput, setPromoInput] = useState("");
-  const [appliedDiscount, setAppliedDiscount] = useState(0);
-  const [promoError, setPromoError] = useState("");
-
   const totalItems = items.reduce((total, item) => total + item.quantity, 0);
   const subtotal = items.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
-  const shipping = subtotal >= 999 || subtotal === 0 ? 0 : 99;
-  const total = Math.max(subtotal + shipping - appliedDiscount, 0);
-
-  const handleApplyPromo = () => {
-    if (promoInput.trim().toUpperCase() === DEMO_PROMO.code) {
-      setAppliedDiscount(DEMO_PROMO.discount);
-      setPromoError("");
-    } else {
-      setAppliedDiscount(0);
-      setPromoError("Invalid promo code");
-    }
-  };
 
   const handleMoveToWishlist = (item: (typeof items)[number]) => {
     addToWishlist({
@@ -257,44 +236,6 @@ export default function CartPage() {
                   );
                 })}
               </div>
-
-              {/* Promo code */}
-              <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-violet-50 p-5 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-white">
-                    <Ticket className="h-5 w-5" />
-                  </div>
-                  <div>
-                    <p className="text-sm font-bold text-black">
-                      Have a promo code?
-                    </p>
-                    <p className="text-xs text-zinc-500">
-                      Enter your code to get amazing discounts!
-                    </p>
-                  </div>
-                </div>
-
-                <div className="flex w-full gap-2 sm:w-auto">
-                  <input
-  type="text"
-  value={promoInput}
-  onChange={(e) => setPromoInput(e.target.value)}
-  placeholder="Enter promo code"
-  className="w-full rounded-xl border border-zinc-300 bg-white px-4 py-2.5 text-sm text-black outline-none placeholder:text-zinc-400 focus:border-violet-500 sm:w-56"
-/>
-                  <button
-                    onClick={handleApplyPromo}
-                    className="shrink-0 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500"
-                  >
-                    Apply
-                  </button>
-                </div>
-              </div>
-              {promoError && (
-                <p className="mt-2 text-xs font-medium text-red-500">
-                  {promoError}
-                </p>
-              )}
             </div>
 
             {/* Order Summary */}
@@ -317,37 +258,19 @@ export default function CartPage() {
                   <span>Subtotal ({totalItems} items)</span>
                   <span className="font-semibold text-black">₹{subtotal}</span>
                 </div>
-
-                <div className="flex justify-between text-zinc-600">
-                  <span>Shipping Charges</span>
-                  <span className="font-semibold text-emerald-600">
-                    {shipping === 0 ? "FREE" : `₹${shipping}`}
-                  </span>
-                </div>
-
-                {appliedDiscount > 0 && (
-                  <div className="flex justify-between text-zinc-600">
-                    <span>Discount</span>
-                    <span className="font-semibold text-emerald-600">
-                      − ₹{appliedDiscount}
-                    </span>
-                  </div>
-                )}
               </div>
 
               <div className="border-t border-zinc-200 pt-4">
                 <div className="flex items-center justify-between">
                   <span className="font-bold text-black">Total Amount</span>
                   <span className="text-xl font-black text-violet-600">
-                    ₹{total}
+                    ₹{subtotal}
                   </span>
                 </div>
 
-                {appliedDiscount > 0 && (
-                  <p className="mt-1 text-xs font-medium text-emerald-600">
-                    You saved ₹{appliedDiscount} on this order!
-                  </p>
-                )}
+                <p className="mt-1 text-xs text-zinc-500">
+                  Shipping charges and promo codes are calculated at checkout.
+                </p>
               </div>
 
               <button

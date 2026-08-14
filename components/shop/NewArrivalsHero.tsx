@@ -2,6 +2,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Clock, Sparkles, Gem } from "lucide-react";
 
+import Reveal from "@/components/motion/Reveal";
+
 export default function NewArrivalsHero() {
   return (
     <div className="relative overflow-hidden bg-black">
@@ -43,7 +45,12 @@ export default function NewArrivalsHero() {
         </div>
       </div>
 
-      <div className="relative z-10 mx-auto max-w-[1700px] px-6 py-14 md:px-14">
+      <Reveal
+        trigger="mount"
+        y={10}
+        duration={0.4}
+        className="relative z-10 mx-auto max-w-[1700px] px-6 py-14 md:px-14"
+      >
         <nav className="mb-6 flex items-center gap-2 text-sm text-zinc-400">
           <Link href="/" className="transition hover:text-white">
             Home
@@ -80,7 +87,7 @@ export default function NewArrivalsHero() {
             </div>
           ))}
         </div>
-      </div>
+      </Reveal>
     </div>
   );
 }
