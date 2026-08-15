@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -129,6 +129,23 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
   // crossfade below so switching filters/sort/page never snaps
   // abruptly. No filtering/sorting logic depends on this.
   const gridKey = `${selectedCategories.join(",")}|${selectedSize}|${selectedColor}|${maxPrice}|${sortBy}|${page}|${view}`;
+
+  // Scroll the results back into view on page change only (not on
+  // initial mount) — without this, switching pages left the viewport
+  // at whatever scroll position it was already at.
+  const resultsTopRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    resultsTopRef.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }, [page, reduceMotion]);
 
   return (
     <div className="mx-auto max-w-[1700px] px-6 py-10 md:px-14">
@@ -333,6 +350,7 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
 
         {/* Product grid */}
         <div>
+          <div ref={resultsTopRef} />
           <Reveal className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-zinc-500">{filtered.length} Products</p>
 
@@ -385,7 +403,7 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
               </p>
             </Reveal>
           ) : (
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               <motion.div
                 key={gridKey}
                 initial="hidden"
@@ -404,7 +422,7 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
                 }}
                 className={
                   view === "grid"
-                    ? "grid grid-cols-2 gap-6 sm:grid-cols-3 xl:grid-cols-4"
+                    ? "grid grid-cols-2 gap-4 sm:gap-6 sm:grid-cols-3 xl:grid-cols-4"
                     : "flex flex-col gap-4"
                 }
               >
@@ -430,7 +448,7 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
                       className={`group relative block ${view === "list" ? "flex gap-4" : ""}`}
                     >
                       <div
-                        className={`relative overflow-hidden rounded-2xl bg-zinc-100 ${
+                        className={`relative overflow-hidden rounded-2xl bg-zinc-100 shadow-sm transition-shadow duration-300 group-hover:shadow-xl ${
                           view === "list" ? "h-32 w-32 shrink-0" : "aspect-square"
                         }`}
                       >
@@ -443,7 +461,7 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.85 }}
                           transition={{ duration: DURATION.micro }}
-                          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-zinc-700 transition-colors hover:text-pink-500"
+                          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-zinc-600 shadow-sm backdrop-blur-sm transition-colors hover:text-pink-500"
                         >
                           <Heart className="h-4 w-4" />
                         </motion.button>
@@ -455,13 +473,15 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
                           sizes="280px"
                           className="object-cover transition duration-500 group-hover:scale-105"
                         />
+
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       </div>
 
-                      <div className="mt-3 transition-transform duration-300 group-hover:-translate-y-0.5">
-                        <h3 className="text-sm font-semibold uppercase tracking-wide text-black">
+                      <div className="mt-3.5 transition-transform duration-300 group-hover:-translate-y-0.5">
+                        <h3 className="line-clamp-1 text-sm font-semibold uppercase tracking-wide text-black">
                           {product.basicInfo.title}
                         </h3>
-                        <p className="mt-1 text-sm font-bold text-black">
+                        <p className="mt-1.5 text-base font-bold text-violet-600">
                           ₹{product.pricing.sellingPrice}
                         </p>
 
@@ -494,7 +514,7 @@ export default function NewArrivalsClient({ products }: NewArrivalsClientProps) 
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <Reveal className="mt-10 flex items-center justify-center gap-2">
+            <Reveal className="mt-10 flex flex-wrap items-center justify-center gap-2">
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}

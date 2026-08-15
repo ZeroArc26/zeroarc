@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
@@ -139,6 +139,25 @@ export default function CollectionClient({ products }: CollectionClientProps) {
   // filters never snaps abruptly, without touching any filtering logic.
   const gridKey = `${selectedCategories.join(",")}|${selectedSize}|${selectedColor}|${sortBy}|${page}|${view}`;
 
+  // Scroll the results back into view on page change only (not on
+  // initial mount, and not on filter/sort changes that happen to keep
+  // page at 1) — without this, switching pages left the viewport at
+  // whatever scroll position it was already at, showing new products
+  // the user hadn't scrolled to see.
+  const resultsTopRef = useRef<HTMLDivElement>(null);
+  const isFirstRender = useRef(true);
+
+  useEffect(() => {
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    resultsTopRef.current?.scrollIntoView({
+      behavior: reduceMotion ? "auto" : "smooth",
+      block: "start",
+    });
+  }, [page, reduceMotion]);
+
   return (
     <div className="mx-auto max-w-[1700px] px-6 py-10 md:px-14">
       <div className="grid grid-cols-1 gap-10 lg:grid-cols-[260px_1fr]">
@@ -258,6 +277,7 @@ export default function CollectionClient({ products }: CollectionClientProps) {
 
         {/* Product grid */}
         <div>
+          <div ref={resultsTopRef} />
           <Reveal className="mb-6 flex flex-wrap items-center justify-between gap-4">
             <p className="text-sm text-zinc-500">
               {filtered.length} Products
@@ -314,7 +334,7 @@ export default function CollectionClient({ products }: CollectionClientProps) {
               </p>
             </Reveal>
           ) : (
-            <AnimatePresence mode="wait">
+            <AnimatePresence mode="popLayout">
               <motion.div
                 key={gridKey}
                 initial="hidden"
@@ -333,7 +353,7 @@ export default function CollectionClient({ products }: CollectionClientProps) {
                 }}
                 className={
                   view === "grid"
-                    ? "grid grid-cols-2 gap-6 sm:grid-cols-3 xl:grid-cols-4"
+                    ? "grid grid-cols-2 gap-4 sm:gap-6 sm:grid-cols-3 xl:grid-cols-4"
                     : "flex flex-col gap-4"
                 }
               >
@@ -361,13 +381,13 @@ export default function CollectionClient({ products }: CollectionClientProps) {
                       }`}
                     >
                       <div
-                        className={`relative overflow-hidden rounded-2xl bg-zinc-100 ${
+                        className={`relative overflow-hidden rounded-2xl bg-zinc-100 shadow-sm transition-shadow duration-300 group-hover:shadow-xl ${
                           view === "list" ? "h-32 w-32 shrink-0" : "aspect-square"
                         }`}
                       >
                         {product.publish?.featured && (
                           <span className="absolute left-3 top-3 z-10 rounded-md bg-violet-600 px-2.5 py-1 text-[11px] font-bold uppercase tracking-wide text-white">
-                            New
+                            Featured
                           </span>
                         )}
 
@@ -376,7 +396,7 @@ export default function CollectionClient({ products }: CollectionClientProps) {
                           whileHover={{ scale: 1.1 }}
                           whileTap={{ scale: 0.85 }}
                           transition={{ duration: DURATION.micro }}
-                          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-zinc-700 transition-colors hover:text-pink-500"
+                          className="absolute right-3 top-3 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/90 text-zinc-600 shadow-sm backdrop-blur-sm transition-colors hover:text-pink-500"
                         >
                           <Heart className="h-4 w-4" />
                         </motion.button>
@@ -388,13 +408,15 @@ export default function CollectionClient({ products }: CollectionClientProps) {
                           sizes="280px"
                           className="object-cover transition duration-500 group-hover:scale-105"
                         />
+
+                        <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/15 via-transparent to-transparent opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
                       </div>
 
-                      <div className="mt-3 transition-transform duration-300 group-hover:-translate-y-0.5">
-                        <h3 className="text-sm font-semibold uppercase tracking-wide text-black">
+                      <div className="mt-3.5 transition-transform duration-300 group-hover:-translate-y-0.5">
+                        <h3 className="line-clamp-1 text-sm font-semibold uppercase tracking-wide text-black">
                           {product.basicInfo.title}
                         </h3>
-                        <p className="mt-1 text-sm font-bold text-black">
+                        <p className="mt-1.5 text-base font-bold text-violet-600">
                           ₹{product.pricing.sellingPrice}
                         </p>
 
@@ -427,7 +449,7 @@ export default function CollectionClient({ products }: CollectionClientProps) {
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <Reveal className="mt-10 flex items-center justify-center gap-2">
+            <Reveal className="mt-10 flex flex-wrap items-center justify-center gap-2">
               <motion.button
                 whileTap={{ scale: 0.9 }}
                 onClick={() => setPage((p) => Math.max(1, p - 1))}
