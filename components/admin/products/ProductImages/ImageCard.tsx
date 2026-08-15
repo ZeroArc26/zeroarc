@@ -61,7 +61,7 @@ export default function ImageCard({
   onClick={() => onPreview(image)}
 >
         <Image
-          src={image.preview}
+          src={image.uploaded && image.url ? image.url : image.preview}
           alt=""
           fill
           className="object-cover transition duration-500 group-hover:scale-105"

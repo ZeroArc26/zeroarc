@@ -158,7 +158,7 @@ export default function ImagePreviewModal({
                 className="relative h-full w-full"
               >
                 <Image
-                  src={image.preview}
+                  src={image.uploaded && image.url ? image.url : image.preview}
                   alt={image.file.name}
                   fill
                   unoptimized
