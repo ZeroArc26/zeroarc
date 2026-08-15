@@ -12,8 +12,6 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
-import PseudoBarcode from "./PseudoBarcode";
-
 const styles = StyleSheet.create({
   page: {
     padding: 22,
@@ -500,7 +498,7 @@ function IconShield({ size = 14 }: { size?: number }) {
 
 interface InvoiceDocumentProps {
   order: any;
-  qrDataUrl: string;
+  qrDataUrl?: string;
   logoDataUrl?: string;
   delhiveryLogoDataUrl?: string;
   company: {
@@ -516,7 +514,6 @@ interface InvoiceDocumentProps {
 
 export default function InvoiceDocument({
   order,
-  qrDataUrl,
   logoDataUrl,
   delhiveryLogoDataUrl,
   company,
@@ -619,30 +616,6 @@ export default function InvoiceDocument({
               {address.city}, {address.state} - {address.pincode}
             </Text>
           </View>
-
-          <View style={styles.qrBox}>
-            <Text
-              style={{
-                fontSize: 7,
-                fontFamily: "Helvetica-Bold",
-                textAlign: "center",
-                marginBottom: 6,
-              }}
-            >
-              SCAN TO TRACK YOUR ORDER
-            </Text>
-
-            {qrDataUrl && (
-              <Image src={qrDataUrl} style={{ width: 70, height: 70 }} />
-            )}
-
-            <Text style={{ fontSize: 6.5, color: "#666666", marginTop: 6 }}>
-              Tracking ID
-            </Text>
-            <Text style={{ fontSize: 7.5, fontFamily: "Helvetica-Bold" }}>
-              {order.shippingLabel?.trackingId || "Pending"}
-            </Text>
-          </View>
         </View>
 
         {/* Items Table */}
@@ -739,6 +712,15 @@ export default function InvoiceDocument({
                   </Text>
                 </View>
               </>
+            )}
+
+            {(order.pricing?.shipping ?? 0) > 0 && (
+              <View style={styles.totalsRow}>
+                <Text style={styles.td}>Shipping Charges</Text>
+                <Text style={styles.td}>
+                  {formatCurrency(order.pricing?.shipping)}
+                </Text>
+              </View>
             )}
 
             <View style={styles.grandTotalRow}>

@@ -12,8 +12,6 @@ import {
   StyleSheet,
 } from "@react-pdf/renderer";
 
-import PseudoBarcode from "./PseudoBarcode";
-
 const styles = StyleSheet.create({
   page: {
     padding: 22,
@@ -472,7 +470,7 @@ function IconHeart({ size = 10 }: { size?: number }) {
 
 interface ShippingLabelDocumentProps {
   order: any;
-  qrDataUrl: string;
+  qrDataUrl?: string;
   logoDataUrl?: string;
   delhiveryLogoDataUrl?: string;
   company: {
@@ -496,7 +494,6 @@ interface ShippingLabelDocumentProps {
 
 export default function ShippingLabelDocument({
   order,
-  qrDataUrl,
   logoDataUrl,
   delhiveryLogoDataUrl,
   company,
@@ -587,11 +584,6 @@ export default function ShippingLabelDocument({
               <Text style={styles.bodyLine}>COURIER PARTNER</Text>
             </View>
             <Text style={styles.courierName}>{label.courierPartner || "To be assigned"}</Text>
-            <Text style={styles.awbLabel}>AWB NO.</Text>
-            <Text style={styles.awbValue}>{label.awbNumber || "Pending"}</Text>
-            {label.awbNumber && (
-              <PseudoBarcode value={label.awbNumber} width={220} height={36} />
-            )}
           </View>
         </View>
 
@@ -714,34 +706,6 @@ export default function ShippingLabelDocument({
             <View style={styles.careItem}>
               <IconBrokenGlass />
               <Text style={styles.careLabel}>DO NOT DROP</Text>
-            </View>
-          </View>
-        </View>
-
-        {/* Track your order */}
-        <View style={{ marginTop: 14 }}>
-          <View style={styles.tagBadge}>
-            <Text style={styles.tagBadgeText}>TRACK YOUR ORDER</Text>
-          </View>
-          <View style={styles.trackRow}>
-            <View style={styles.trackQrCol}>
-              {qrDataUrl && <Image src={qrDataUrl} style={{ width: 60, height: 60 }} />}
-            </View>
-
-            <View style={styles.trackTextCol}>
-              <Text style={styles.trackTitle}>SCAN TO TRACK</Text>
-              <Text style={styles.trackTitle}>YOUR ORDER</Text>
-              <Text style={styles.trackSub}>Tracking ID</Text>
-              <Text style={styles.trackValue}>{label.trackingId || "Pending"}</Text>
-            </View>
-
-            <View style={styles.trackBarcodeCol}>
-              {label.trackingId && (
-                <PseudoBarcode value={label.trackingId} width={220} height={34} />
-              )}
-              <Text style={{ fontSize: 8, fontFamily: "Helvetica-Bold", marginTop: 4 }}>
-                {label.trackingId}
-              </Text>
             </View>
           </View>
         </View>
