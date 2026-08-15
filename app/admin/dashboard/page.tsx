@@ -17,6 +17,11 @@ import ActivityFeed from "@/components/admin/dashboard/ActivityFeed";
 import { getDashboardStats } from "@/lib/actions/dashboard/getDashboardStats";
 import { getRevenueAnalytics } from "@/lib/actions/dashboard/getRevenueAnalytics";
 
+// This is an admin-only internal page reading live store stats — it
+// should never serve a cached/stale snapshot (e.g. after an order is
+// deleted directly in the database, outside the app).
+export const dynamic = "force-dynamic";
+
 export default async function AdminDashboardPage() {
   const [stats, revenue] = await Promise.all([
     getDashboardStats(),
