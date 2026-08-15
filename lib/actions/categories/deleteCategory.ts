@@ -2,6 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import Category from "@/models/Category";
+import { deleteFromImageKit } from "@/lib/imagekit";
 
 export async function deleteCategory(id: string) {
   await connectDB();
@@ -14,25 +15,13 @@ export async function deleteCategory(id: string) {
   }
 
 
-  // 2. Delete image from Bunny CDN
+  // 2. Delete image from ImageKit
   if (category.image?.url) {
     try {
-      await fetch(
-        `${process.env.NEXT_PUBLIC_APP_URL}/api/upload/delete`,
-        {
-          method: "POST",
-          body: JSON.stringify({
-            url: category.image.url,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      );
-
+      await deleteFromImageKit(category.image.url);
     } catch (error) {
       console.error(
-        "Bunny image delete failed:",
+        "ImageKit image delete failed:",
         error
       );
     }

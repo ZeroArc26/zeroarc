@@ -8,6 +8,8 @@ import { toast } from "sonner";
 import {
   MapPin,
   Pencil,
+  Truck,
+  Zap,
   CreditCard,
   Receipt,
   Ticket,
@@ -26,8 +28,8 @@ import Footer from "@/components/layout/Footer";
 import OrderButton from "@/components/checkout/OrderButton";
 
 const SHIPPING_METHODS = [
-  { id: "standard" as const, label: "Standard Delivery", meta: "3 – 5 business days" },
-  { id: "express" as const, label: "Express Delivery", meta: "1 – 2 business days" },
+  { id: "standard" as const, label: "Standard Delivery", meta: "3 – 5 business days", icon: Truck },
+  { id: "express" as const, label: "Express Delivery", meta: "1 – 2 business days", icon: Zap },
 ];
 
 const PAYMENT_METHODS = [
@@ -108,6 +110,17 @@ export default function CheckoutPage() {
       ? 0
       : baseShippingRate + (paymentMethod === "cod" ? codCharge : 0);
   const total = Math.max(subtotal + shipping - appliedDiscount, 0);
+
+  // Display-only helper for the shipping method selector below — mirrors
+  // the exact same free-shipping-threshold logic used for the real
+  // `shipping` total above, just per-method so both options can show
+  // their rate. Does not affect `shipping`/`total`/`baseShippingRate`.
+  function getShippingMethodRate(methodId: (typeof SHIPPING_METHODS)[number]["id"]) {
+    if (subtotal >= freeShippingThreshold) return 0;
+    return methodId === "express"
+      ? storeSettings?.expressShippingRate ?? 149
+      : storeSettings?.standardShippingRate ?? 0;
+  }
 
   useEffect(() => {
     if (mounted && cartItems.length === 0) {
@@ -514,6 +527,49 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* 2. Shipping Method */}
+              <div className="rounded-2xl border border-zinc-200 p-6">
+                <h2 className="mb-5 flex items-center gap-2 font-bold text-black">
+                  <Truck className="h-4 w-4 text-violet-600" />
+                  2. Shipping Method
+                </h2>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  {SHIPPING_METHODS.map(({ id, label, meta, icon: Icon }) => {
+                    const rate = getShippingMethodRate(id);
+
+                    return (
+                      <button
+                        key={id}
+                        type="button"
+                        onClick={() => setShippingMethod(id)}
+                        className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
+                          shippingMethod === id
+                            ? "border-violet-600 bg-violet-50"
+                            : "border-zinc-200 hover:border-violet-300"
+                        }`}
+                      >
+                        <Icon className="h-5 w-5 shrink-0 text-zinc-600" />
+                        <span className="flex-1">
+                          <span className="block text-sm font-semibold text-black">
+                            {label}
+                          </span>
+                          <span className="block text-xs text-zinc-500">
+                            {meta}
+                          </span>
+                        </span>
+                        <span
+                          className={`shrink-0 text-sm font-bold ${
+                            rate === 0 ? "text-emerald-600" : "text-black"
+                          }`}
+                        >
+                          {rate === 0 ? "FREE" : `₹${rate}`}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
 
               {/* 3. Payment Method */}
               <div className="rounded-2xl border border-zinc-200 p-6">

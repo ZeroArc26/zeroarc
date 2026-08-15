@@ -65,7 +65,7 @@ export default function ImageSection({
 setPreview(imagePreview);
 
 
-// Upload to Bunny
+// Upload to ImageKit
 
 const uploadData = new FormData();
 
@@ -94,7 +94,7 @@ if (!response.ok) {
 }
 
 
-// Save Bunny URL
+// Save ImageKit URL
 
 form.setValue(
   "image",

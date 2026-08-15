@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server";
 
+import { imagekit } from "@/lib/imagekit";
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -22,31 +24,16 @@ export async function POST(request: Request) {
 
     const filename = `${crypto.randomUUID()}-${file.name}`;
 
-    const response = await fetch(
-      `https://storage.bunnycdn.com/${process.env.BUNNY_STORAGE_ZONE}/${folder}/${filename}`,
-      {
-        method: "PUT",
-        headers: {
-          AccessKey: process.env.BUNNY_STORAGE_API_KEY!,
-          "Content-Type": file.type,
-        },
-        body: buffer,
-      }
-    );
-
-    if (!response.ok) {
-      const errorText = await response.text();
-
-      console.log("BUNNY UPLOAD ERROR:", errorText);
-
-      throw new Error("Bunny upload failed");
-    }
-
-    const url = `${process.env.BUNNY_CDN_URL}/${folder}/${filename}`;
+    const result = await imagekit.upload({
+      file: buffer,
+      fileName: filename,
+      folder: `/${folder}`,
+      useUniqueFileName: false,
+    });
 
     return NextResponse.json({
       success: true,
-      url,
+      url: result.url,
     });
   } catch (error) {
     console.error("UPLOAD ERROR:", error);
