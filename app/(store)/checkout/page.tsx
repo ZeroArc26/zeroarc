@@ -8,11 +8,9 @@ import { toast } from "sonner";
 import {
   MapPin,
   Pencil,
-  Truck,
   CreditCard,
   Receipt,
   Ticket,
-  Lock,
   ShieldCheck,
   RotateCcw,
   Gem,
@@ -25,6 +23,7 @@ import AnnouncementBar from "@/components/home/AnnouncementBar";
 import Navbar from "@/components/home/Navbar";
 import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
+import OrderButton from "@/components/checkout/OrderButton";
 
 const SHIPPING_METHODS = [
   { id: "standard" as const, label: "Standard Delivery", meta: "3 – 5 business days" },
@@ -60,6 +59,7 @@ export default function CheckoutPage() {
   }, []);
 
   const [loading, setLoading] = useState(false);
+  const [orderPlaced, setOrderPlaced] = useState(false);
 
   const [formData, setFormData] = useState({
     fullName: "",
@@ -236,6 +236,8 @@ export default function CheckoutPage() {
     }
 
     toast.success("Order Placed Successfully!");
+    setOrderPlaced(true);
+    await new Promise((resolve) => setTimeout(resolve, 900));
     router.push(`/order-success?orderId=${data.order._id}`);
   }
 
@@ -690,15 +692,12 @@ export default function CheckoutPage() {
                   )}
                 </div>
 
-                <button
-                  type="button"
+                <OrderButton
+                  status={
+                    orderPlaced ? "success" : loading ? "loading" : "idle"
+                  }
                   onClick={handleCheckout}
-                  disabled={loading}
-                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 text-sm font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50"
-                >
-                  <Lock className="h-4 w-4" />
-                  {loading ? "Placing Order..." : "Proceed to Payment"}
-                </button>
+                />
 
                 <p className="mt-3 flex items-center justify-center gap-1.5 text-center text-xs text-zinc-500">
                   <ShieldCheck className="h-3.5 w-3.5 text-violet-600" />
