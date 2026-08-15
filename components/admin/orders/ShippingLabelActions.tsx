@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import { Download, Eye, Printer, Truck, Loader2, Pencil } from "lucide-react";
 
 import {
@@ -55,18 +56,20 @@ export default function ShippingLabelActions({
       const data = await res.json();
 
       if (!data.success) {
-        alert(data.message);
+        toast.error(data.message);
         return;
       }
 
       if (data.warning) {
-        alert(data.warning);
+        toast.warning(data.warning, { duration: 8000 });
+      } else {
+        toast.success("Shipping label generated.");
       }
 
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert("Failed to generate shipping label.");
+      toast.error("Failed to generate shipping label.");
     } finally {
       setGenerating(false);
     }
@@ -88,15 +91,16 @@ export default function ShippingLabelActions({
       const data = await res.json();
 
       if (!data.success) {
-        alert(data.message);
+        toast.error(data.message);
         return;
       }
 
+      toast.success("Shipping label details updated.");
       setEditOpen(false);
       router.refresh();
     } catch (error) {
       console.error(error);
-      alert("Failed to update shipping label.");
+      toast.error("Failed to update shipping label.");
     } finally {
       setSaving(false);
     }

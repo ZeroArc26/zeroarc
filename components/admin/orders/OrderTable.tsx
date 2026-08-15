@@ -121,7 +121,7 @@ export default function OrderTable({
                 <td className="px-6 py-4 text-zinc-500">
                   {new Date(
                     order.date
-                  ).toLocaleDateString()}
+                  ).toLocaleDateString("en-IN")}
                 </td>
 
 

@@ -154,7 +154,7 @@ export async function POST(request: Request, { params }: RouteParams) {
       success: true,
       order,
       warning: isProvisional
-        ? `Delhivery API unavailable (${delhiveryResult.message}). Used a provisional AWB — this is NOT trackable with Delhivery yet.`
+        ? `Delhivery couldn't create this shipment automatically (${delhiveryResult.message}). A provisional tracking number was used instead — this order won't be trackable with Delhivery until a real AWB is set.`
         : undefined,
     });
   } catch (error) {

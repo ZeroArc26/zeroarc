@@ -167,7 +167,7 @@ export default function OrdersPageClient({ orders }: Props) {
                     </td>
 
                     <td className="px-6 py-4 text-zinc-500">
-                      {new Date(order.date).toLocaleDateString()}
+                      {new Date(order.date).toLocaleDateString("en-IN")}
                     </td>
 
                     <td className="px-6 py-4">

@@ -2,9 +2,11 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 
 import { updateOrderStatus } from "@/lib/actions/orders/updateOrderStatus";
 import { cancelOrder } from "@/lib/actions/orders/cancelOrder";
+import { deleteOrder } from "@/lib/actions/orders/deleteOrder";
 
 type OrderStatus =
   | "pending"
@@ -29,6 +31,9 @@ export default function OrderActions({
     useState<OrderStatus>(currentStatus);
 
   const [loading, setLoading] =
+    useState(false);
+
+  const [deleting, setDeleting] =
     useState(false);
 
   async function handleUpdate() {
@@ -73,6 +78,31 @@ export default function OrderActions({
       );
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleDeleteOrder() {
+    const confirmed = window.confirm(
+      "This will PERMANENTLY delete this order and cannot be undone. The customer's order count and total spent will be adjusted accordingly. Are you sure?"
+    );
+
+    if (!confirmed) return;
+
+    try {
+      setDeleting(true);
+
+      await deleteOrder(orderId);
+
+      toast.success("Order deleted.");
+      router.push("/admin/dashboard/orders");
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Failed to delete order."
+      );
+      setDeleting(false);
     }
   }
 
@@ -169,6 +199,22 @@ export default function OrderActions({
             ? "Please wait..."
             : "Cancel Order"}
         </button>
+
+        <div className="mt-6 border-t border-zinc-800 pt-6">
+          <p className="text-sm text-zinc-400">
+            Permanently deleting an order removes it from the database
+            entirely and adjusts the customer&apos;s order count/total
+            spent. This cannot be undone.
+          </p>
+
+          <button
+            onClick={handleDeleteOrder}
+            disabled={deleting}
+            className="mt-5 rounded-xl border border-red-600 px-6 py-3 text-sm font-medium text-red-500 transition hover:bg-red-600 hover:text-white disabled:cursor-not-allowed disabled:opacity-50"
+          >
+            {deleting ? "Deleting..." : "Delete Order Permanently"}
+          </button>
+        </div>
 
       </div>
 
