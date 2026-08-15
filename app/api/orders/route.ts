@@ -44,6 +44,18 @@ export async function POST(req: Request) {
   try {
     await connectDB();
 
+    const currentUser = await getCurrentUser();
+
+    if (!currentUser) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Please sign in to place an order.",
+        },
+        { status: 401 }
+      );
+    }
+
     const body = await req.json();
 
     const {
@@ -181,7 +193,6 @@ export async function POST(req: Request) {
     // the order itself has already been placed successfully.
     // ------------------------------------------------------------
     try {
-      const currentUser = await getCurrentUser();
       const customerEmail = (customer?.email || "").toLowerCase();
 
       if (customerEmail || customer?.phone) {

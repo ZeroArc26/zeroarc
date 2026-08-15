@@ -4,12 +4,22 @@ import Link from "next/link";
 import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function SignupForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Where to send the user after signing up — set by proxy.ts when it
+  // redirects an unauthenticated visitor away from a protected route
+  // like /checkout or /account. Only relative paths are trusted.
+  const redirectParam = searchParams.get("redirect") || "/";
+  const redirectTarget =
+    redirectParam.startsWith("/") && !redirectParam.startsWith("//")
+      ? redirectParam
+      : "/";
 
 const [loading, setLoading] = useState(false);
 
@@ -68,7 +78,7 @@ console.log(data);
 
     toast.success("Account created successfully!");
 
-    router.push("/");
+    router.push(redirectTarget);
   } catch (error) {
     console.error(error);
 
@@ -176,7 +186,7 @@ console.log(data);
       <button
   type="button"
   onClick={() => {
-    window.location.href = "/api/auth/google";
+    window.location.href = `/api/auth/google?redirect=${encodeURIComponent(redirectTarget)}`;
   }}
   className="flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-950 py-4 font-medium transition hover:border-purple-500"
 >

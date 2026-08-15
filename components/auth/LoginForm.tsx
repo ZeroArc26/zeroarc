@@ -4,10 +4,20 @@ import { useState } from "react";
 import Link from "next/link";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 export default function LoginForm() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+
+  // Where to send the user after a successful login — set by proxy.ts
+  // when it redirects an unauthenticated visitor away from a protected
+  // route like /checkout or /account. Only relative paths are trusted.
+  const redirectParam = searchParams.get("redirect") || "/";
+  const redirectTarget =
+    redirectParam.startsWith("/") && !redirectParam.startsWith("//")
+      ? redirectParam
+      : "/";
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -54,7 +64,7 @@ export default function LoginForm() {
 
 router.refresh();
 
-router.replace("/");
+router.replace(redirectTarget);
     } catch (error) {
       console.error(error);
 
@@ -162,7 +172,7 @@ router.replace("/");
       <button
   type="button"
   onClick={() => {
-    window.location.href = "/api/auth/google";
+    window.location.href = `/api/auth/google?redirect=${encodeURIComponent(redirectTarget)}`;
   }}
   className="flex w-full items-center justify-center gap-3 rounded-2xl border border-zinc-700 bg-zinc-950 py-4 font-medium transition hover:border-purple-500"
 >

@@ -57,9 +57,29 @@ export function proxy(request: NextRequest) {
     }
   }
 
+  // ---------------- Checkout (requires an account) ----------------
+  if (pathname.startsWith("/checkout")) {
+    const token = request.cookies.get("token")?.value;
+
+    if (!token) {
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirect", pathname);
+      return NextResponse.redirect(loginUrl);
+    }
+
+    try {
+      verifyUserToken(token);
+      return NextResponse.next();
+    } catch {
+      const response = NextResponse.redirect(new URL("/login", request.url));
+      response.cookies.delete("token");
+      return response;
+    }
+  }
+
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/account/:path*"],
+  matcher: ["/admin/:path*", "/account/:path*", "/checkout/:path*"],
 };

@@ -80,7 +80,13 @@ export async function GET(req: NextRequest) {
 
     await setUserCookie(token);
 
-    return NextResponse.redirect(process.env.NEXT_PUBLIC_APP_URL!);
+    const state = req.nextUrl.searchParams.get("state") || "/";
+    const redirectTarget =
+      state.startsWith("/") && !state.startsWith("//") ? state : "/";
+
+    return NextResponse.redirect(
+      `${process.env.NEXT_PUBLIC_APP_URL}${redirectTarget}`
+    );
   } catch (error) {
     console.error("Google OAuth error:", error);
 
