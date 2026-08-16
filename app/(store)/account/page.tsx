@@ -6,9 +6,6 @@ import {
   Star,
   Wallet,
   MapPin,
-  Pencil,
-  MoreVertical,
-  Plus,
   Truck,
   CreditCard,
   Gift,
@@ -21,26 +18,18 @@ import Navbar from "@/components/home/Navbar";
 import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
 import AccountSidebar from "@/components/account/AccountSidebar";
+import SavedAddressesCard from "@/components/account/SavedAddressesCard";
 
 import { getCurrentUser } from "@/lib/auth";
 import { getOrdersByCustomerEmail } from "@/lib/actions/orders/getOrdersByCustomerEmail";
 
-// TODO (before launch): Addresses and Wallet/Arc Points are still
-// placeholder data — those features aren't built yet (marked "SOON"
-// in the sidebar already).
-const ADDRESSES = [
-  {
-    label: "Home",
-    isDefault: true,
-    name: "Aryan Verma",
-    lines: ["A-23, Green Park Extension", "New Delhi - 110016, India"],
-    phone: "+91 98765 43210",
-  },
-];
+// TODO (before launch): Wallet/Arc Points are still placeholder data —
+// those features aren't built yet (marked "SOON" in the sidebar
+// already). Addresses now use real data via SavedAddressesCard.
 
 const QUICK_ACTIONS = [
   { icon: Truck, title: "Track Order", subtitle: "Check delivery status", href: "/account/orders" },
-  { icon: MapPin, title: "Manage Addresses", subtitle: "Add or edit addresses", href: "/account/addresses" },
+  { icon: MapPin, title: "Manage Addresses", subtitle: "Add or edit addresses", href: "/account" },
   { icon: CreditCard, title: "Payment Methods", subtitle: "Cards & UPI", href: "/account/wallet" },
   { icon: Star, title: "Arc Points", subtitle: "View points history", href: "/account/points" },
   { icon: Gift, title: "Refer & Earn", subtitle: "Invite friends", href: "/account/refer" },
@@ -212,65 +201,7 @@ export default async function AccountDashboardPage() {
 
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
               {/* Saved Addresses */}
-              <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-                <div className="mb-4 flex items-center justify-between">
-                  <h2 className="font-bold text-black">Saved Addresses</h2>
-                  <Link
-                    href="/account/addresses"
-                    className="text-sm font-semibold text-violet-600 hover:underline"
-                  >
-                    View All →
-                  </Link>
-                </div>
-
-                <div className="space-y-4">
-                  {ADDRESSES.map((addr) => (
-                    <div
-                      key={addr.label}
-                      className="flex items-start justify-between gap-3 border-b border-zinc-100 pb-4 last:border-0 last:pb-0"
-                    >
-                      <div className="flex gap-3">
-                        <MapPin className="mt-0.5 h-4 w-4 shrink-0 text-violet-600" />
-                        <div>
-                          <div className="flex items-center gap-2">
-                            <span className="text-sm font-semibold text-black">
-                              {addr.label}
-                            </span>
-                            {addr.isDefault && (
-                              <span className="rounded-md bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase text-violet-700">
-                                Default
-                              </span>
-                            )}
-                          </div>
-                          <p className="mt-1 text-xs text-zinc-500">
-                            {addr.name}
-                          </p>
-                          {addr.lines.map((line) => (
-                            <p key={line} className="text-xs text-zinc-500">
-                              {line}
-                            </p>
-                          ))}
-                          <p className="text-xs text-zinc-500">{addr.phone}</p>
-                        </div>
-                      </div>
-
-                      <div className="flex shrink-0 gap-1 text-zinc-400">
-                        <button className="rounded-lg p-1.5 hover:bg-zinc-100 hover:text-violet-600">
-                          <Pencil className="h-3.5 w-3.5" />
-                        </button>
-                        <button className="rounded-lg p-1.5 hover:bg-zinc-100 hover:text-violet-600">
-                          <MoreVertical className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                <button className="mt-4 flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-300 py-3 text-sm font-semibold text-violet-600 transition hover:bg-violet-50">
-                  <Plus className="h-4 w-4" />
-                  Add New Address
-                </button>
-              </div>
+              <SavedAddressesCard />
 
               {/* Quick Actions + Security */}
               <div className="space-y-6">

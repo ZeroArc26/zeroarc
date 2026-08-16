@@ -7,7 +7,6 @@ import Script from "next/script";
 import { toast } from "sonner";
 import {
   MapPin,
-  Pencil,
   Truck,
   Zap,
   CreditCard,
@@ -17,6 +16,7 @@ import {
   RotateCcw,
   Gem,
   Headset,
+  Plus,
 } from "lucide-react";
 
 import { useCartStore } from "@/stores/cartStore";
@@ -74,6 +74,101 @@ export default function CheckoutPage() {
     pincode: "",
     country: "India",
   });
+
+  // Prefill email from the logged-in user's own account — checkout is
+  // gated behind login, so we already know it and shouldn't ask the
+  // customer to retype something we have. It's account-level, not tied
+  // to any particular saved address, so this is separate from the
+  // address-selection logic below.
+  useEffect(() => {
+    fetch("/api/account/me")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.user?.email) {
+          setFormData((prev) => ({ ...prev, email: data.user.email }));
+        }
+      })
+      .catch(() => {});
+  }, []);
+
+  // Saved addresses — lets a returning customer pick a previous address
+  // instead of retyping it, and offers "Add New Address" when they have
+  // none saved yet (or want to ship somewhere new).
+  interface SavedAddress {
+    _id: string;
+    label: string;
+    name: string;
+    phone: string;
+    address: string;
+    city: string;
+    state: string;
+    pincode: string;
+    country: string;
+    isDefault: boolean;
+  }
+
+  const [savedAddresses, setSavedAddresses] = useState<SavedAddress[]>([]);
+  const [addressesLoading, setAddressesLoading] = useState(true);
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/account/addresses")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setSavedAddresses(data.addresses);
+          if (data.addresses.length === 0) setShowNewAddressForm(true);
+
+          const defaultAddr = data.addresses.find((a: SavedAddress) => a.isDefault);
+          if (defaultAddr) {
+            setSelectedAddressId(defaultAddr._id);
+            setFormData((prev) => ({
+              ...prev,
+              fullName: defaultAddr.name,
+              phone: defaultAddr.phone,
+              address: defaultAddr.address,
+              city: defaultAddr.city,
+              state: defaultAddr.state,
+              pincode: defaultAddr.pincode,
+              country: defaultAddr.country || "India",
+            }));
+          }
+        }
+      })
+      .catch(() => {})
+      .finally(() => setAddressesLoading(false));
+  }, []);
+
+  function handleSelectAddress(addr: SavedAddress) {
+    setSelectedAddressId(addr._id);
+    setShowNewAddressForm(false);
+    setFormData((prev) => ({
+      ...prev,
+      fullName: addr.name,
+      phone: addr.phone,
+      address: addr.address,
+      city: addr.city,
+      state: addr.state,
+      pincode: addr.pincode,
+      country: addr.country || "India",
+    }));
+  }
+
+  function handleAddNewAddress() {
+    setSelectedAddressId(null);
+    setShowNewAddressForm(true);
+    setFormData((prev) => ({
+      ...prev,
+      fullName: "",
+      phone: "",
+      address: "",
+      landmark: "",
+      city: "",
+      state: "",
+      pincode: "",
+    }));
+  }
 
   const [shippingMethod, setShippingMethod] =
     useState<(typeof SHIPPING_METHODS)[number]["id"]>("standard");
@@ -249,6 +344,28 @@ export default function CheckoutPage() {
     }
 
     toast.success("Order Placed Successfully!");
+
+    // If the customer typed a fresh address (rather than picking a
+    // saved one), save it to their account for next time. This never
+    // blocks or fails the checkout — it's a best-effort convenience.
+    if (!selectedAddressId) {
+      fetch("/api/account/addresses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          label: "Home",
+          name: formData.fullName,
+          phone: formData.phone,
+          address: formData.address,
+          city: formData.city,
+          state: formData.state,
+          pincode: formData.pincode,
+          country: formData.country,
+          isDefault: savedAddresses.length === 0,
+        }),
+      }).catch(() => {});
+    }
+
     setOrderPlaced(true);
     await new Promise((resolve) => setTimeout(resolve, 900));
     router.push(`/order-success?orderId=${data.order._id}`);
@@ -403,12 +520,85 @@ export default function CheckoutPage() {
                     <MapPin className="h-4 w-4 text-violet-600" />
                     1. Shipping Information
                   </h2>
-                  <button className="flex items-center gap-1 text-sm font-semibold text-violet-600 hover:underline">
-                    Edit <Pencil className="h-3.5 w-3.5" />
-                  </button>
                 </div>
 
+                {/* Email is account-level (prefilled from the logged-in
+                    user), not part of an address — so it's always shown
+                    here regardless of which address is being used. */}
+                <div className="mb-5">
+                  <label className="mb-1.5 block text-xs font-semibold text-zinc-500">
+                    Email Address
+                  </label>
+                  <input
+                    name="email"
+                    type="email"
+                    value={formData.email}
+                    onChange={handleChange}
+                    placeholder="aryan@email.com"
+                    className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm text-black outline-none placeholder:text-zinc-400 focus:border-violet-500"
+                  />
+                </div>
+
+                {/* Saved addresses — pick one instead of retyping */}
+                {!addressesLoading && savedAddresses.length > 0 && !showNewAddressForm && (
+                  <div className="mb-5 space-y-3">
+                    {savedAddresses.map((addr) => (
+                      <button
+                        key={addr._id}
+                        type="button"
+                        onClick={() => handleSelectAddress(addr)}
+                        className={`w-full rounded-xl border p-4 text-left transition ${
+                          selectedAddressId === addr._id
+                            ? "border-violet-600 bg-violet-50"
+                            : "border-zinc-200 hover:border-violet-300"
+                        }`}
+                      >
+                        <div className="flex items-center gap-2">
+                          <span className="text-sm font-semibold text-black">
+                            {addr.label}
+                          </span>
+                          {addr.isDefault && (
+                            <span className="rounded-md bg-violet-100 px-2 py-0.5 text-[10px] font-bold uppercase text-violet-700">
+                              Default
+                            </span>
+                          )}
+                        </div>
+                        <p className="mt-1 text-sm text-zinc-600">
+                          {addr.name} · {addr.phone}
+                        </p>
+                        <p className="text-sm text-zinc-500">
+                          {addr.address}, {addr.city}, {addr.state} - {addr.pincode}
+                        </p>
+                      </button>
+                    ))}
+
+                    <button
+                      type="button"
+                      onClick={handleAddNewAddress}
+                      className="flex w-full items-center justify-center gap-2 rounded-xl border border-dashed border-zinc-300 py-3 text-sm font-semibold text-violet-600 transition hover:bg-violet-50"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Add New Address
+                    </button>
+                  </div>
+                )}
+
+                {(showNewAddressForm || (!addressesLoading && savedAddresses.length === 0)) && (
                 <div className="space-y-4">
+                  {savedAddresses.length > 0 && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setShowNewAddressForm(false);
+                        const defaultAddr = savedAddresses.find((a) => a.isDefault) || savedAddresses[0];
+                        if (defaultAddr) handleSelectAddress(defaultAddr);
+                      }}
+                      className="text-sm font-semibold text-violet-600 hover:underline"
+                    >
+                      ← Back to saved addresses
+                    </button>
+                  )}
+
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
                     <div>
                       <label className="mb-1.5 block text-xs font-semibold text-zinc-500">
@@ -446,20 +636,6 @@ export default function CheckoutPage() {
                         className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm text-black outline-none placeholder:text-zinc-400 focus:border-violet-500"
                       />
                     </div>
-                  </div>
-
-                  <div>
-                    <label className="mb-1.5 block text-xs font-semibold text-zinc-500">
-                      Email Address
-                    </label>
-                    <input
-                      name="email"
-                      type="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      placeholder="aryan@email.com"
-                      className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm text-black outline-none placeholder:text-zinc-400 focus:border-violet-500"
-                    />
                   </div>
 
                   <div>
@@ -526,6 +702,7 @@ export default function CheckoutPage() {
                     </div>
                   </div>
                 </div>
+                )}
               </div>
 
               {/* 2. Shipping Method */}
