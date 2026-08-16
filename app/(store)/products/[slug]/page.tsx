@@ -9,6 +9,7 @@ import Breadcrumb from "@/components/products/Breadcrumb";
 import ProductGalleryAndInfo from "@/components/products/ProductGalleryAndInfo";
 import ProductTabs from "@/components/products/ProductTabs";
 import ProductPromoBanner from "@/components/products/ProductPromoBanner";
+import ProductReviews from "@/components/products/ProductReviews";
 import RelatedProducts from "@/components/products/RelatedProducts";
 
 import connectDB from "@/lib/mongodb";
@@ -82,6 +83,8 @@ export default async function ProductPage({ params }: ProductPageProps) {
           <ProductTabs description={product.basicInfo.description} />
           <ProductPromoBanner />
         </div>
+
+        <ProductReviews productId={product._id} />
 
         <RelatedProducts products={relatedProducts} />
       </div>

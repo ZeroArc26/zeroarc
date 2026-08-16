@@ -1,4 +1,5 @@
 import ProductForm from "@/components/admin/products/ProductForm";
+import AdminProductReviews from "@/components/admin/products/AdminProductReviews";
 import { getProductById } from "@/lib/actions/products/getProductById";
 
 type Props = {
@@ -23,9 +24,13 @@ export default async function EditProductPage({
   }
 
   return (
-    <ProductForm
-      mode="edit"
-      initialData={product}
-    />
+    <div className="space-y-8">
+      <ProductForm
+        mode="edit"
+        initialData={product}
+      />
+
+      <AdminProductReviews productId={id} />
+    </div>
   );
 }
