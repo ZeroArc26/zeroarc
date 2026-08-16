@@ -284,7 +284,8 @@ export default function CheckoutPage() {
         amount: razorpayOrder.amount,
         currency: razorpayOrder.currency,
         name: "ZeroArc",
-        description: "Order Payment",
+        description: "Wear Your Next Arc — Secure Checkout",
+        image: `${process.env.NEXT_PUBLIC_APP_URL}/images/logo/zeroarc-logo.png`,
         order_id: razorpayOrder.id,
         prefill: {
           name: formData.fullName,
