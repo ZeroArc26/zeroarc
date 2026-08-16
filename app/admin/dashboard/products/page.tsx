@@ -4,6 +4,11 @@ import ProductTable from "@/components/admin/products/ProductTable";
 
 import { getProducts } from "@/lib/actions/products/getProducts";
 
+// Admin-only internal page reading live product data — must never
+// serve a cached/stale snapshot (e.g. a deleted product still showing
+// up here after being removed from the database).
+export const dynamic = "force-dynamic";
+
 export default async function ProductsPage() {
   const products = await getProducts();
 

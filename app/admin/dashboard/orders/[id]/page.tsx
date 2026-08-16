@@ -15,6 +15,9 @@ import OrderSummary from "@/components/admin/orders/OrderSummary";
 import ShippingLabelActions from "@/components/admin/orders/ShippingLabelActions";
 import ReturnManagementCard from "@/components/admin/orders/ReturnManagementCard";
 
+// Admin-only internal page reading live order data — must never
+// serve a cached/stale snapshot.
+export const dynamic = "force-dynamic";
 
 type Props = {
   params: Promise<{

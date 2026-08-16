@@ -7,6 +7,10 @@ import { Button } from "@/components/ui/button";
 import { getCategories } from "@/lib/actions/categories/getCategories";
 import CategoriesClient from "@/components/admin/categories/CategoriesClient";
 
+// Admin-only internal page reading live category data — must never
+// serve a cached/stale snapshot.
+export const dynamic = "force-dynamic";
+
 export default async function CategoriesPage() {
   const categories = await getCategories();
 

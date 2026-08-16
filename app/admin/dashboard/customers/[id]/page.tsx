@@ -10,6 +10,10 @@ interface CustomerDetailPageProps {
   params: Promise<{ id: string }>;
 }
 
+// Admin-only internal page reading live customer data — must never
+// serve a cached/stale snapshot.
+export const dynamic = "force-dynamic";
+
 export default async function CustomerDetailsPage({ params }: CustomerDetailPageProps) {
   const { id } = await params;
 

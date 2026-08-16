@@ -7,6 +7,9 @@ import CustomerStats from "@/components/admin/customers/CustomerStats";
 import CustomerToolbar from "@/components/admin/customers/CustomerToolbar";
 import CustomerTable from "@/components/admin/customers/CustomerTable";
 
+// Admin-only internal page reading live customer data — must never
+// serve a cached/stale snapshot.
+export const dynamic = "force-dynamic";
 
 type CustomersPageProps = {
   searchParams: Promise<{
