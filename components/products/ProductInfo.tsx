@@ -41,9 +41,17 @@ interface ProductInfoProps {
       featured?: boolean;
     };
   };
+  /** Lets a parent (e.g. the gallery, which needs to filter images by
+   * the selected color) stay in sync with the color chosen here. */
+  selectedColor?: string;
+  onColorChange?: (color: string) => void;
 }
 
-export default function ProductInfo({ product }: ProductInfoProps) {
+export default function ProductInfo({
+  product,
+  selectedColor: selectedColorProp,
+  onColorChange,
+}: ProductInfoProps) {
   const colors = useMemo(() => {
     const seen = new Map<string, string | undefined>();
     product.variants.forEach((v) => {
@@ -55,7 +63,13 @@ export default function ProductInfo({ product }: ProductInfoProps) {
     }));
   }, [product.variants]);
 
-  const [selectedColor, setSelectedColor] = useState(colors[0]?.color ?? "");
+  const [internalColor, setInternalColor] = useState(colors[0]?.color ?? "");
+  const selectedColor = selectedColorProp ?? internalColor;
+
+  const setSelectedColor = (color: string) => {
+    setInternalColor(color);
+    onColorChange?.(color);
+  };
 
   const sizesForColor = useMemo(() => {
     return product.variants.filter((v) => v.color === selectedColor);
@@ -67,6 +81,15 @@ export default function ProductInfo({ product }: ProductInfoProps) {
   const [justAdded, setJustAdded] = useState(false);
 
   useEffect(() => setMounted(true), []);
+
+  useEffect(() => {
+    if (!selectedColorProp && internalColor) {
+      onColorChange?.(internalColor);
+    }
+    // Only run when the resolved default color is first known — not on
+    // every selection change (that's handled by setSelectedColor above).
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   useEffect(() => {
     const stillAvailable = sizesForColor.find((v) => v.size === selectedSize);

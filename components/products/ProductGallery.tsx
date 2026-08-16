@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 
@@ -9,19 +9,39 @@ interface GalleryImage {
   alt?: string;
   isCover?: boolean;
   order?: number;
+  color?: string;
 }
 
 interface ProductGalleryProps {
   images: GalleryImage[];
+  /** When provided, only images tagged with this color are shown
+   * (falls back to the full set if none match, so a product with
+   * untagged/shared images never ends up with an empty gallery). */
+  selectedColor?: string;
 }
 
-export default function ProductGallery({ images }: ProductGalleryProps) {
-  const sorted = [...images].sort(
+export default function ProductGallery({
+  images,
+  selectedColor,
+}: ProductGalleryProps) {
+  const colorFiltered = selectedColor
+    ? images.filter((img) => img.color === selectedColor)
+    : images;
+
+  const visible = colorFiltered.length > 0 ? colorFiltered : images;
+
+  const sorted = [...visible].sort(
     (a, b) => (a.order ?? 0) - (b.order ?? 0)
   );
 
   const [activeIndex, setActiveIndex] = useState(0);
   const active = sorted[activeIndex] ?? sorted[0];
+
+  // Selecting a different color should show that color's own first
+  // image, not stay on whatever index was active before.
+  useEffect(() => {
+    setActiveIndex(0);
+  }, [selectedColor]);
 
   const goTo = (dir: "prev" | "next") => {
     setActiveIndex((prev) => {

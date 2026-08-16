@@ -6,9 +6,7 @@ import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
 
 import Breadcrumb from "@/components/products/Breadcrumb";
-import ProductGallery from "@/components/products/ProductGallery";
-import ProductInfo from "@/components/products/ProductInfo";
-import ProductFeatures from "@/components/products/ProductFeatures";
+import ProductGalleryAndInfo from "@/components/products/ProductGalleryAndInfo";
 import ProductTabs from "@/components/products/ProductTabs";
 import ProductPromoBanner from "@/components/products/ProductPromoBanner";
 import RelatedProducts from "@/components/products/RelatedProducts";
@@ -77,12 +75,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
         />
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          <div>
-            <ProductGallery images={product.images} />
-            <ProductFeatures />
-          </div>
-
-          <ProductInfo product={product} />
+          <ProductGalleryAndInfo product={product} />
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
