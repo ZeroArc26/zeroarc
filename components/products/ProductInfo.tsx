@@ -2,10 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Star, ShoppingBag, Heart, Truck, ChevronRight, Check, Minus, Plus, ShieldCheck } from "lucide-react";
+import { Star, ShoppingBag, Heart, Truck, ChevronRight, Check, Minus, Plus, ShieldCheck, Flame } from "lucide-react";
 
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
+import SizeGuideModal from "@/components/products/SizeGuideModal";
 
 interface Variant {
   id: string;
@@ -45,12 +46,21 @@ interface ProductInfoProps {
    * the selected color) stay in sync with the color chosen here. */
   selectedColor?: string;
   onColorChange?: (color: string) => void;
+  /** Real count of non-cancelled orders for this product in the last
+   * 7 days — omitted from display entirely when 0, never faked. */
+  recentPurchaseCount?: number;
+  /** Real lowest price this product has been at (including current)
+   * in the last 30 days — null when no genuine price change was
+   * logged in that window, in which case nothing is shown. */
+  lowestPriceLast30Days?: number | null;
 }
 
 export default function ProductInfo({
   product,
   selectedColor: selectedColorProp,
   onColorChange,
+  recentPurchaseCount,
+  lowestPriceLast30Days,
 }: ProductInfoProps) {
   const colors = useMemo(() => {
     const seen = new Map<string, string | undefined>();
@@ -65,6 +75,7 @@ export default function ProductInfo({
 
   const [internalColor, setInternalColor] = useState(colors[0]?.color ?? "");
   const selectedColor = selectedColorProp ?? internalColor;
+  const [sizeGuideOpen, setSizeGuideOpen] = useState(false);
 
   const setSelectedColor = (color: string) => {
     setInternalColor(color);
@@ -202,6 +213,20 @@ export default function ProductInfo({
       </div>
       <p className="text-xs text-zinc-400">Inclusive of all taxes</p>
 
+      {lowestPriceLast30Days != null &&
+        lowestPriceLast30Days < product.pricing.sellingPrice && (
+          <p className="mt-1 text-xs text-zinc-400">
+            Lowest price in the last 30 days: ₹{lowestPriceLast30Days}
+          </p>
+        )}
+
+      {!!recentPurchaseCount && recentPurchaseCount > 0 && (
+        <div className="mt-2 flex items-center gap-1.5 text-xs font-medium text-orange-600">
+          <Flame className="h-3.5 w-3.5" />
+          {recentPurchaseCount} {recentPurchaseCount === 1 ? "person" : "people"} bought this in the last 7 days
+        </div>
+      )}
+
       <p className="mt-5 leading-relaxed text-zinc-600">
         {product.basicInfo.description}
       </p>
@@ -212,27 +237,37 @@ export default function ProductInfo({
           <p className="mb-3 text-sm font-semibold text-black">
             Color: <span className="font-normal text-zinc-500">{selectedColor}</span>
           </p>
-          <div className="flex gap-3">
+          <div className="flex flex-wrap gap-2.5">
             {colors.map(({ color, colorHex }) => (
               <button
                 key={color}
                 onClick={() => setSelectedColor(color)}
-                className={`relative flex h-9 w-9 items-center justify-center rounded-full border-2 transition ${
+                className={`flex items-center gap-2 rounded-full border-2 py-1.5 pl-1.5 pr-3.5 transition ${
                   selectedColor === color
-                    ? "border-violet-600 ring-2 ring-violet-200"
+                    ? "border-violet-600 bg-violet-50"
                     : "border-zinc-200 hover:border-zinc-300"
                 }`}
-                style={{ backgroundColor: colorHex || "#000" }}
-                title={color}
               >
-                {selectedColor === color && (
-                  <Check
-                    className="h-4 w-4 drop-shadow"
-                    style={{
-                      color: colorHex && isLightColor(colorHex) ? "#000" : "#fff",
-                    }}
-                  />
-                )}
+                <span
+                  className="relative flex h-6 w-6 shrink-0 items-center justify-center rounded-full border border-black/10"
+                  style={{ backgroundColor: colorHex || "#000" }}
+                >
+                  {selectedColor === color && (
+                    <Check
+                      className="h-3.5 w-3.5 drop-shadow"
+                      style={{
+                        color: colorHex && isLightColor(colorHex) ? "#000" : "#fff",
+                      }}
+                    />
+                  )}
+                </span>
+                <span
+                  className={`text-xs font-medium ${
+                    selectedColor === color ? "text-violet-700" : "text-zinc-600"
+                  }`}
+                >
+                  {color}
+                </span>
               </button>
             ))}
           </div>
@@ -246,7 +281,10 @@ export default function ProductInfo({
             <p className="text-sm font-semibold text-black">
               Size: <span className="font-normal text-zinc-500">Select your size</span>
             </p>
-            <button className="flex items-center gap-1 text-xs font-semibold text-violet-600 hover:underline">
+            <button
+              onClick={() => setSizeGuideOpen(true)}
+              className="flex items-center gap-1 text-xs font-semibold text-violet-600 hover:underline"
+            >
               Size Guide
             </button>
           </div>
@@ -388,6 +426,8 @@ export default function ProductInfo({
       {activeVariant?.sku && (
         <p className="mt-4 text-xs text-zinc-400">SKU: {activeVariant.sku}</p>
       )}
+
+      <SizeGuideModal open={sizeGuideOpen} onOpenChange={setSizeGuideOpen} />
     </div>
   );
 }

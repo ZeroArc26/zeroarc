@@ -110,9 +110,44 @@ export async function PUT(
       );
     }
 
+    const existingProduct = await Product.findById(id).select(
+      "pricing.sellingPrice"
+    );
+
+    if (!existingProduct) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Product not found.",
+        },
+        {
+          status: 404,
+        }
+      );
+    }
+
+    const oldPrice = existingProduct.pricing?.sellingPrice;
+    const newPrice = parsed.data.pricing?.sellingPrice;
+
+    const updatePayload: typeof parsed.data & {
+      $push?: { priceHistory: { price: number; recordedAt: Date } };
+    } = { ...parsed.data };
+
+    // Log the price we're moving away from — not the new one — so the
+    // history always reflects prices the product has actually been at.
+    if (
+      typeof oldPrice === "number" &&
+      typeof newPrice === "number" &&
+      oldPrice !== newPrice
+    ) {
+      updatePayload.$push = {
+        priceHistory: { price: oldPrice, recordedAt: new Date() },
+      };
+    }
+
     const updatedProduct = await Product.findByIdAndUpdate(
       id,
-      parsed.data,
+      updatePayload,
       {
         new: true,
         runValidators: true,

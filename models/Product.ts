@@ -370,6 +370,19 @@ const ProductSchema = new Schema(
       required: true,
     },
 
+    // Logged whenever sellingPrice actually changes (see the product
+    // update route) — powers the "lowest price in the last N days"
+    // transparency line on the product page.
+    priceHistory: {
+      type: [
+        {
+          price: Number,
+          recordedAt: { type: Date, default: Date.now },
+        },
+      ],
+      default: [],
+    },
+
     inventory: {
       type: InventorySchema,
       required: true,

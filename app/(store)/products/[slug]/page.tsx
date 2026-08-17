@@ -14,6 +14,7 @@ import RelatedProducts from "@/components/products/RelatedProducts";
 
 import connectDB from "@/lib/mongodb";
 import Product from "@/models/Product";
+import Order from "@/models/Order";
 
 export const dynamic = "force-dynamic";
 
@@ -34,6 +35,35 @@ async function getProduct(slug: string) {
   if (!product) return null;
 
   return { ...product, _id: product._id.toString() };
+}
+
+// Real price-history transparency — only shown when there's an actual
+// logged price change in the window (see the product PUT route, which
+// logs to priceHistory whenever sellingPrice genuinely changes).
+function getLowestPriceLast30Days(product: any): number | null {
+  const thirtyDaysAgo = Date.now() - 30 * 24 * 60 * 60 * 1000;
+
+  const recentHistoricalPrices = (product.priceHistory || [])
+    .filter((entry: any) => new Date(entry.recordedAt).getTime() >= thirtyDaysAgo)
+    .map((entry: any) => entry.price);
+
+  if (recentHistoricalPrices.length === 0) return null;
+
+  return Math.min(product.pricing.sellingPrice, ...recentHistoricalPrices);
+}
+
+// Real count, not a made-up number — how many non-cancelled orders in
+// the last 7 days included this product.
+async function getRecentPurchaseCount(productId: string) {
+  await connectDB();
+
+  const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
+  return Order.countDocuments({
+    "items.productId": productId,
+    "orderInfo.status": { $ne: "cancelled" },
+    createdAt: { $gte: sevenDaysAgo },
+  });
 }
 
 async function getRelatedProducts(category: string, excludeSlug: string) {
@@ -64,6 +94,9 @@ export default async function ProductPage({ params }: ProductPageProps) {
     product.basicInfo.slug
   );
 
+  const recentPurchaseCount = await getRecentPurchaseCount(product._id);
+  const lowestPriceLast30Days = getLowestPriceLast30Days(product);
+
   return (
     <main className="min-h-screen bg-white">
       <AnnouncementBar />
@@ -76,7 +109,11 @@ export default async function ProductPage({ params }: ProductPageProps) {
         />
 
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
-          <ProductGalleryAndInfo product={product} />
+          <ProductGalleryAndInfo
+            product={product}
+            recentPurchaseCount={recentPurchaseCount}
+            lowestPriceLast30Days={lowestPriceLast30Days}
+          />
         </div>
 
         <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">

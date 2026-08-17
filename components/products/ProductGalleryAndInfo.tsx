@@ -8,6 +8,8 @@ import ProductInfo from "@/components/products/ProductInfo";
 
 interface ProductGalleryAndInfoProps {
   product: any;
+  recentPurchaseCount?: number;
+  lowestPriceLast30Days?: number | null;
 }
 
 /**
@@ -19,6 +21,8 @@ interface ProductGalleryAndInfoProps {
  */
 export default function ProductGalleryAndInfo({
   product,
+  recentPurchaseCount,
+  lowestPriceLast30Days,
 }: ProductGalleryAndInfoProps) {
   const [selectedColor, setSelectedColor] = useState(
     product.variants?.[0]?.color ?? ""
@@ -35,6 +39,8 @@ export default function ProductGalleryAndInfo({
         product={product}
         selectedColor={selectedColor}
         onColorChange={setSelectedColor}
+        recentPurchaseCount={recentPurchaseCount}
+        lowestPriceLast30Days={lowestPriceLast30Days}
       />
     </>
   );
