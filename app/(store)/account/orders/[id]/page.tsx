@@ -15,6 +15,7 @@ import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
 import AccountSidebar from "@/components/account/AccountSidebar";
 import RequestReturnDialog from "@/components/account/RequestReturnDialog";
+import LiveTracking from "@/components/account/LiveTracking";
 
 import { getOrderById } from "@/lib/actions/orders/getOrderById";
 import { getCurrentUser } from "@/lib/auth";
@@ -104,8 +105,12 @@ export default async function OrderDetailPage({
             <div className="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_340px]">
               <div className="space-y-6">
                 {status !== "cancelled" && (
+                  <LiveTracking orderId={order.id} />
+                )}
+
+                {status !== "cancelled" && (
                   <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-                    <h2 className="mb-6 font-bold text-black">Order Tracking</h2>
+                    <h2 className="mb-6 font-bold text-black">Order Status</h2>
 
                     {order.timeline.length === 0 ? (
                       <p className="text-sm text-zinc-500">No tracking updates yet.</p>
