@@ -109,7 +109,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           title={product.basicInfo.title}
         />
 
-        <div className="grid grid-cols-1 gap-12 lg:grid-cols-2">
+        <div className="grid grid-cols-1 items-start gap-12 lg:grid-cols-2">
           <ProductGalleryAndInfo
             product={product}
             recentPurchaseCount={recentPurchaseCount}
@@ -117,7 +117,7 @@ export default async function ProductPage({ params }: ProductPageProps) {
           />
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-8 lg:grid-cols-[1fr_320px]">
+        <div className="mt-16 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px]">
           <ProductTabs description={product.basicInfo.description} />
           <ProductPromoBanner />
         </div>

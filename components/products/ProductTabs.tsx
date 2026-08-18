@@ -17,6 +17,8 @@ import {
   Flame,
 } from "lucide-react";
 
+import { parseProductDescription } from "@/lib/utils/parseDescription";
+
 const TABS = ["Description", "Details", "Size & Fit", "Shipping & Returns"] as const;
 
 const SIZE_CHART = [
@@ -103,11 +105,45 @@ export default function ProductTabs({
 
       {/* Tab content */}
       <div className="pt-8">
-        {active === "Description" && (
-          <p className="max-w-2xl leading-relaxed text-zinc-600">
-            {description}
-          </p>
-        )}
+        {active === "Description" && (() => {
+          const { narrative, features } = parseProductDescription(description);
+
+          return (
+            <div className="max-w-3xl space-y-8">
+              <p className="leading-relaxed text-zinc-600">{narrative}</p>
+
+              {features.length > 0 && (
+                <div>
+                  <h3 className="mb-4 text-sm font-bold uppercase tracking-wide text-black">
+                    Specifications
+                  </h3>
+                  <div className="grid grid-cols-1 gap-px overflow-hidden rounded-2xl border border-zinc-200 bg-zinc-200 sm:grid-cols-2">
+                    {features.map((feature, i) => {
+                      const isLastAlone =
+                        i === features.length - 1 && features.length % 2 !== 0;
+
+                      return (
+                        <div
+                          key={i}
+                          className={`flex items-center justify-between gap-4 bg-white px-5 py-3.5 ${
+                            isLastAlone ? "sm:col-span-2" : ""
+                          }`}
+                        >
+                          <span className="shrink-0 text-xs font-semibold uppercase tracking-wide text-zinc-400">
+                            {feature.label}
+                          </span>
+                          <span className="text-right text-sm font-medium text-black">
+                            {feature.value}
+                          </span>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })()}
 
         {active === "Details" && (
           <div className="space-y-6">

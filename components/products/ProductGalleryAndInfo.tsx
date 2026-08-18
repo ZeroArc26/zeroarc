@@ -30,7 +30,7 @@ export default function ProductGalleryAndInfo({
 
   return (
     <>
-      <div>
+      <div className="sticky top-20">
         <ProductGallery images={product.images} selectedColor={selectedColor} />
         <ProductFeatures />
       </div>

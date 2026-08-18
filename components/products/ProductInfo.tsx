@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Star, ShoppingBag, Heart, Check, Minus, Plus, ShieldCheck, Flame } from "lucide-react";
 
@@ -8,6 +9,7 @@ import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import SizeGuideModal from "@/components/products/SizeGuideModal";
 import DeliveryEstimate from "@/components/products/DeliveryEstimate";
+import { parseProductDescription } from "@/lib/utils/parseDescription";
 
 interface Variant {
   id: string;
@@ -63,6 +65,8 @@ export default function ProductInfo({
   recentPurchaseCount,
   lowestPriceLast30Days,
 }: ProductInfoProps) {
+  const router = useRouter();
+
   const colors = useMemo(() => {
     const seen = new Map<string, string | undefined>();
     product.variants.forEach((v) => {
@@ -164,6 +168,26 @@ export default function ProductInfo({
     setTimeout(() => setJustAdded(false), 1200);
   }
 
+  function handleBuyNow() {
+    if (stock <= 0) return;
+
+    addToCart({
+      productId: product._id,
+      slug: product.basicInfo.slug,
+      title: product.basicInfo.title,
+      image: coverImage,
+      color: selectedColor,
+      size: selectedSize,
+      price: product.pricing.sellingPrice,
+      comparePrice: product.pricing.comparePrice,
+      quantity,
+      stock,
+      addedAt: new Date().toISOString(),
+    });
+
+    router.push("/checkout");
+  }
+
   return (
     <div>
       {product.publish?.featured && (
@@ -230,7 +254,7 @@ export default function ProductInfo({
       )}
 
       <p className="mt-5 leading-relaxed text-zinc-600">
-        {product.basicInfo.description}
+        {parseProductDescription(product.basicInfo.description).narrative}
       </p>
 
       {/* Color */}
@@ -356,7 +380,7 @@ export default function ProductInfo({
         <button
           disabled={stock <= 0}
           onClick={handleAddToCart}
-          className={`flex flex-1 items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 font-semibold text-white transition-all duration-200 hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-300 ${
+          className={`flex flex-1 items-center justify-center gap-2 rounded-full bg-violet-600 py-4 font-semibold text-white transition-all duration-200 hover:bg-violet-500 disabled:cursor-not-allowed disabled:bg-zinc-300 ${
             justAdded ? "scale-[0.98]" : ""
           }`}
         >
@@ -392,17 +416,23 @@ export default function ProductInfo({
             });
             toast.success("Added to Wishlist");
           }}
-          className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-xl border border-zinc-300 transition hover:border-pink-400 hover:text-pink-500"
+          className="flex h-[54px] w-[54px] shrink-0 items-center justify-center rounded-full border border-zinc-300 transition hover:border-pink-400 hover:text-pink-500"
         >
           <Heart
             className={`h-5 w-5 ${
-              mounted && isInWishlist ? "fill-pink-500 text-pink-500" : ""
+              mounted && isInWishlist
+                ? "fill-pink-500 text-pink-500"
+                : "text-zinc-500"
             }`}
           />
         </button>
       </div>
 
-      <button className="mt-3 flex w-full items-center justify-center gap-2 rounded-xl bg-black py-4 font-semibold text-white transition hover:bg-zinc-800">
+      <button
+        disabled={stock <= 0}
+        onClick={handleBuyNow}
+        className="mt-3 flex w-full items-center justify-center gap-2 rounded-full bg-black py-4 font-semibold text-white transition hover:bg-zinc-800 disabled:cursor-not-allowed disabled:bg-zinc-300"
+      >
         ⚡ BUY IT NOW
       </button>
 

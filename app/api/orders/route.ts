@@ -92,10 +92,9 @@ export async function POST(req: Request) {
 
         try {
           const product = await Product.findById(item.productId).lean<any>();
-          const variant = product?.variants?.find(
-            (v: any) => v.color === item.color && v.size === item.size
-          );
-          sku = variant?.sku || "";
+          // One SKU per product (not per color/size variant) — this is
+          // what shows on invoices and shipping labels.
+          sku = product?.inventory?.sku || "";
         } catch {
           sku = "";
         }

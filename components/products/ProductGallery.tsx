@@ -104,7 +104,7 @@ export default function ProductGallery({
         onMouseLeave={() => setIsHovering(false)}
         onMouseMove={handleMouseMove}
         onClick={() => setLightboxOpen(true)}
-        className="relative aspect-square flex-1 cursor-zoom-in overflow-hidden rounded-2xl bg-zinc-100"
+        className="relative aspect-[4/5] flex-1 cursor-zoom-in overflow-hidden rounded-2xl bg-zinc-100"
       >
         {active && (
           <Image
