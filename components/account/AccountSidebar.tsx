@@ -22,14 +22,14 @@ const MAIN_LINKS = [
   { label: "Dashboard", href: "/account", icon: LayoutDashboard },
   { label: "Orders", href: "/account/orders", icon: Package },
   { label: "Wishlist", href: "/account/wishlist", icon: Heart },
-  { label: "Arc Points", href: "#", icon: Star, disabled: true },
-  { label: "Wallet", href: "#", icon: Wallet, disabled: true },
+  { label: "Arc Points", href: "/account/points", icon: Star },
+  { label: "Wallet", href: "/account/wallet", icon: Wallet },
   { label: "Addresses", href: "/account", icon: MapPin },
-  { label: "Security", href: "/account", icon: ShieldCheck },
+  { label: "Security", href: "/account/security", icon: ShieldCheck },
 ];
 
 const MORE_LINKS = [
-  { label: "Refer & Earn", href: "#", icon: Gift, disabled: true },
+  { label: "Refer & Earn", href: "/account/refer", icon: Gift },
   { label: "Help & Support", href: "/contact", icon: HelpCircle },
 ];
 
@@ -59,25 +59,19 @@ export default function AccountSidebar() {
         <nav className="space-y-1">
           {MAIN_LINKS.map((link) => {
             const Icon = link.icon;
-            const active = pathname === link.href && !link.disabled;
+            const active = pathname === link.href;
             return (
               <Link
                 key={link.label}
-                href={link.disabled ? "#" : link.href}
-                onClick={(e) => link.disabled && e.preventDefault()}
+                href={link.href}
                 className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  link.disabled
-                    ? "cursor-not-allowed text-zinc-300"
-                    : active
+                  active
                     ? "bg-violet-50 text-violet-700"
                     : "text-zinc-600 hover:bg-zinc-50"
                 }`}
               >
                 <Icon className="h-4 w-4" />
                 {link.label}
-                {link.disabled && (
-                  <span className="ml-auto text-[10px] uppercase text-zinc-300">Soon</span>
-                )}
               </Link>
             );
           })}
@@ -95,19 +89,11 @@ export default function AccountSidebar() {
             return (
               <Link
                 key={link.label}
-                href={link.disabled ? "#" : link.href}
-                onClick={(e) => link.disabled && e.preventDefault()}
-                className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition ${
-                  link.disabled
-                    ? "cursor-not-allowed text-zinc-300"
-                    : "text-zinc-600 hover:bg-zinc-50"
-                }`}
+                href={link.href}
+                className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-zinc-600 transition hover:bg-zinc-50"
               >
                 <Icon className="h-4 w-4" />
                 {link.label}
-                {link.disabled && (
-                  <span className="ml-auto text-[10px] uppercase text-zinc-300">Soon</span>
-                )}
               </Link>
             );
           })}

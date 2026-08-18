@@ -33,7 +33,7 @@ const QUICK_ACTIONS = [
   { icon: CreditCard, title: "Payment Methods", subtitle: "Cards & UPI", href: "/account/wallet" },
   { icon: Star, title: "Arc Points", subtitle: "View points history", href: "/account/points" },
   { icon: Gift, title: "Refer & Earn", subtitle: "Invite friends", href: "/account/refer" },
-  { icon: HelpCircle, title: "Help & Support", subtitle: "Get help anytime", href: "/account/help" },
+  { icon: HelpCircle, title: "Help & Support", subtitle: "Get help anytime", href: "/contact" },
 ];
 
 function statusBadge(status: string) {
