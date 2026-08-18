@@ -1,7 +1,14 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { PackageCheck, Truck, Loader2 } from "lucide-react";
+import {
+  Truck,
+  Package,
+  MapPin,
+  Loader2,
+  CircleCheck,
+  ChevronDown,
+} from "lucide-react";
 
 interface Scan {
   ScanDetail: {
@@ -19,8 +26,28 @@ interface TrackingState {
   message?: string;
 }
 
+const COLLAPSED_COUNT = 4;
+
+function ScanStatusIcon({
+  text,
+  className,
+}: {
+  text: string;
+  className?: string;
+}) {
+  const t = text.toLowerCase();
+
+  if (t.includes("deliver")) return <CircleCheck className={className} />;
+  if (t.includes("out for")) return <Truck className={className} />;
+  if (t.includes("transit") || t.includes("dispatch"))
+    return <Truck className={className} />;
+  if (t.includes("pick")) return <Package className={className} />;
+  return <MapPin className={className} />;
+}
+
 export default function LiveTracking({ orderId }: { orderId: string }) {
   const [state, setState] = useState<TrackingState>({ status: "loading" });
+  const [expanded, setExpanded] = useState(false);
 
   useEffect(() => {
     fetch(`/api/orders/${orderId}/track`)
@@ -60,8 +87,8 @@ export default function LiveTracking({ orderId }: { orderId: string }) {
 
   if (state.status === "loading") {
     return (
-      <div className="flex items-center gap-2 rounded-2xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
-        <Loader2 className="h-4 w-4 animate-spin" />
+      <div className="flex items-center gap-2.5 rounded-2xl border border-zinc-200 bg-white p-6 text-sm text-zinc-500">
+        <Loader2 className="h-4 w-4 animate-spin text-violet-500" />
         Checking live courier tracking...
       </div>
     );
@@ -74,59 +101,118 @@ export default function LiveTracking({ orderId }: { orderId: string }) {
     return null;
   }
 
+  const scans = state.scans!;
+  const visibleScans = expanded ? scans : scans.slice(0, COLLAPSED_COUNT);
+  const latest = scans[0];
+  const latestText = latest.ScanDetail.Instructions || latest.ScanDetail.Scan;
+
   return (
-    <div className="rounded-2xl border border-zinc-200 bg-white p-6">
-      <div className="mb-6 flex items-center justify-between">
-        <h2 className="flex items-center gap-2 font-bold text-black">
-          <Truck className="h-4 w-4 text-violet-600" />
+    <div className="overflow-hidden rounded-2xl border border-zinc-200 bg-white">
+      {/* Hero status */}
+      <div className="relative overflow-hidden bg-gradient-to-br from-violet-600 to-violet-800 p-6">
+        <div className="pointer-events-none absolute -right-8 -top-8 h-32 w-32 rounded-full bg-white/10 blur-2xl" />
+
+        <p className="relative text-xs font-semibold uppercase tracking-wide text-violet-200">
           Live Courier Tracking
-        </h2>
-        {state.currentStatus && (
-          <span className="rounded-full bg-violet-100 px-3 py-1 text-xs font-bold uppercase text-violet-700">
-            {state.currentStatus}
-          </span>
+        </p>
+
+        <div className="relative mt-2 flex items-center gap-2.5">
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white/15">
+            <ScanStatusIcon text={latestText} className="h-[18px] w-[18px] text-white" />
+          </div>
+          <p className="text-lg font-black text-white">
+            {state.currentStatus ||
+              latest.ScanDetail.Instructions ||
+              latest.ScanDetail.Scan}
+          </p>
+        </div>
+
+        {latest.ScanDetail.ScannedLocation && (
+          <p className="relative mt-4 flex items-center gap-1.5 text-xs text-violet-200">
+            <MapPin className="h-3 w-3" />
+            {latest.ScanDetail.ScannedLocation}
+          </p>
         )}
       </div>
 
-      <div className="relative pl-2">
-        {state.scans!.map((scan, i) => (
-          <div key={i} className="relative flex gap-4 pb-8 last:pb-0">
-            {i < state.scans!.length - 1 && (
-              <span className="absolute left-[9px] top-6 h-full w-0.5 bg-zinc-200" />
-            )}
+      {/* Timeline */}
+      <div className="p-6">
+        <div className="relative">
+          {visibleScans.map((scan, i) => {
+            const scanText = scan.ScanDetail.Instructions || scan.ScanDetail.Scan;
+            const isLatest = i === 0;
 
-            <PackageCheck
-              className={`relative z-10 h-5 w-5 shrink-0 ${
-                i === 0 ? "text-violet-600" : "text-zinc-300"
+            return (
+              <div key={i} className="relative flex gap-4 pb-7 last:pb-0">
+                {i < visibleScans.length - 1 && (
+                  <span className="absolute left-[13px] top-7 h-full w-px bg-zinc-200" />
+                )}
+
+                <div
+                  className={`relative z-10 flex h-7 w-7 shrink-0 items-center justify-center rounded-full border-2 ${
+                    isLatest
+                      ? "border-violet-600 bg-violet-50"
+                      : "border-zinc-200 bg-white"
+                  }`}
+                >
+                  <ScanStatusIcon
+                    text={scanText}
+                    className={`h-3.5 w-3.5 ${
+                      isLatest ? "text-violet-600" : "text-zinc-400"
+                    }`}
+                  />
+                </div>
+
+                <div className="pt-0.5">
+                  <p
+                    className={`text-sm font-semibold ${
+                      isLatest ? "text-black" : "text-zinc-700"
+                    }`}
+                  >
+                    {scan.ScanDetail.Instructions || scan.ScanDetail.Scan}
+                  </p>
+                  {scan.ScanDetail.ScannedLocation && (
+                    <p className="mt-0.5 text-xs text-zinc-500">
+                      {scan.ScanDetail.ScannedLocation}
+                    </p>
+                  )}
+                  {scan.ScanDetail.ScanDateTime && (
+                    <p className="mt-0.5 text-xs text-zinc-400">
+                      {new Date(scan.ScanDetail.ScanDateTime).toLocaleString(
+                        "en-IN",
+                        {
+                          day: "2-digit",
+                          month: "short",
+                          year: "numeric",
+                          hour: "2-digit",
+                          minute: "2-digit",
+                        }
+                      )}
+                    </p>
+                  )}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {scans.length > COLLAPSED_COUNT && (
+          <button
+            onClick={() => setExpanded((prev) => !prev)}
+            className="mt-2 flex items-center gap-1.5 text-sm font-semibold text-violet-600 hover:underline"
+          >
+            {expanded
+              ? "Show less"
+              : `Show ${scans.length - COLLAPSED_COUNT} earlier update${
+                  scans.length - COLLAPSED_COUNT !== 1 ? "s" : ""
+                }`}
+            <ChevronDown
+              className={`h-4 w-4 transition-transform ${
+                expanded ? "rotate-180" : ""
               }`}
             />
-
-            <div>
-              <p className="text-sm font-semibold text-black">
-                {scan.ScanDetail.Instructions || scan.ScanDetail.Scan}
-              </p>
-              {scan.ScanDetail.ScannedLocation && (
-                <p className="text-xs text-zinc-500">
-                  {scan.ScanDetail.ScannedLocation}
-                </p>
-              )}
-              {scan.ScanDetail.ScanDateTime && (
-                <p className="text-xs text-zinc-400">
-                  {new Date(scan.ScanDetail.ScanDateTime).toLocaleString(
-                    "en-IN",
-                    {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                      hour: "2-digit",
-                      minute: "2-digit",
-                    }
-                  )}
-                </p>
-              )}
-            </div>
-          </div>
-        ))}
+          </button>
+        )}
       </div>
     </div>
   );
