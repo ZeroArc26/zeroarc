@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { usePathname } from "next/navigation";
-import { Star, ShieldCheck, MessageSquarePlus, ImagePlus, X, Loader2 } from "lucide-react";
+import { Star, ShieldCheck, MessageSquarePlus, ImagePlus, X, Loader2, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -17,6 +17,7 @@ import {
 
 interface Review {
   _id: string;
+  userId: string;
   customerName: string;
   rating: number;
   title: string;
@@ -58,8 +59,10 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   const [loading, setLoading] = useState(true);
 
   const [isLoggedIn, setIsLoggedIn] = useState<boolean | null>(null);
+  const [currentUserId, setCurrentUserId] = useState<string | null>(null);
 
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [editingReviewId, setEditingReviewId] = useState<string | null>(null);
   const [rating, setRating] = useState(0);
   const [hoverRating, setHoverRating] = useState(0);
   const [title, setTitle] = useState("");
@@ -87,12 +90,16 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
 
     fetch("/api/account/me")
       .then((res) => res.json())
-      .then((data) => setIsLoggedIn(!!data.success))
+      .then((data) => {
+        setIsLoggedIn(!!data.success);
+        if (data.success) setCurrentUserId(data.user.id);
+      })
       .catch(() => setIsLoggedIn(false));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [productId]);
 
   const reviewCount = reviews.length;
+  const myReview = reviews.find((r) => r.userId === currentUserId);
   const averageRating =
     reviewCount > 0
       ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviewCount
@@ -150,6 +157,24 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     setReviewImages((prev) => prev.filter((img) => img !== url));
   }
 
+  function openEditDialog(review: Review) {
+    setEditingReviewId(review._id);
+    setRating(review.rating);
+    setTitle(review.title || "");
+    setComment(review.comment);
+    setReviewImages(review.images || []);
+    setDialogOpen(true);
+  }
+
+  function resetForm() {
+    setDialogOpen(false);
+    setEditingReviewId(null);
+    setRating(0);
+    setTitle("");
+    setComment("");
+    setReviewImages([]);
+  }
+
   async function handleSubmit() {
     if (rating === 0) {
       toast.error("Please select a rating.");
@@ -164,8 +189,12 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     setSubmitting(true);
 
     try {
-      const res = await fetch(`/api/products/${productId}/reviews`, {
-        method: "POST",
+      const url = editingReviewId
+        ? `/api/products/${productId}/reviews/${editingReviewId}`
+        : `/api/products/${productId}/reviews`;
+
+      const res = await fetch(url, {
+        method: editingReviewId ? "PUT" : "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating, title, comment, images: reviewImages }),
       });
@@ -177,18 +206,37 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         return;
       }
 
-      toast.success("Review submitted!");
-      setDialogOpen(false);
-      setRating(0);
-      setTitle("");
-      setComment("");
-      setReviewImages([]);
+      toast.success(editingReviewId ? "Review updated!" : "Review submitted!");
+      resetForm();
       fetchReviews();
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong.");
     } finally {
       setSubmitting(false);
+    }
+  }
+
+  async function handleDeleteReview(reviewId: string) {
+    const confirmed = window.confirm("Delete your review? This can't be undone.");
+    if (!confirmed) return;
+
+    try {
+      const res = await fetch(`/api/products/${productId}/reviews/${reviewId}`, {
+        method: "DELETE",
+      });
+      const data = await res.json();
+
+      if (!data.success) {
+        toast.error(data.message || "Failed to delete review.");
+        return;
+      }
+
+      toast.success("Review deleted.");
+      fetchReviews();
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong.");
     }
   }
 
@@ -208,12 +256,27 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
           </Link>
         ) : (
           <button
-            onClick={() => setDialogOpen(true)}
+            onClick={() => {
+              if (myReview) {
+                openEditDialog(myReview);
+              } else {
+                setEditingReviewId(null);
+                setRating(0);
+                setTitle("");
+                setComment("");
+                setReviewImages([]);
+                setDialogOpen(true);
+              }
+            }}
             disabled={isLoggedIn === null}
             className="flex items-center gap-2 rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-violet-500 disabled:opacity-50"
           >
-            <MessageSquarePlus className="h-4 w-4" />
-            Write a Review
+            {myReview ? (
+              <Pencil className="h-4 w-4" />
+            ) : (
+              <MessageSquarePlus className="h-4 w-4" />
+            )}
+            {myReview ? "Edit Your Review" : "Write a Review"}
           </button>
         )}
       </div>
@@ -278,13 +341,34 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                     )}
                   </div>
 
-                  <span className="text-xs text-zinc-400">
-                    {new Date(review.createdAt).toLocaleDateString("en-IN", {
-                      day: "2-digit",
-                      month: "short",
-                      year: "numeric",
-                    })}
-                  </span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-zinc-400">
+                      {new Date(review.createdAt).toLocaleDateString("en-IN", {
+                        day: "2-digit",
+                        month: "short",
+                        year: "numeric",
+                      })}
+                    </span>
+
+                    {currentUserId === review.userId && (
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => openEditDialog(review)}
+                          className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-violet-600"
+                          title="Edit your review"
+                        >
+                          <Pencil className="h-3.5 w-3.5" />
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReview(review._id)}
+                          className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-100 hover:text-red-600"
+                          title="Delete your review"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
 
                 {review.title && (
@@ -325,7 +409,9 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
         <DialogContent className="max-w-lg border border-zinc-200 bg-white text-black sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle className="text-black">Write a Review</DialogTitle>
+            <DialogTitle className="text-black">
+              {editingReviewId ? "Edit Your Review" : "Write a Review"}
+            </DialogTitle>
           </DialogHeader>
 
           <div className="space-y-4">
@@ -434,13 +520,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
 
           <DialogFooter className="bg-white">
             <button
-              onClick={() => {
-                setDialogOpen(false);
-                setRating(0);
-                setTitle("");
-                setComment("");
-                setReviewImages([]);
-              }}
+              onClick={resetForm}
               className="rounded-xl border border-zinc-300 px-5 py-2.5 text-sm font-semibold text-zinc-700 hover:bg-zinc-50"
             >
               Cancel
@@ -450,7 +530,11 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
               disabled={submitting}
               className="rounded-xl bg-violet-600 px-5 py-2.5 text-sm font-semibold text-white hover:bg-violet-500 disabled:opacity-60"
             >
-              {submitting ? "Submitting..." : "Submit Review"}
+              {submitting
+                ? "Saving..."
+                : editingReviewId
+                ? "Save Changes"
+                : "Submit Review"}
             </button>
           </DialogFooter>
         </DialogContent>

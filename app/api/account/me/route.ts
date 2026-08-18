@@ -15,6 +15,7 @@ export async function GET() {
   return NextResponse.json({
     success: true,
     user: {
+      id: current.id,
       email: current.email,
       fullName: current.fullName,
     },

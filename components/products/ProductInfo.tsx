@@ -2,11 +2,12 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { Star, ShoppingBag, Heart, Truck, ChevronRight, Check, Minus, Plus, ShieldCheck, Flame } from "lucide-react";
+import { Star, ShoppingBag, Heart, Check, Minus, Plus, ShieldCheck, Flame } from "lucide-react";
 
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
 import SizeGuideModal from "@/components/products/SizeGuideModal";
+import DeliveryEstimate from "@/components/products/DeliveryEstimate";
 
 interface Variant {
   id: string;
@@ -406,18 +407,7 @@ export default function ProductInfo({
       </button>
 
       {/* Delivery */}
-      <div className="mt-6 flex items-center justify-between rounded-xl border border-zinc-200 p-4">
-        <div className="flex items-center gap-3">
-          <Truck className="h-5 w-5 text-zinc-500" />
-          <div>
-            <p className="text-sm font-semibold text-black">
-              Estimated Delivery
-            </p>
-            <p className="text-xs text-zinc-500">2-5 business days</p>
-          </div>
-        </div>
-        <ChevronRight className="h-4 w-4 text-zinc-400" />
-      </div>
+      <DeliveryEstimate />
 
       <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
         <ShieldCheck className="h-4 w-4 text-emerald-500" />

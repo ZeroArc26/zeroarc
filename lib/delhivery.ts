@@ -24,6 +24,66 @@ interface DelhiveryResult {
   raw?: any;
 }
 
+interface ServiceabilityResult {
+  serviceable: boolean;
+  codAvailable: boolean;
+  message?: string;
+}
+
+/**
+ * Checks whether Delhivery currently delivers to a pincode, and
+ * whether COD is available there. Used on the storefront product page
+ * for a delivery estimate — separate from actual shipment creation.
+ */
+export async function checkPincodeServiceability(
+  pincode: string
+): Promise<ServiceabilityResult> {
+  const baseUrl = process.env.DELHIVERY_BASE_URL || "https://track.delhivery.com";
+  const token = process.env.DELHIVERY_API_TOKEN;
+
+  if (!token) {
+    return {
+      serviceable: false,
+      codAvailable: false,
+      message: "Delhivery API not configured.",
+    };
+  }
+
+  try {
+    const res = await fetch(
+      `${baseUrl}/c/api/pin-codes/json/?filter_codes=${pincode}`,
+      {
+        headers: {
+          Authorization: `Token ${token}`,
+        },
+      }
+    );
+
+    const data = await res.json();
+    const entry = data?.delivery_codes?.[0]?.postal_code;
+
+    if (!entry) {
+      return {
+        serviceable: false,
+        codAvailable: false,
+        message: "We don't currently deliver to this pincode.",
+      };
+    }
+
+    return {
+      serviceable: entry.pre_paid === "Y" || entry.cash === "Y",
+      codAvailable: entry.cash === "Y",
+    };
+  } catch (error) {
+    console.error("Delhivery serviceability check error:", error);
+    return {
+      serviceable: false,
+      codAvailable: false,
+      message: "Couldn't check serviceability right now.",
+    };
+  }
+}
+
 export async function createDelhiveryShipment(
   input: DelhiveryShipmentInput
 ): Promise<DelhiveryResult> {
