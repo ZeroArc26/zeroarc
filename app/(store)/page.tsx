@@ -6,6 +6,7 @@ import MenWomenSplit from "@/components/home/MenWomenSplit";
 import NewArrivals from "@/components/home/NewArrivals";
 import ExploreCollections from "@/components/home/ExploreCollections";
 import FeaturesBar from "@/components/home/FeaturesBar";
+import SiteTestimonials from "@/components/home/SiteTestimonials";
 import SocialFollow from "@/components/home/SocialFollow";
 import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
@@ -34,6 +35,7 @@ export default async function Home() {
       <NewArrivals products={products} />
       <ExploreCollections />
       <FeaturesBar />
+      <SiteTestimonials />
       <SocialFollow />
       <Newsletter />
       <Footer />

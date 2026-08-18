@@ -39,13 +39,13 @@ function StarRow({
   size?: number;
 }) {
   return (
-    <div className="flex text-violet-500">
+    <div className="flex text-yellow-400">
       {Array.from({ length: 5 }).map((_, i) => (
         <Star
           key={i}
           width={size}
           height={size}
-          className={i < Math.round(rating) ? "fill-violet-500" : "fill-none"}
+          className={i < Math.round(rating) ? "fill-yellow-400" : "fill-none"}
         />
       ))}
     </div>
@@ -311,7 +311,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                   </span>
                   <div className="h-2 flex-1 overflow-hidden rounded-full bg-zinc-100">
                     <div
-                      className="h-full rounded-full bg-violet-500"
+                      className="h-full rounded-full bg-yellow-400"
                       style={{ width: `${percent}%` }}
                     />
                   </div>
@@ -431,7 +431,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
                     <Star
                       className={`h-7 w-7 ${
                         star <= (hoverRating || rating)
-                          ? "fill-violet-500 text-violet-500"
+                          ? "fill-yellow-400 text-yellow-400"
                           : "fill-none text-zinc-300"
                       }`}
                     />

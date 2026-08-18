@@ -180,12 +180,12 @@ export default function ProductInfo({
 
       {reviewCount > 0 && (
         <div className="mt-3 flex items-center gap-2">
-          <div className="flex text-violet-500">
+          <div className="flex text-yellow-400">
             {Array.from({ length: 5 }).map((_, i) => (
               <Star
                 key={i}
                 className={`h-4 w-4 ${
-                  i < Math.round(rating) ? "fill-violet-500" : "fill-none"
+                  i < Math.round(rating) ? "fill-yellow-400" : "fill-none"
                 }`}
               />
             ))}

@@ -86,6 +86,13 @@ export const adminNavItems: AdminNavItem[] = [
   },
 
   {
+    title: "Testimonials",
+    href: "/admin/dashboard/testimonials",
+    icon: MessageSquare,
+    section: "INSIGHTS",
+  },
+
+  {
     title: "Settings",
     href: "/admin/dashboard/settings",
     icon: Settings,

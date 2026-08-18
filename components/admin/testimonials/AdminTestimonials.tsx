@@ -1,35 +1,25 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
-import { Star, ShieldCheck, Trash2, Loader2 } from "lucide-react";
+import { Star, Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 
-interface Review {
+interface SiteReview {
   _id: string;
   customerName: string;
   rating: number;
-  title: string;
   comment: string;
-  images?: string[];
-  verifiedPurchase: boolean;
   createdAt: string;
 }
 
-interface AdminProductReviewsProps {
-  productId: string;
-}
-
-export default function AdminProductReviews({
-  productId,
-}: AdminProductReviewsProps) {
-  const [reviews, setReviews] = useState<Review[]>([]);
+export default function AdminTestimonials() {
+  const [reviews, setReviews] = useState<SiteReview[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchReviews = async () => {
     try {
-      const res = await fetch(`/api/products/${productId}/reviews`);
+      const res = await fetch("/api/site-reviews");
       const data = await res.json();
       if (data.success) setReviews(data.reviews);
     } catch (error) {
@@ -41,31 +31,29 @@ export default function AdminProductReviews({
 
   useEffect(() => {
     fetchReviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
+  }, []);
 
-  async function handleDelete(reviewId: string) {
+  async function handleDelete(id: string) {
     const confirmed = window.confirm(
-      "Delete this review permanently? The product's rating will be recalculated."
+      "Delete this testimonial? It will no longer show on the homepage."
     );
     if (!confirmed) return;
 
-    setDeletingId(reviewId);
+    setDeletingId(id);
 
     try {
-      const res = await fetch(
-        `/api/products/${productId}/reviews/${reviewId}`,
-        { method: "DELETE" }
-      );
+      const res = await fetch(`/api/site-reviews/${id}`, {
+        method: "DELETE",
+      });
       const data = await res.json();
 
       if (!data.success) {
-        toast.error(data.message || "Failed to delete review.");
+        toast.error(data.message || "Failed to delete testimonial.");
         return;
       }
 
-      setReviews((prev) => prev.filter((r) => r._id !== reviewId));
-      toast.success("Review deleted.");
+      setReviews((prev) => prev.filter((r) => r._id !== id));
+      toast.success("Testimonial deleted.");
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong.");
@@ -78,10 +66,10 @@ export default function AdminProductReviews({
     <div className="rounded-2xl border border-zinc-800 bg-zinc-950 p-6">
       <div className="mb-4 flex items-center justify-between">
         <h3 className="text-lg font-semibold text-white">
-          Customer Reviews
+          Homepage Testimonials
         </h3>
         <span className="rounded-full border border-violet-500/20 bg-violet-500/10 px-4 py-1 text-sm font-medium text-violet-300">
-          {reviews.length} review{reviews.length !== 1 ? "s" : ""}
+          {reviews.length} testimonial{reviews.length !== 1 ? "s" : ""}
         </span>
       </div>
 
@@ -91,7 +79,7 @@ export default function AdminProductReviews({
         </div>
       ) : reviews.length === 0 ? (
         <p className="py-6 text-center text-sm text-zinc-500">
-          No reviews for this product yet.
+          No testimonials yet.
         </p>
       ) : (
         <div className="space-y-4">
@@ -112,12 +100,6 @@ export default function AdminProductReviews({
                       />
                     ))}
                   </div>
-                  {review.verifiedPurchase && (
-                    <span className="flex items-center gap-1 rounded-full bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold uppercase text-emerald-400">
-                      <ShieldCheck className="h-3 w-3" />
-                      Verified
-                    </span>
-                  )}
                   <span className="text-xs text-zinc-500">
                     {new Date(review.createdAt).toLocaleDateString("en-IN", {
                       day: "2-digit",
@@ -127,29 +109,7 @@ export default function AdminProductReviews({
                   </span>
                 </div>
 
-                {review.title && (
-                  <p className="mt-2 text-sm font-semibold text-white">
-                    {review.title}
-                  </p>
-                )}
-
-                <p className="mt-1 text-sm text-zinc-400">{review.comment}</p>
-
-                {review.images && review.images.length > 0 && (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    {review.images.map((url, i) => (
-                      <a
-                        key={i}
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="relative h-14 w-14 overflow-hidden rounded-lg border border-zinc-800"
-                      >
-                        <Image src={url} alt="" fill className="object-cover" />
-                      </a>
-                    ))}
-                  </div>
-                )}
+                <p className="mt-2 text-sm text-zinc-400">{review.comment}</p>
 
                 <p className="mt-2 text-xs font-medium text-zinc-500">
                   — {review.customerName}
@@ -160,7 +120,7 @@ export default function AdminProductReviews({
                 onClick={() => handleDelete(review._id)}
                 disabled={deletingId === review._id}
                 className="shrink-0 rounded-lg p-2 text-zinc-500 hover:bg-red-500/10 hover:text-red-400 disabled:opacity-50"
-                title="Delete review"
+                title="Delete testimonial"
               >
                 <Trash2 className="h-4 w-4" />
               </button>
