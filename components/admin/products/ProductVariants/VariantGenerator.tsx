@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { Sparkles, Plus } from "lucide-react";
+import { toast } from "sonner";
 
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -9,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { VariantGeneratorProps, VariantPreset } from "./types";
-import { generateVariants } from "./utils";
+import { generateVariants, isDuplicateVariant } from "./utils";
 
 const DEFAULT_COLORS = [
   { name: "Black", hex: "#000000" },
@@ -100,7 +101,23 @@ export default function VariantGenerator({
   DEFAULT_COLORS
 );
 
-    setVariants(generated);
+    // Only add combinations that don't already exist — this was
+    // previously a hard replace, which wiped out every existing
+    // variant's stock/SKU/image data whenever "Generate" was clicked
+    // again (e.g. to add just one new size to an existing product).
+    const newOnes = generated.filter(
+      (v) => !isDuplicateVariant(variants, v.color, v.size)
+    );
+
+    const skipped = generated.length - newOnes.length;
+
+    setVariants([...variants, ...newOnes]);
+
+    if (skipped > 0) {
+      toast.info(
+        `Added ${newOnes.length} new variant${newOnes.length !== 1 ? "s" : ""}. ${skipped} combination${skipped !== 1 ? "s" : ""} already existed and ${skipped !== 1 ? "were" : "was"} left unchanged.`
+      );
+    }
   };
 
   return (

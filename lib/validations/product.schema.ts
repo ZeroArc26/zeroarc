@@ -200,6 +200,10 @@ export const publishSchema = z.object({
     "archived",
   ]),
 
+  visibility: z
+    .enum(["public", "hidden"])
+    .default("public"),
+
   featured: z
     .boolean()
     .default(false),

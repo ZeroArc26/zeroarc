@@ -17,6 +17,7 @@ export default async function ShopPage() {
 
   const raw = await Product.find({
     "publish.status": "active",
+    "publish.visibility": { $ne: "hidden" },
   })
     .sort({ createdAt: -1 })
     .lean();

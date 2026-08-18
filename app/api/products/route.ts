@@ -14,6 +14,7 @@ export async function GET() {
 
     const products = await Product.find({
       "publish.status": "active",
+      "publish.visibility": { $ne: "hidden" },
     }).sort({
       createdAt: -1,
     });

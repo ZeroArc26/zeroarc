@@ -1,5 +1,3 @@
-import { Dispatch, SetStateAction } from "react";
-
 export interface PricingFormProps {
   sellingPrice: number;
   comparePrice: number;
@@ -8,14 +6,12 @@ export interface PricingFormProps {
   discountType: "percentage" | "fixed";
   discountValue: number;
 
-  setSellingPrice: Dispatch<SetStateAction<number>>;
-  setComparePrice: Dispatch<SetStateAction<number>>;
-  setCostPrice: Dispatch<SetStateAction<number>>;
-  setTaxRate: Dispatch<SetStateAction<number>>;
-  setDiscountType: Dispatch<
-    SetStateAction<"percentage" | "fixed">
-  >;
-  setDiscountValue: Dispatch<SetStateAction<number>>;
+  setSellingPrice: (value: number) => void;
+  setComparePrice: (value: number) => void;
+  setCostPrice: (value: number) => void;
+  setTaxRate: (value: number) => void;
+  setDiscountType: (value: "percentage" | "fixed") => void;
+  setDiscountValue: (value: number) => void;
 }
 
 export interface PricingSummaryProps {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
 import type { ProductFormValues } from "@/lib/validations/product.schema";
 
@@ -13,12 +13,32 @@ import ImageGrid from "./ImageGrid";
 import ImagePreviewModal from "./ImagePreviewModal";
 
 import { useProductImages } from "./hooks/useImageUploader";
+import type { ProductImage } from "./image-types";
 
 export default function ProductImages() {
   const {
   watch,
   setValue,
+  getValues,
 } = useFormContext<ProductFormValues>();
+
+// Seed local upload state from any images this product already has
+// saved (edit mode) — computed once, on first render only, so it
+// doesn't clobber in-progress local edits on every re-render.
+const [initialImages] = useState<ProductImage[]>(() =>
+  (getValues("images") || []).map((img, index) => ({
+    id: crypto.randomUUID(),
+    color: img.color || "Default",
+    preview: img.url,
+    url: img.url,
+    isCover: img.isCover ?? index === 0,
+    status: "uploaded" as const,
+    progress: 100,
+    uploaded: true,
+    size: 0,
+    type: "",
+  }))
+);
 
 const {
   images,
@@ -33,7 +53,7 @@ const {
   setPreviewImage,
 
   getImagesByColor,
-} = useProductImages();
+} = useProductImages(initialImages);
 
 const variants = watch("variants") ?? [];
 
@@ -47,9 +67,6 @@ const colors =
         ),
       ]
     : [];
-
-    console.log("Variants:", variants);
-console.log("Colors:", colors);
 
 useEffect(() => {
   const uploadedImages = images
@@ -67,7 +84,9 @@ useEffect(() => {
 
   async function uploadImages() {
     for (const image of images) {
-      if (image.uploaded) continue;
+      if (image.uploaded || !image.file) continue;
+
+      const file = image.file;
 
       setImages((prev) =>
         prev.map((item) =>
@@ -81,7 +100,7 @@ useEffect(() => {
       );
 
       const result = await uploadImage(
-        image.file,
+        file,
         (progress) => {
           setImages((prev) =>
             prev.map((item) =>

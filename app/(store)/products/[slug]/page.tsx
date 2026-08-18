@@ -71,6 +71,7 @@ async function getRelatedProducts(category: string, excludeSlug: string) {
 
   const raw = await Product.find({
     "publish.status": "active",
+    "publish.visibility": { $ne: "hidden" },
     "basicInfo.category": category,
     "basicInfo.slug": { $ne: excludeSlug },
   })

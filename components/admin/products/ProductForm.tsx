@@ -84,6 +84,7 @@ export default function ProductForm({
 
       publish: {
         status: "draft",
+        visibility: "public",
         featured: false,
         publishedAt: null,
       },

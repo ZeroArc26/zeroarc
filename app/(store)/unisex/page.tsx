@@ -17,6 +17,7 @@ export default async function UnisexCollectionPage() {
 
   const raw = await Product.find({
     "publish.status": "active",
+    "publish.visibility": { $ne: "hidden" },
     "basicInfo.audience": "unisex",
   })
     .sort({ createdAt: -1 })

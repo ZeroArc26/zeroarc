@@ -29,6 +29,7 @@ export default function ProductPublishCard({
   const { setValue, watch } = useFormContext();
 
   const status = watch("publish.status");
+  const visibility = watch("publish.visibility");
   const title = watch("basicInfo.title");
   const slug = watch("basicInfo.slug");
   const images = watch("images");
@@ -170,7 +171,15 @@ export default function ProductPublishCard({
         <div className="space-y-2">
           <Label>Visibility</Label>
 
-          <Select defaultValue="public">
+          <Select
+            value={visibility}
+            onValueChange={(value) =>
+              setValue("publish.visibility", value, {
+                shouldValidate: true,
+                shouldDirty: true,
+              })
+            }
+          >
             <SelectTrigger className="rounded-xl">
               <SelectValue />
             </SelectTrigger>
@@ -185,6 +194,12 @@ export default function ProductPublishCard({
               </SelectItem>
             </SelectContent>
           </Select>
+
+          <p className="text-xs text-zinc-500">
+            Hidden products stay reachable by direct link, but won&apos;t
+            appear on the homepage, category pages, search, or new
+            arrivals.
+          </p>
         </div>
       </div>
 

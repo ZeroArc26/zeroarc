@@ -119,7 +119,7 @@ export default function ImagePreviewModal({
             <div className="flex items-center justify-between border-b border-white/10 bg-zinc-950/70 px-8 py-5 backdrop-blur-xl">
               <div>
                 <h2 className="truncate text-lg font-semibold text-white">
-                  {image.file.name}
+                  {image.file?.name || "Uploaded image"}
                 </h2>
 
                 <p className="mt-1 text-sm text-zinc-400">
@@ -159,7 +159,7 @@ export default function ImagePreviewModal({
               >
                 <Image
                   src={image.uploaded && image.url ? image.url : image.preview}
-                  alt={image.file.name}
+                  alt={image.file?.name || "Uploaded image"}
                   fill
                   unoptimized
                   priority
@@ -196,7 +196,7 @@ export default function ImagePreviewModal({
             <div className="flex flex-wrap items-center justify-between gap-6 border-t border-white/10 bg-zinc-950/70 px-8 py-5 backdrop-blur-xl">
               <div className="space-y-2">
                 <p className="text-lg font-semibold text-white">
-                  {image.file.name}
+                  {image.file?.name || "Uploaded image"}
                 </p>
 
                 <div className="flex flex-wrap items-center gap-4 text-sm text-zinc-400">

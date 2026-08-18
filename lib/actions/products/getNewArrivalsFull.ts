@@ -4,7 +4,10 @@ import Product from "@/models/Product";
 export async function getNewArrivalsFull() {
   await connectDB();
 
-  const products = await Product.find({ "publish.status": "active" })
+  const products = await Product.find({
+    "publish.status": "active",
+    "publish.visibility": { $ne: "hidden" },
+  })
     .sort({ createdAt: -1 })
     .select("basicInfo pricing images publish variants averageRating reviewCount createdAt")
     .lean();

@@ -16,6 +16,7 @@ export async function GET(request: Request) {
 
     const raw = await Product.find({
       "publish.status": "active",
+      "publish.visibility": { $ne: "hidden" },
       "basicInfo.title": { $regex: q, $options: "i" },
     })
       .limit(5)

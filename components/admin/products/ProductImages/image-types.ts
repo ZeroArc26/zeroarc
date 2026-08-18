@@ -10,7 +10,11 @@ export interface ProductImage {
 
   color: string;
 
-  file: File;
+  // Only present for a freshly-selected local file. Images already
+  // saved in the database (loaded when editing an existing product)
+  // have no local File — just a `url` — since they were uploaded in
+  // a previous session.
+  file?: File;
 
   preview: string;
 

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useFormContext } from "react-hook-form";
-import { Package2, CheckCircle2 } from "lucide-react";
+import { Package2, CheckCircle2, ChevronDown, X } from "lucide-react";
 
 
 import type { ProductFormValues } from "@/lib/validations/product.schema";
@@ -10,9 +10,16 @@ import {
   generateSKU,
   generateBarcode,
 } from "@/lib/utils/inventory";
+import { COLLECTIONS } from "@/constants/collections";
 
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
 import {
   Select,
   SelectContent,
@@ -30,15 +37,32 @@ export default function ProductBasicInfo() {
 
   const tags = watch("basicInfo.tags") ?? [];
 
-  // Tags input is kept as a separate local string so the user can type a
-  // trailing comma/space to start the next tag without it being stripped
-  // out immediately by the tags-array filter on every keystroke.
-  const [tagsInput, setTagsInput] = useState(tags.join(", "));
+  const [customTagInput, setCustomTagInput] = useState("");
 
-  useEffect(() => {
-    setTagsInput(tags.join(", "));
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  function toggleTag(tag: string) {
+    const next = tags.includes(tag)
+      ? tags.filter((t) => t !== tag)
+      : [...tags, tag];
+
+    setValue("basicInfo.tags", next, {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+  }
+
+  function addCustomTag() {
+    const value = customTagInput.trim();
+    if (!value || tags.includes(value)) {
+      setCustomTagInput("");
+      return;
+    }
+
+    setValue("basicInfo.tags", [...tags, value], {
+      shouldDirty: true,
+      shouldValidate: true,
+    });
+    setCustomTagInput("");
+  }
 
   const title = watch("basicInfo.title") ?? "";
   const slug = watch("basicInfo.slug") ?? "";
@@ -461,42 +485,103 @@ useEffect(() => {
             </Label>
 
             <span className="text-xs text-zinc-500">
-              Comma Separated
+              Collection tags shown first, or add your own
             </span>
 
           </div>
 
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                id="tags"
+                className="flex w-full items-center justify-between rounded-xl border border-zinc-700 bg-transparent px-3 py-2 text-sm text-zinc-300 hover:border-zinc-500"
+              >
+                {tags.length > 0
+                  ? `${tags.length} tag${tags.length !== 1 ? "s" : ""} selected`
+                  : "Select or add tags"}
+                <ChevronDown className="h-4 w-4 text-zinc-500" />
+              </button>
+            </PopoverTrigger>
 
+            <PopoverContent className="w-80 space-y-3" align="start">
+              <div>
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                  Collections
+                </p>
 
-          <Input
-  id="tags"
-  placeholder="Anime, Naruto, Oversized"
-  value={tagsInput}
-  onChange={(e) => {
-    const raw = e.target.value;
-    setTagsInput(raw);
+                <div className="space-y-2">
+                  {COLLECTIONS.map((collection) => (
+                    <label
+                      key={collection.tag}
+                      className="flex cursor-pointer items-center gap-2 text-sm"
+                    >
+                      <Checkbox
+                        checked={tags.includes(collection.tag)}
+                        onCheckedChange={() => toggleTag(collection.tag)}
+                      />
+                      {collection.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
 
-    setValue(
-      "basicInfo.tags",
-      raw
-        .split(",")
-        .map((t) => t.trim())
-        .filter(Boolean),
-      {
-        shouldDirty: true,
-        shouldValidate: true,
-      }
-    );
-  }}
-  onBlur={() => {
-    // Tidy up the display once the user is done typing (collapses
-    // stray commas/spaces), without affecting the array while typing.
-    setTagsInput(tags.join(", "));
-  }}
-/>
+              <div className="border-t border-zinc-800 pt-3">
+                <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+                  Custom Tag
+                </p>
+
+                <div className="flex gap-2">
+                  <Input
+                    value={customTagInput}
+                    onChange={(e) => setCustomTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter") {
+                        e.preventDefault();
+                        addCustomTag();
+                      }
+                    }}
+                    placeholder="e.g. Naruto"
+                    className="h-9"
+                  />
+                  <button
+                    type="button"
+                    onClick={addCustomTag}
+                    className="shrink-0 rounded-lg bg-violet-600 px-3 text-sm font-medium text-white hover:bg-violet-500"
+                  >
+                    Add
+                  </button>
+                </div>
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {tags.length > 0 && (
+            <div className="mt-3 flex flex-wrap gap-2">
+              {tags.map((tag) => {
+                const collection = COLLECTIONS.find((c) => c.tag === tag);
+                return (
+                  <span
+                    key={tag}
+                    className="flex items-center gap-1.5 rounded-full border border-violet-500/30 bg-violet-500/10 px-3 py-1 text-xs font-medium text-violet-300"
+                  >
+                    {collection?.name ?? tag}
+                    <button
+                      type="button"
+                      onClick={() => toggleTag(tag)}
+                      className="text-violet-400 hover:text-white"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </span>
+                );
+              })}
+            </div>
+          )}
 
           <p className="mt-2 text-xs text-zinc-500">
-            Example: Anime, Naruto, Oversized, Cotton. Separate each tag using a comma.
+            Collection tags control which storefront collection page this
+            product appears on.
           </p>
 
         </div>

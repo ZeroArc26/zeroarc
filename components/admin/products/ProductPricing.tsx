@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo } from "react";
 import { useFormContext } from "react-hook-form";
+import type { ProductFormValues } from "@/lib/validations/product.schema";
 
 import PricingForm from "./ProductPricing/PricingForm";
 import PricingSummary from "./ProductPricing/PricingSummary";
@@ -16,16 +17,41 @@ import {
 } from "./ProductPricing/utils";
 
 export default function ProductPricing() {
-  const [sellingPrice, setSellingPrice] = useState(1299);
-  const [comparePrice, setComparePrice] = useState(1999);
-  const [costPrice, setCostPrice] = useState(650);
-  const [taxRate, setTaxRate] = useState(18);
+  const { watch, setValue } = useFormContext<ProductFormValues>();
 
-  const [discountType, setDiscountType] = useState<
-    "percentage" | "fixed"
-  >("percentage");
+  // Reads directly from the real form state (which starts as the
+  // product's actual saved pricing in edit mode) instead of hardcoded
+  // local defaults — that mismatch was the bug: this section always
+  // showed ₹1299/₹1999/₹650/18%/35% regardless of what was actually
+  // saved, and editing any field risked overwriting real data with
+  // numbers derived from those wrong starting values.
+  const sellingPrice = watch("pricing.sellingPrice") ?? 0;
+  const comparePrice = watch("pricing.comparePrice") ?? 0;
+  const costPrice = watch("pricing.costPrice") ?? 0;
+  const taxClass = watch("pricing.taxClass") ?? "GST 18%";
+  const taxRate = parseInt(taxClass.replace(/\D/g, ""), 10) || 0;
+  const rawDiscountType = watch("pricing.discountType") ?? "percentage";
+  const discountType: "percentage" | "fixed" =
+    rawDiscountType === "fixed" ? "fixed" : "percentage";
+  const discountValue = watch("pricing.discountValue") ?? 0;
 
-  const [discountValue, setDiscountValue] = useState(35);
+  const setSellingPrice = (value: number) =>
+    setValue("pricing.sellingPrice", value, { shouldDirty: true });
+
+  const setComparePrice = (value: number) =>
+    setValue("pricing.comparePrice", value, { shouldDirty: true });
+
+  const setCostPrice = (value: number) =>
+    setValue("pricing.costPrice", value, { shouldDirty: true });
+
+  const setTaxRate = (value: number) =>
+    setValue("pricing.taxClass", `GST ${value}%`, { shouldDirty: true });
+
+  const setDiscountType = (value: "percentage" | "fixed") =>
+    setValue("pricing.discountType", value, { shouldDirty: true });
+
+  const setDiscountValue = (value: number) =>
+    setValue("pricing.discountValue", value, { shouldDirty: true });
 
   const profit = useMemo(
     () =>

@@ -33,6 +33,7 @@ export default async function CollectionDetailPage({
 
   const raw = await Product.find({
     "publish.status": "active",
+    "publish.visibility": { $ne: "hidden" },
     "basicInfo.tags": meta.tag,
   })
     .sort({ createdAt: -1 })

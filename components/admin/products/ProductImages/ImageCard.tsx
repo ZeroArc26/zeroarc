@@ -110,7 +110,7 @@ export default function ImageCard({
       <div className="space-y-4 p-4">
         <div className="flex items-center justify-between text-sm">
           <span className="truncate text-zinc-300">
-            {image.file.name}
+            {image.file?.name || "Uploaded image"}
           </span>
 
           <span className="text-zinc-500">

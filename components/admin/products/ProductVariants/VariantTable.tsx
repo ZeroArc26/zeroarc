@@ -67,6 +67,14 @@ export default function VariantTable({
     );
   };
 
+  const handleToggleActive = (id: string) => {
+    setVariants((prev) =>
+      prev.map((v) =>
+        v.id === id ? { ...v, isActive: !v.isActive } : v
+      )
+    );
+  };
+
   if (!variants.length) {
     return (
       <Card>
@@ -209,17 +217,24 @@ export default function VariantTable({
 
                 <TableCell>
 
-                  <Badge
-                    variant={
-                      variant.isActive
-                        ? "default"
-                        : "secondary"
-                    }
+                  <button
+                    type="button"
+                    onClick={() => handleToggleActive(variant.id)}
+                    title="Click to toggle"
                   >
-                    {variant.isActive
-                      ? "Active"
-                      : "Inactive"}
-                  </Badge>
+                    <Badge
+                      variant={
+                        variant.isActive
+                          ? "default"
+                          : "secondary"
+                      }
+                      className="cursor-pointer"
+                    >
+                      {variant.isActive
+                        ? "Active"
+                        : "Inactive"}
+                    </Badge>
+                  </button>
 
                 </TableCell>
 

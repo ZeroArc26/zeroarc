@@ -339,6 +339,17 @@ const PublishSchema = new Schema(
       index: true,
     },
 
+    // "public": shows in listings/search/homepage like normal.
+    // "hidden": still reachable by direct product URL (e.g. shared
+    // privately, unlisted promo), but excluded from every browsing
+    // surface — homepage, category pages, search, new arrivals.
+    visibility: {
+      type: String,
+      enum: ["public", "hidden"],
+      default: "public",
+      index: true,
+    },
+
     featured: {
       type: Boolean,
       default: false,

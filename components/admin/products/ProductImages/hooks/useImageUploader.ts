@@ -4,8 +4,8 @@ import { useState } from "react";
 
 import type { ProductImage } from "../image-types";
 
-export function useProductImages() {
-  const [images, setImages] = useState<ProductImage[]>([]);
+export function useProductImages(initialImages: ProductImage[] = []) {
+  const [images, setImages] = useState<ProductImage[]>(initialImages);
 
   const [previewImage, setPreviewImage] =
     useState<ProductImage | null>(null);
