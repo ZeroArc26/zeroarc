@@ -152,6 +152,7 @@ export default function ProductInfo({
       color: selectedColor,
       size: selectedSize,
       price: product.pricing.sellingPrice,
+      comparePrice: product.pricing.comparePrice,
       quantity,
       stock,
       addedAt: new Date().toISOString(),

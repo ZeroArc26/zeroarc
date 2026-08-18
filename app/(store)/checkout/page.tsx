@@ -11,6 +11,10 @@ import {
   Zap,
   CreditCard,
   Receipt,
+  Smartphone,
+  Landmark,
+  Wallet as WalletIcon,
+  Lock,
   Ticket,
   ShieldCheck,
   RotateCcw,
@@ -34,12 +38,40 @@ const SHIPPING_METHODS = [
 
 const PAYMENT_METHODS = [
   {
-    id: "online",
-    label: "Online Payment",
-    subtitle: "UPI, Card, Net Banking, Wallets",
+    id: "card",
+    label: "Debit & Credit Card",
+    subtitle: "Visa, Mastercard, RuPay & more",
     icon: CreditCard,
+    razorpayMethod: "card",
   },
-  { id: "cod", label: "Cash on Delivery", subtitle: "Pay at your doorstep", icon: Receipt },
+  {
+    id: "upi",
+    label: "UPI",
+    subtitle: "Pay via any UPI app",
+    icon: Smartphone,
+    razorpayMethod: "upi",
+  },
+  {
+    id: "netbanking",
+    label: "Net Banking",
+    subtitle: "All major banks supported",
+    icon: Landmark,
+    razorpayMethod: "netbanking",
+  },
+  {
+    id: "wallet",
+    label: "Wallet",
+    subtitle: "PhonePe, Mobikwik & more",
+    icon: WalletIcon,
+    razorpayMethod: "wallet",
+  },
+  {
+    id: "cod",
+    label: "Cash on Delivery",
+    subtitle: "Pay at your doorstep",
+    icon: Receipt,
+    razorpayMethod: null,
+  },
 ] as const;
 
 export default function CheckoutPage() {
@@ -174,7 +206,7 @@ export default function CheckoutPage() {
     useState<(typeof SHIPPING_METHODS)[number]["id"]>("standard");
 
   const [paymentMethod, setPaymentMethod] =
-    useState<(typeof PAYMENT_METHODS)[number]["id"]>("online");
+    useState<(typeof PAYMENT_METHODS)[number]["id"]>("card");
 
   const [storeSettings, setStoreSettings] = useState<{
     freeShippingThreshold: number;
@@ -228,6 +260,35 @@ export default function CheckoutPage() {
   ) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+
+    if (name === "pincode" && /^\d{6}$/.test(value)) {
+      autoFillFromPincode(value);
+    }
+  }
+
+  const [pincodeLookupLoading, setPincodeLookupLoading] = useState(false);
+
+  async function autoFillFromPincode(pincode: string) {
+    setPincodeLookupLoading(true);
+
+    try {
+      const res = await fetch(`/api/pincode/${pincode}`);
+      const data = await res.json();
+
+      if (data.success) {
+        setFormData((prev) => ({
+          ...prev,
+          city: data.city,
+          state: data.state,
+        }));
+      }
+    } catch (error) {
+      // Silent failure — pincode auto-fill is a convenience, not a
+      // requirement. The customer can always type city/state manually.
+      console.error(error);
+    } finally {
+      setPincodeLookupLoading(false);
+    }
   }
 
   async function handleApplyPromo() {
@@ -396,6 +457,8 @@ export default function CheckoutPage() {
         throw new Error("Failed to create payment order.");
       }
 
+      const selectedMethod = PAYMENT_METHODS.find((m) => m.id === paymentMethod);
+
       const options = {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
         amount: razorpayOrder.amount,
@@ -408,6 +471,9 @@ export default function CheckoutPage() {
           name: formData.fullName,
           email: formData.email,
           contact: formData.phone,
+          ...(selectedMethod?.razorpayMethod
+            ? { method: selectedMethod.razorpayMethod }
+            : {}),
         },
         theme: { color: "#7c3aed" },
         handler: async function (response: any) {
@@ -633,8 +699,14 @@ export default function CheckoutPage() {
                         value={formData.pincode}
                         onChange={handleChange}
                         placeholder="110016"
+                        maxLength={6}
                         className="w-full rounded-xl border border-zinc-300 px-4 py-3 text-sm text-black outline-none placeholder:text-zinc-400 focus:border-violet-500"
                       />
+                      {pincodeLookupLoading && (
+                        <p className="mt-1 text-xs text-violet-500">
+                          Detecting city & state...
+                        </p>
+                      )}
                     </div>
                   </div>
 
@@ -756,13 +828,13 @@ export default function CheckoutPage() {
   2. Payment Method
 </h2>
 
-                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                <div className="space-y-2.5">
                   {PAYMENT_METHODS.map(({ id, label, subtitle, icon: Icon }) => (
                     <button
                       key={id}
                       type="button"
                       onClick={() => setPaymentMethod(id)}
-                      className={`flex items-center gap-3 rounded-xl border p-4 text-left transition ${
+                      className={`flex w-full items-center gap-3 rounded-xl border p-4 text-left transition ${
                         paymentMethod === id
                           ? "border-violet-600 bg-violet-50"
                           : "border-zinc-200 hover:border-violet-300"
@@ -780,6 +852,12 @@ export default function CheckoutPage() {
                     </button>
                   ))}
                 </div>
+
+                <p className="mt-3 flex items-center gap-1.5 text-xs text-zinc-400">
+                  <Lock className="h-3 w-3" />
+                  Card, UPI, Net Banking & Wallet details are entered
+                  securely through Razorpay — never on this page.
+                </p>
 
                 {/* Promo code */}
                 <div className="mt-6 flex flex-col gap-4 rounded-2xl bg-violet-50 p-5 sm:flex-row sm:items-center sm:justify-between">

@@ -13,10 +13,15 @@ import {
   ShieldCheck,
   RotateCcw,
   Gem,
+  MapPin,
+  Truck,
+  BadgePercent,
 } from "lucide-react";
 
 import { useCartStore } from "@/stores/cartStore";
 import { useWishlistStore } from "@/stores/wishlistStore";
+
+import DeliveryPincodeModal from "@/components/cart/DeliveryPincodeModal";
 
 import AnnouncementBar from "@/components/home/AnnouncementBar";
 import Navbar from "@/components/home/Navbar";
@@ -35,6 +40,42 @@ export default function CartPage() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  // Default delivery address preview + free-shipping threshold — both
+  // real data, fetched from the same sources checkout already uses.
+  const [defaultAddress, setDefaultAddress] = useState<{
+    pincode: string;
+    city: string;
+  } | null>(null);
+
+  const [freeShippingThreshold, setFreeShippingThreshold] = useState<
+    number | null
+  >(null);
+
+  const [pincodeModalOpen, setPincodeModalOpen] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/account/addresses")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success && data.addresses.length > 0) {
+          const addr =
+            data.addresses.find((a: { isDefault: boolean }) => a.isDefault) ||
+            data.addresses[0];
+          setDefaultAddress({ pincode: addr.pincode, city: addr.city });
+        }
+      })
+      .catch(() => {});
+
+    fetch("/api/settings/public")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.success) {
+          setFreeShippingThreshold(data.shipping.freeShippingThreshold);
+        }
+      })
+      .catch(() => {});
+  }, []);
+
   // Cart data is persisted in localStorage, which the server can't see.
   // Rendering an empty cart until mounted keeps the first client render
   // identical to the server render, avoiding a hydration mismatch.
@@ -45,6 +86,16 @@ export default function CartPage() {
     (total, item) => total + item.price * item.quantity,
     0
   );
+
+  const totalSavings = items.reduce((total, item) => {
+    if (!item.comparePrice || item.comparePrice <= item.price) return total;
+    return total + (item.comparePrice - item.price) * item.quantity;
+  }, 0);
+
+  const amountToFreeShipping =
+    freeShippingThreshold != null
+      ? Math.max(freeShippingThreshold - subtotal, 0)
+      : null;
 
   const handleMoveToWishlist = (item: (typeof items)[number]) => {
     addToWishlist({
@@ -86,6 +137,42 @@ export default function CartPage() {
             Continue Shopping
           </Link>
         </div>
+
+        {items.length > 0 && (
+          <div className="mb-6 space-y-3">
+            {totalSavings > 0 && (
+              <div className="flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-700">
+                <BadgePercent className="h-4 w-4 shrink-0" />
+                You are saving ₹{totalSavings} on this order
+              </div>
+            )}
+
+            {defaultAddress && (
+              <div className="flex items-center gap-2 rounded-xl bg-zinc-50 px-4 py-3 text-sm text-zinc-600">
+                <MapPin className="h-4 w-4 shrink-0 text-violet-600" />
+                Delivering to:{" "}
+                <span className="font-semibold text-black">
+                  {defaultAddress.city} - {defaultAddress.pincode}
+                </span>
+                <button
+                  onClick={() => setPincodeModalOpen(true)}
+                  className="ml-auto text-xs font-semibold text-violet-600 hover:underline"
+                >
+                  Change
+                </button>
+              </div>
+            )}
+
+            {amountToFreeShipping != null && (
+              <div className="flex items-center gap-2 rounded-xl bg-violet-50 px-4 py-3 text-sm font-semibold text-violet-700">
+                <Truck className="h-4 w-4 shrink-0" />
+                {amountToFreeShipping === 0
+                  ? "Yayy! You've unlocked FREE delivery on this order"
+                  : `Add ₹${amountToFreeShipping} more to get FREE delivery`}
+              </div>
+            )}
+          </div>
+        )}
 
         {items.length === 0 ? (
           <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-16 text-center">
@@ -183,6 +270,11 @@ export default function CartPage() {
                       {/* Price */}
                       <div className="text-sm font-semibold text-black">
                         ₹{item.price}
+                        {!!item.comparePrice && item.comparePrice > item.price && (
+                          <span className="ml-1.5 text-xs font-normal text-zinc-400 line-through">
+                            ₹{item.comparePrice}
+                          </span>
+                        )}
                       </div>
 
                       {/* Quantity */}
@@ -258,6 +350,13 @@ export default function CartPage() {
                   <span>Subtotal ({totalItems} items)</span>
                   <span className="font-semibold text-black">₹{subtotal}</span>
                 </div>
+
+                {totalSavings > 0 && (
+                  <div className="flex justify-between text-emerald-600">
+                    <span>You Saved</span>
+                    <span className="font-semibold">− ₹{totalSavings}</span>
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-zinc-200 pt-4">
@@ -314,6 +413,12 @@ export default function CartPage() {
           </div>
         )}
       </div>
+
+      <DeliveryPincodeModal
+        open={pincodeModalOpen}
+        onOpenChange={setPincodeModalOpen}
+        onSelect={(pincode, city) => setDefaultAddress({ pincode, city })}
+      />
 
       <Newsletter />
       <Footer />

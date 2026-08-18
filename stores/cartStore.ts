@@ -14,6 +14,10 @@ export interface CartItem {
 
   price: number;
 
+  /** Original (pre-discount) price, if the product had one — powers
+   * the "you're saving ₹X" display on the cart page. */
+  comparePrice?: number;
+
   quantity: number;
 
   stock: number;
