@@ -10,11 +10,6 @@ export interface CollectionMeta {
 
 // Products get tagged with the `tag` value in the admin Product form
 // (Basic Info -> Tags, comma-separated) to appear on a category's page.
-//
-// NOTE: banner images for arc-essentials, arc-graphics, arc-gaming,
-// and bestsellers are currently reusing existing hero/collection
-// images as placeholders — swap `image` below for a dedicated banner
-// (same 1536x1024 landscape ratio as mens-banner.png) whenever ready.
 
 export const COLLECTIONS: CollectionMeta[] = [
   {
@@ -24,7 +19,7 @@ export const COLLECTIONS: CollectionMeta[] = [
     subtitle: "Collection",
     description:
       "Clean, timeless and versatile. ARC Essentials are premium everyday T-shirts designed for effortless style, comfort and daily wear.",
-    image: "/images/hero/hero.png",
+    image: "/images/collections/collection-essential.png",
   },
   {
     name: "Arc Oversized",
@@ -42,7 +37,7 @@ export const COLLECTIONS: CollectionMeta[] = [
     subtitle: "Collection",
     description:
       "Bold artwork meets street culture. Explore statement graphics created to make your outfit stand out wherever you go.",
-    image: "/images/hero/hero-smoke.png",
+    image: "/images/collections/collection-graphics.png",
   },
   {
     name: "Arc Anime",
@@ -60,7 +55,7 @@ export const COLLECTIONS: CollectionMeta[] = [
     subtitle: "Collection",
     description:
       "Level up your style. Gaming-inspired T-shirts featuring designs made for players, creators and gaming culture.",
-    image: "/images/hero/hero-ring.png",
+    image: "/images/collections/collection-gaming.png",
   },
   {
     name: "Bestsellers",
@@ -69,7 +64,7 @@ export const COLLECTIONS: CollectionMeta[] = [
     subtitle: "Collection",
     description:
       "The pieces everyone wants. Discover ZERO ARC CO.'s most-loved designs, proven favorites and customer top picks.",
-    image: "/images/hero/featured-shirt.png",
+    image: "/images/collections/collection-bestsellers.png",
   },
 ];
 
