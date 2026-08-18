@@ -32,10 +32,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
-      <body
-        className={`${inter.variable} ${spaceGrotesk.variable} ${anton.variable} antialiased`}
-      >
+    <html
+      lang="en"
+      className={`dark ${inter.variable} ${spaceGrotesk.variable} ${anton.variable}`}
+    >
+      <body className="antialiased">
         <Toaster
           richColors
           position="top-right"
