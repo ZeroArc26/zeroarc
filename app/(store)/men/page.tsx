@@ -18,7 +18,7 @@ export default async function MenCollectionPage() {
   const raw = await Product.find({
     "publish.status": "active",
     "publish.visibility": { $ne: "hidden" },
-    "basicInfo.audience": { $in: ["men", "unisex"] },
+    "basicInfo.audience": "men",
   })
     .sort({ createdAt: -1 })
     .lean();

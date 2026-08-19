@@ -9,7 +9,8 @@
     "lint": "eslint",
     "seed": "tsx seed.ts",
     "migrate:images": "tsx scripts/migrate-images-to-imagekit.ts",
-    "seed:admin": "tsx scripts/seedAdmin.ts"
+    "seed:admin": "tsx scripts/seedAdmin.ts",
+    "check:audience": "tsx scripts/check-audience.ts"
   },
   "dependencies": {
     "@auth/mongodb-adapter": "^3.11.2",
