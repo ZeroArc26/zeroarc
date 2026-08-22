@@ -1,9 +1,11 @@
-import "dotenv/config";
+import dotenv from "dotenv";
 
-import connectDB from "@/lib/mongodb";
-import Product from "@/models/Product";
+dotenv.config({ path: ".env.local" });
 
 async function checkAudience() {
+  const { default: connectDB } = await import("@/lib/mongodb");
+  const { default: Product } = await import("@/models/Product");
+
   await connectDB();
 
   const products = await Product.find(
