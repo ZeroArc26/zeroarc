@@ -20,6 +20,10 @@ const DEFAULT_COLORS = [
   { name: "Green", hex: "#16A34A" },
   { name: "Brown", hex: "#8B5E3C" },
   { name: "Beige", hex: "#D6C6B8" },
+  { name: "Peach", hex: "#FFCBA4" },
+  { name: "Pink", hex: "#EC4899" },
+  { name: "Dusky Pink", hex: "#C48A8A" },
+  { name: "Maroon", hex: "#800000" },
 ];
 
 const DEFAULT_SIZES = [
