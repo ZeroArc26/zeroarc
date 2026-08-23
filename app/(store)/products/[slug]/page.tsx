@@ -78,7 +78,10 @@ async function getRelatedProducts(category: string, excludeSlug: string) {
     .limit(5)
     .lean();
 
-  return raw.map((p: any) => ({ ...p, _id: p._id.toString() }));
+  // Full deep-serialize (not just the top-level _id) — nested
+  // subdocuments like priceHistory[] carry their own ObjectId/Date
+  // instances that a Client Component can't receive directly.
+  return JSON.parse(JSON.stringify(raw));
 }
 
 export default async function ProductPage({ params }: ProductPageProps) {

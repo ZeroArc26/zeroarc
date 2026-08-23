@@ -7,6 +7,8 @@ interface EstimateResult {
   serviceable: boolean;
   message?: string;
   codAvailable?: boolean;
+  city?: string | null;
+  state?: string | null;
   standard?: { from: string; to: string };
   express?: { from: string; to: string };
 }
@@ -81,7 +83,7 @@ export default function DeliveryEstimate() {
         <div className="mt-3 space-y-2">
           <div className="flex items-center gap-2 text-sm text-emerald-600">
             <CheckCircle2 className="h-4 w-4 shrink-0" />
-            Delivers to your area
+            {result.city ? `Delivers to ${result.city}` : "Delivers to your area"}
             {result.codAvailable && " · Cash on Delivery available"}
           </div>
 

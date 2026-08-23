@@ -22,10 +22,7 @@ export default async function ShopPage() {
     .sort({ createdAt: -1 })
     .lean();
 
-  const products = raw.map((p: any) => ({
-    ...p,
-    _id: p._id.toString(),
-  }));
+  const products = JSON.parse(JSON.stringify(raw));
 
   return (
     <main className="min-h-screen bg-white">
