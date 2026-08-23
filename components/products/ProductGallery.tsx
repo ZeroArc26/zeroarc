@@ -113,7 +113,7 @@ export default function ProductGallery({
             fill
             priority
             sizes="(max-width: 768px) 100vw, 45vw"
-            className="object-cover transition-transform duration-150 ease-out"
+            className="object-contain transition-transform duration-150 ease-out"
             style={
               isHovering
                 ? {
