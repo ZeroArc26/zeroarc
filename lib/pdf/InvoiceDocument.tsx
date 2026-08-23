@@ -172,13 +172,13 @@ const styles = StyleSheet.create({
     color: "#333333",
   },
   colNum: { width: "3%", paddingHorizontal: 3 },
-  colProduct: { width: "17%", paddingHorizontal: 3 },
+  colProduct: { width: "20%", paddingHorizontal: 3 },
   colSku: { width: "9%", paddingHorizontal: 3 },
   colSize: { width: "6%", paddingHorizontal: 3 },
   colColor: { width: "8%", paddingHorizontal: 3 },
   colQty: { width: "5%", paddingHorizontal: 3 },
   colPrice: { width: "10%", paddingHorizontal: 3, textAlign: "right" },
-  colDiscount: { width: "8%", paddingHorizontal: 3, textAlign: "right" },
+  colDiscount: { width: "5%", paddingHorizontal: 3, textAlign: "right" },
   colTaxable: { width: "11%", paddingHorizontal: 3, textAlign: "right" },
   colTaxPct: { width: "6%", paddingHorizontal: 3, textAlign: "right" },
   colTaxAmt: { width: "9%", paddingHorizontal: 3, textAlign: "right" },
@@ -646,13 +646,23 @@ export default function InvoiceDocument({
               <View style={styles.tableRow} key={i}>
                 <Text style={[styles.td, styles.colNum]}>{i + 1}</Text>
                 <View style={[styles.td, styles.colProduct]}>
-                  <Text>{item.name}</Text>
-                  {itemBarcodes?.[i] && (
-                    <Image
-                      src={itemBarcodes[i] as string}
-                      style={{ width: 70, height: 18, marginTop: 2 }}
-                    />
-                  )}
+                  <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 4 }}>
+                    {item.image ? (
+                      <Image
+                        src={item.image}
+                        style={{ width: 24, height: 24, borderRadius: 2 }}
+                      />
+                    ) : null}
+                    <View style={{ flex: 1 }}>
+                      <Text>{item.name}</Text>
+                      {itemBarcodes?.[i] && (
+                        <Image
+                          src={itemBarcodes[i] as string}
+                          style={{ width: 65, height: 16, marginTop: 2 }}
+                        />
+                      )}
+                    </View>
+                  </View>
                 </View>
                 <Text style={[styles.td, styles.colSku]}>{item.sku || "-"}</Text>
                 <Text style={[styles.td, styles.colSize]}>{item.size || "-"}</Text>

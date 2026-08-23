@@ -70,7 +70,10 @@ function BarcodeLabel({ label }: { label: LabelData }) {
   }
 
   return (
-    <div className="flex w-[220px] flex-col items-center gap-1 rounded-lg border border-zinc-300 p-3 print:break-inside-avoid">
+    <div
+      id="barcode-label-print"
+      className="flex w-[220px] flex-col items-center gap-1 rounded-lg border border-zinc-300 bg-white p-3 print:break-inside-avoid"
+    >
       <p className="w-full truncate text-center text-xs font-bold text-zinc-900">
         {label.title}
       </p>
@@ -89,9 +92,16 @@ function BarcodeLabel({ label }: { label: LabelData }) {
   );
 }
 
-export default function BarcodeLabelPrint({ product }: { product: any }) {
+interface ProductForLabel {
+  basicInfo?: { title?: string };
+  pricing?: { sellingPrice?: number };
+  inventory?: { barcode?: string };
+  variants?: { color: string }[];
+}
+
+export default function BarcodeLabelPrint({ product }: { product: ProductForLabel }) {
   const colorNames: string[] = Array.from(
-    new Set((product?.variants || []).map((v: any) => v.color))
+    new Set((product?.variants || []).map((v) => v.color))
   );
 
   const productLabel: LabelData | null = product?.inventory?.barcode
@@ -106,10 +116,27 @@ export default function BarcodeLabelPrint({ product }: { product: any }) {
 
   return (
     <div className="space-y-6">
+      <style>{`
+        @media print {
+          body * {
+            visibility: hidden;
+          }
+          #barcode-label-print,
+          #barcode-label-print * {
+            visibility: visible;
+          }
+          #barcode-label-print {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+          }
+        }
+      `}</style>
+
       <div className="flex items-center justify-between print:hidden">
         <div>
-          <h1 className="text-xl font-bold text-zinc-900">Barcode Label</h1>
-          <p className="text-sm text-zinc-500">{product.basicInfo?.title}</p>
+          <h1 className="text-xl font-bold text-white">Barcode Label</h1>
+          <p className="text-sm text-zinc-400">{product.basicInfo?.title}</p>
         </div>
         <button
           onClick={() => window.print()}
@@ -121,14 +148,14 @@ export default function BarcodeLabelPrint({ product }: { product: any }) {
 
       {productLabel ? (
         <div>
-          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-500 print:hidden">
+          <p className="mb-2 text-xs font-semibold uppercase tracking-wide text-zinc-400 print:hidden">
             One barcode per product — covers every color/size. Scan this at
             the POS, then pick color/size manually.
           </p>
           <BarcodeLabel label={productLabel} />
         </div>
       ) : (
-        <p className="text-sm text-zinc-500">
+        <p className="text-sm text-zinc-400">
           No barcode found on this product yet. Open it in the admin editor —
           a barcode is auto-generated under Inventory.
         </p>

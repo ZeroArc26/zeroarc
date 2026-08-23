@@ -5,7 +5,6 @@ import Order from "@/models/Order";
 import Product from "@/models/Product";
 import Customer from "@/models/Customer";
 import { requireAdmin } from "@/lib/auth/admin";
-import { getStoreSettings } from "@/lib/settings";
 
 function generateOrderNumber() {
   const timestamp = Date.now().toString().slice(-8);
@@ -84,7 +83,7 @@ export async function POST(request: Request) {
       }
 
       const variant = productDoc.variants.find(
-        (v: any) => v.color === item.color && v.size === item.size
+        (v: { color: string; size: string }) => v.color === item.color && v.size === item.size
       );
 
       if (!variant || variant.stock < item.quantity) {
@@ -106,7 +105,7 @@ export async function POST(request: Request) {
       const productDoc = productDocs[i];
 
       const variant = productDoc.variants.find(
-        (v: any) => v.color === item.color && v.size === item.size
+        (v: { color: string; size: string }) => v.color === item.color && v.size === item.size
       );
 
       variant.stock = Math.max(variant.stock - item.quantity, 0);
@@ -117,7 +116,6 @@ export async function POST(request: Request) {
     // Build order items + pricing (GST-inclusive pricing, same as
     // the online checkout flow).
     // ------------------------------------------------------------
-    const settings = await getStoreSettings();
     // Offline/in-store sale — always the same state as the shop, so
     // it's always CGST+SGST, never IGST.
     const isInterState = false;
@@ -127,10 +125,17 @@ export async function POST(request: Request) {
       const lineTaxable = round2(lineTotal / 1.18);
       const lineGst = round2(lineTotal - lineTaxable);
 
+      const productDoc = productDocs[i];
+      const coverImage =
+        productDoc?.images?.find((img: { isCover?: boolean }) => img.isCover)?.url ||
+        productDoc?.images?.[0]?.url ||
+        item.image ||
+        "";
+
       return {
         productId: item.productId,
         name: item.title,
-        image: item.image || "",
+        image: coverImage,
         sku: productDocs[i]?.inventory?.sku || "",
         barcode: productDocs[i]?.inventory?.barcode || "",
         color: item.color,
@@ -239,14 +244,15 @@ export async function POST(request: Request) {
         soldBy: admin?.name || "",
       },
     });
-  } catch (error: any) {
-    if (error?.message === "Unauthorized") {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : undefined;
+    if (message === "Unauthorized") {
       return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
     }
 
     console.error("POS COMPLETE SALE ERROR:", error);
     return NextResponse.json(
-      { success: false, message: error?.message || "Failed to complete sale." },
+      { success: false, message: message || "Failed to complete sale." },
       { status: 500 }
     );
   }

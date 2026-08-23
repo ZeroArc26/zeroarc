@@ -11,10 +11,8 @@ declare module "bwip-js" {
     [key: string]: unknown;
   }
 
-  function toBuffer(options: ToBufferOptions): Promise<Buffer>;
-
   const bwipjs: {
-    toBuffer: typeof toBuffer;
+    toBuffer: (options: ToBufferOptions) => Promise<Buffer>;
   };
 
   export default bwipjs;

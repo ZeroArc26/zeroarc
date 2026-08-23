@@ -128,7 +128,7 @@ export async function GET(request: Request, { params }: RouteParams) {
     // POS scanner and the product's printed label use).
     const { generateBarcodeDataUrl } = await import("@/lib/pdf/generateBarcode");
     const itemBarcodes = await Promise.all(
-      (order.items || []).map((item: any) =>
+      (order.items || []).map((item: { barcode?: string }) =>
         item.barcode ? generateBarcodeDataUrl(item.barcode) : Promise.resolve(null)
       )
     );

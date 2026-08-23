@@ -35,6 +35,24 @@ interface CartLine {
   stock: number;
 }
 
+interface ReceiptOrder {
+  orderNumber: string;
+  invoiceNumber: string;
+  date: string;
+  customer: { name: string; phone: string };
+  items: {
+    name: string;
+    color: string;
+    size: string;
+    quantity: number;
+    price: number;
+    totalAmount: number;
+  }[];
+  pricing: { subtotal: number; totalTax: number; grandTotal: number };
+  payment: { method: string };
+  soldBy?: string;
+}
+
 export default function POSTerminal() {
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -54,7 +72,7 @@ export default function POSTerminal() {
   const [paymentMethod, setPaymentMethod] = useState<"cash" | "upi" | "card">("cash");
 
   const [completing, setCompleting] = useState(false);
-  const [receipt, setReceipt] = useState<{ order: any; orderId: string } | null>(null);
+  const [receipt, setReceipt] = useState<{ order: ReceiptOrder; orderId: string } | null>(null);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -79,6 +97,7 @@ export default function POSTerminal() {
       setSelectedSize("");
       setSelectedQty(1);
     } catch (err) {
+      console.error("Barcode lookup failed:", err);
       toast.error("Lookup failed. Check your connection.");
     } finally {
       setScanning(false);
@@ -195,8 +214,8 @@ export default function POSTerminal() {
       setCart([]);
       setCustomerName("");
       setCustomerPhone("");
-    } catch (err: any) {
-      toast.error(err.message || "Something went wrong.");
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong.");
     } finally {
       setCompleting(false);
     }

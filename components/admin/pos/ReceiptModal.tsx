@@ -5,8 +5,26 @@ import { Printer, Download, X } from "lucide-react";
 
 import ThermalReceipt from "./ThermalReceipt";
 
+interface ReceiptOrder {
+  orderNumber: string;
+  invoiceNumber: string;
+  date: string;
+  customer: { name: string; phone: string };
+  items: {
+    name: string;
+    color: string;
+    size: string;
+    quantity: number;
+    price: number;
+    totalAmount: number;
+  }[];
+  pricing: { subtotal: number; totalTax: number; grandTotal: number };
+  payment: { method: string };
+  soldBy?: string;
+}
+
 interface ReceiptModalProps {
-  order: any;
+  order: ReceiptOrder;
   orderId: string;
   onClose: () => void;
 }

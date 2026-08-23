@@ -34,9 +34,18 @@ export async function GET(request: Request) {
       product: {
         _id: product._id,
         title: product.basicInfo?.title,
-        image: product.images?.[0]?.url || "",
+        image:
+          product.images?.find((img: { isCover?: boolean }) => img.isCover)?.url ||
+          product.images?.[0]?.url ||
+          "",
         sellingPrice: product.pricing?.sellingPrice,
-        variants: (product.variants || []).map((v: any) => ({
+        variants: (product.variants || []).map((v: {
+          color: string;
+          colorHex?: string;
+          size: string;
+          stock: number;
+          price: number;
+        }) => ({
           color: v.color,
           colorHex: v.colorHex,
           size: v.size,
@@ -45,8 +54,9 @@ export async function GET(request: Request) {
         })),
       },
     });
-  } catch (error: any) {
-    if (error?.message === "Unauthorized") {
+  } catch (error: unknown) {
+    const message = error instanceof Error ? error.message : undefined;
+    if (message === "Unauthorized") {
       return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
     }
 

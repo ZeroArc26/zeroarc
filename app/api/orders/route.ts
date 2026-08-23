@@ -90,6 +90,7 @@ export async function POST(req: Request) {
       products.map(async (item: any) => {
         let sku = "";
         let barcode = "";
+        let coverImage = item.image; // fallback to whatever the cart sent
 
         try {
           const product = await Product.findById(item.productId).lean<any>();
@@ -97,6 +98,14 @@ export async function POST(req: Request) {
           // what shows on invoices and shipping labels.
           sku = product?.inventory?.sku || "";
           barcode = product?.inventory?.barcode || "";
+          // Always the admin-selected cover image (not whatever image
+          // the storefront gallery happened to be showing) — keeps
+          // invoice/shipping-label consistent regardless of purchased
+          // color/variant.
+          coverImage =
+            product?.images?.find((img: any) => img.isCover)?.url ||
+            product?.images?.[0]?.url ||
+            item.image;
         } catch {
           sku = "";
         }
@@ -108,7 +117,7 @@ export async function POST(req: Request) {
         return {
           productId: item.productId,
           name: item.title,
-          image: item.image,
+          image: coverImage,
           sku,
           barcode,
           color: item.color,

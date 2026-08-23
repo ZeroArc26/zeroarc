@@ -679,13 +679,23 @@ export default function ShippingLabelDocument({
           {(order.items || []).map((item: any, i: number) => (
             <View style={styles.tableRow} key={i}>
               <View style={[styles.td, styles.colProduct]}>
-                <Text>{item.name}</Text>
-                {itemBarcodes?.[i] && (
-                  <Image
-                    src={itemBarcodes[i] as string}
-                    style={{ width: 65, height: 16, marginTop: 2 }}
-                  />
-                )}
+                <View style={{ flexDirection: "row", alignItems: "flex-start", gap: 5 }}>
+                  {item.image ? (
+                    <Image
+                      src={item.image}
+                      style={{ width: 28, height: 28, borderRadius: 2 }}
+                    />
+                  ) : null}
+                  <View style={{ flex: 1 }}>
+                    <Text>{item.name}</Text>
+                    {itemBarcodes?.[i] && (
+                      <Image
+                        src={itemBarcodes[i] as string}
+                        style={{ width: 65, height: 16, marginTop: 2 }}
+                      />
+                    )}
+                  </View>
+                </View>
               </View>
               <Text style={[styles.td, styles.colSku]}>{item.sku || "-"}</Text>
               <Text style={[styles.td, styles.colQty]}>{item.quantity}</Text>
