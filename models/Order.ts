@@ -43,6 +43,7 @@ const OrderSchema = new Schema(
         enum: [
           "website",
           "admin",
+          "pos",
         ],
 
         default: "website",
@@ -159,6 +160,8 @@ const OrderSchema = new Schema(
 
         color: String,
 
+        barcode: String,
+
 
         hsnCode: {
 
@@ -261,6 +264,7 @@ const OrderSchema = new Schema(
           "card",
           "cod",
           "netbanking",
+          "cash",
         ],
 
       },

@@ -501,6 +501,7 @@ interface InvoiceDocumentProps {
   qrDataUrl?: string;
   logoDataUrl?: string;
   delhiveryLogoDataUrl?: string;
+  itemBarcodes?: (string | null)[];
   company: {
     name: string;
     tagline: string;
@@ -516,6 +517,7 @@ export default function InvoiceDocument({
   order,
   logoDataUrl,
   delhiveryLogoDataUrl,
+  itemBarcodes,
   company,
 }: InvoiceDocumentProps) {
   const address = order.customer?.shippingAddress || {};
@@ -643,7 +645,15 @@ export default function InvoiceDocument({
             return (
               <View style={styles.tableRow} key={i}>
                 <Text style={[styles.td, styles.colNum]}>{i + 1}</Text>
-                <Text style={[styles.td, styles.colProduct]}>{item.name}</Text>
+                <View style={[styles.td, styles.colProduct]}>
+                  <Text>{item.name}</Text>
+                  {itemBarcodes?.[i] && (
+                    <Image
+                      src={itemBarcodes[i] as string}
+                      style={{ width: 70, height: 18, marginTop: 2 }}
+                    />
+                  )}
+                </View>
                 <Text style={[styles.td, styles.colSku]}>{item.sku || "-"}</Text>
                 <Text style={[styles.td, styles.colSize]}>{item.size || "-"}</Text>
                 <Text style={[styles.td, styles.colColor]}>{item.color || "-"}</Text>

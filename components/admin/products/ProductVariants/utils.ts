@@ -16,12 +16,11 @@ export function generateVariantSKU(
 }
 
 /* -------------------------------- */
-/* Barcode Generator                */
+/* Barcode                          */
 /* -------------------------------- */
-
-export function generateVariantBarcode(index: number) {
-  return `890${String(index + 1).padStart(9, "0")}`;
-}
+/* NOTE: Barcodes are now PRODUCT-level, not per-variant. One barcode
+   covers every color/size of a product — see basicInfo/inventory
+   barcode field. Variants no longer get their own barcode. */
 
 /* -------------------------------- */
 /* Generate Variant Combinations    */
@@ -57,7 +56,7 @@ export function generateVariants(
         colorHex: colorInfo?.hex ?? "#000000",
 
         sku: generateVariantSKU(color, size, index),
-        barcode: generateVariantBarcode(index),
+        barcode: "", // shared product-level barcode is used instead
 
         price,
         stock,

@@ -124,12 +124,22 @@ export async function GET(request: Request, { params }: RouteParams) {
     const logoDataUrl = loadLogoDataUrl();
     const delhiveryLogoDataUrl = loadDelhiveryLogoDataUrl();
 
+    // Real, scannable barcode per order line item (same barcode the
+    // POS scanner and the product's printed label use).
+    const { generateBarcodeDataUrl } = await import("@/lib/pdf/generateBarcode");
+    const itemBarcodes = await Promise.all(
+      (order.items || []).map((item: any) =>
+        item.barcode ? generateBarcodeDataUrl(item.barcode) : Promise.resolve(null)
+      )
+    );
+
     const buffer = await renderToBuffer(
       InvoiceDocument({
         order,
         qrDataUrl,
         logoDataUrl,
         delhiveryLogoDataUrl,
+        itemBarcodes,
         company,
       }) as any
     );

@@ -473,6 +473,7 @@ interface ShippingLabelDocumentProps {
   qrDataUrl?: string;
   logoDataUrl?: string;
   delhiveryLogoDataUrl?: string;
+  itemBarcodes?: (string | null)[];
   company: {
     name: string;
     tagline: string;
@@ -496,6 +497,7 @@ export default function ShippingLabelDocument({
   order,
   logoDataUrl,
   delhiveryLogoDataUrl,
+  itemBarcodes,
   company,
 }: ShippingLabelDocumentProps) {
   const label = order.shippingLabel || {};
@@ -676,7 +678,15 @@ export default function ShippingLabelDocument({
 
           {(order.items || []).map((item: any, i: number) => (
             <View style={styles.tableRow} key={i}>
-              <Text style={[styles.td, styles.colProduct]}>{item.name}</Text>
+              <View style={[styles.td, styles.colProduct]}>
+                <Text>{item.name}</Text>
+                {itemBarcodes?.[i] && (
+                  <Image
+                    src={itemBarcodes[i] as string}
+                    style={{ width: 65, height: 16, marginTop: 2 }}
+                  />
+                )}
+              </View>
               <Text style={[styles.td, styles.colSku]}>{item.sku || "-"}</Text>
               <Text style={[styles.td, styles.colQty]}>{item.quantity}</Text>
               <Text style={[styles.td, styles.colSize]}>{item.size || "-"}</Text>

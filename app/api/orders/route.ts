@@ -89,12 +89,14 @@ export async function POST(req: Request) {
     const items = await Promise.all(
       products.map(async (item: any) => {
         let sku = "";
+        let barcode = "";
 
         try {
           const product = await Product.findById(item.productId).lean<any>();
           // One SKU per product (not per color/size variant) — this is
           // what shows on invoices and shipping labels.
           sku = product?.inventory?.sku || "";
+          barcode = product?.inventory?.barcode || "";
         } catch {
           sku = "";
         }
@@ -108,6 +110,7 @@ export async function POST(req: Request) {
           name: item.title,
           image: item.image,
           sku,
+          barcode,
           color: item.color,
           size: item.size,
           quantity: item.quantity,

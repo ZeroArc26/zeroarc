@@ -9,6 +9,7 @@ import {
   BarChart3,
   MessageSquare,
   Settings,
+  ScanBarcode,
   type LucideIcon,
 } from "lucide-react";
 
@@ -74,6 +75,11 @@ export const adminNavItems: AdminNavItem[] = [
         title: "Coupons",
         href: "/admin/dashboard/coupons",
         icon: Ticket,
+      },
+      {
+        title: "Offline Sale (POS)",
+        href: "/admin/dashboard/pos",
+        icon: ScanBarcode,
       },
     ],
   },

@@ -9,6 +9,7 @@ import {
   Pencil,
   Copy,
   Trash2,
+  ScanBarcode,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -95,6 +96,16 @@ export default function ProductActions({
             >
               <Pencil className="mr-2 h-4 w-4" />
               Edit Product
+            </Link>
+          </DropdownMenuItem>
+
+          <DropdownMenuItem asChild>
+            <Link
+              href={`/admin/dashboard/products/${productId}/barcode-labels`}
+              className="cursor-pointer"
+            >
+              <ScanBarcode className="mr-2 h-4 w-4" />
+              Print Barcode Labels
             </Link>
           </DropdownMenuItem>
 
