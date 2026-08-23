@@ -33,7 +33,8 @@ import OrderButton from "@/components/checkout/OrderButton";
 
 const SHIPPING_METHODS = [
   { id: "standard" as const, label: "Standard Delivery", meta: "3 – 5 business days", icon: Truck },
-  { id: "express" as const, label: "Express Delivery", meta: "1 – 2 business days", icon: Zap },
+  // Express Delivery temporarily disabled — will be re-enabled later.
+  // { id: "express" as const, label: "Express Delivery", meta: "1 – 2 business days", icon: Zap },
 ];
 
 const PAYMENT_METHODS = [
@@ -226,10 +227,10 @@ export default function CheckoutPage() {
   const totalItems = cartItems.reduce((sum, i) => sum + i.quantity, 0);
   const subtotal = cartItems.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const freeShippingThreshold = storeSettings?.freeShippingThreshold ?? 999;
-  const baseShippingRate =
-    shippingMethod === "express"
-      ? storeSettings?.expressShippingRate ?? 149
-      : storeSettings?.standardShippingRate ?? 0;
+  // Express Delivery is temporarily disabled — only "standard" exists in
+  // SHIPPING_METHODS right now, so this always resolves to the standard
+  // rate. Restore the express ? ... : ... ternary here when it's back.
+  const baseShippingRate = storeSettings?.standardShippingRate ?? 0;
   const codCharge = storeSettings?.codCharge ?? 99;
 
   const shipping =
@@ -242,11 +243,9 @@ export default function CheckoutPage() {
   // the exact same free-shipping-threshold logic used for the real
   // `shipping` total above, just per-method so both options can show
   // their rate. Does not affect `shipping`/`total`/`baseShippingRate`.
-  function getShippingMethodRate(methodId: (typeof SHIPPING_METHODS)[number]["id"]) {
+  function getShippingMethodRate(_methodId: (typeof SHIPPING_METHODS)[number]["id"]) {
     if (subtotal >= freeShippingThreshold) return 0;
-    return methodId === "express"
-      ? storeSettings?.expressShippingRate ?? 149
-      : storeSettings?.standardShippingRate ?? 0;
+    return storeSettings?.standardShippingRate ?? 0;
   }
 
   useEffect(() => {

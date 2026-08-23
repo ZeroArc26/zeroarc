@@ -15,7 +15,8 @@ interface RouteParams {
 // same zone as the warehouse ships fastest, other zones add days,
 // and known remote zones (NE states, J&K/Ladakh, Andaman) add more.
 const BASE_STANDARD_DAYS: [number, number] = [2, 3];
-const BASE_EXPRESS_DAYS: [number, number] = [1, 1];
+// Express Delivery is temporarily disabled — will be re-enabled later.
+// const BASE_EXPRESS_DAYS: [number, number] = [1, 1];
 
 // Pincode prefixes that are genuinely remote / slower to reach.
 const REMOTE_PREFIXES = ["79", "78", "18", "19", "744"]; // NE states, J&K/Ladakh, Andaman
@@ -103,17 +104,11 @@ export async function GET(req: Request, { params }: RouteParams) {
     BASE_STANDARD_DAYS[0] + extraDays,
     BASE_STANDARD_DAYS[1] + extraDays,
   ];
-  const expressDays: [number, number] = [
-    BASE_EXPRESS_DAYS[0] + Math.min(extraDays, 2), // express caps how much distance can slow it down
-    BASE_EXPRESS_DAYS[1] + Math.min(extraDays, 2),
-  ];
 
   const now = new Date();
 
   const standardFrom = addBusinessDays(now, standardDays[0]);
   const standardTo = addBusinessDays(now, standardDays[1]);
-  const expressFrom = addBusinessDays(now, expressDays[0]);
-  const expressTo = addBusinessDays(now, expressDays[1]);
 
   return NextResponse.json({
     success: true,
@@ -124,10 +119,6 @@ export async function GET(req: Request, { params }: RouteParams) {
     standard: {
       from: formatDate(standardFrom),
       to: formatDate(standardTo),
-    },
-    express: {
-      from: formatDate(expressFrom),
-      to: formatDate(expressTo),
     },
   });
 }

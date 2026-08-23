@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { MapPin, Truck, Zap, Loader2, CheckCircle2, XCircle } from "lucide-react";
+import { MapPin, Truck, Loader2, CheckCircle2, XCircle } from "lucide-react";
 
 interface EstimateResult {
   serviceable: boolean;
@@ -10,7 +10,6 @@ interface EstimateResult {
   city?: string | null;
   state?: string | null;
   standard?: { from: string; to: string };
-  express?: { from: string; to: string };
 }
 
 export default function DeliveryEstimate() {
@@ -91,18 +90,8 @@ export default function DeliveryEstimate() {
             <div className="flex items-center gap-2 text-sm text-zinc-600">
               <Truck className="h-4 w-4 shrink-0 text-zinc-400" />
               <span>
-                <span className="font-medium text-black">Standard:</span>{" "}
+                <span className="font-medium text-black">Expected:</span>{" "}
                 {result.standard.from} – {result.standard.to}
-              </span>
-            </div>
-          )}
-
-          {result.express && (
-            <div className="flex items-center gap-2 text-sm text-zinc-600">
-              <Zap className="h-4 w-4 shrink-0 text-zinc-400" />
-              <span>
-                <span className="font-medium text-black">Express:</span>{" "}
-                {result.express.from} – {result.express.to}
               </span>
             </div>
           )}
