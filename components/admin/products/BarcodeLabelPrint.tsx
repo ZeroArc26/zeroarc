@@ -108,9 +108,9 @@ export default function BarcodeLabelPrint({ product }: { product: ProductForLabe
     ? {
         key: "product",
         code: product.inventory.barcode,
-        title: product.basicInfo?.title,
+        title: product.basicInfo?.title || "Untitled Product",
         subtitle: colorNames.length ? `All colors: ${colorNames.join(", ")}` : "All variants",
-        price: product.pricing?.sellingPrice,
+        price: product.pricing?.sellingPrice ?? 0,
       }
     : null;
 
