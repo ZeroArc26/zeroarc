@@ -1,70 +1,134 @@
 import Image from "next/image";
 import Link from "next/link";
+import { Star } from "lucide-react";
 
 import { COLLECTIONS } from "@/constants/collections";
+import connectDB from "@/lib/mongodb";
+import Product from "@/models/Product";
 import Reveal from "@/components/motion/Reveal";
-import { StaggerGroup, StaggerItem } from "@/components/motion/Stagger";
 
-export default function ExploreCollections() {
-  // Homepage preview shows the first 3 collections; "VIEW ALL" links to
-  // /collections for the full set. Data comes from constants/collections.ts,
-  // the single source of truth also used by /collections and
-  // /collections/[slug] — no slugs are hardcoded here.
-  const preview = COLLECTIONS.slice(0, 3);
+// Only these 3 collections show here — their products only, no banner
+// images, laid out side by side in one row, in this exact order.
+const FEATURED_SLUGS = ["arc-graphics", "arc-anime", "arc-gaming"];
+
+async function getPreviewProducts(tag: string) {
+  await connectDB();
+
+  const raw = await Product.find({
+    "publish.status": "active",
+    "publish.visibility": { $ne: "hidden" },
+    "basicInfo.tags": tag,
+  })
+    .sort({ createdAt: -1 })
+    .limit(4)
+    .lean();
+
+  return JSON.parse(JSON.stringify(raw));
+}
+
+export default async function ExploreCollections() {
+  const featuredCollections = FEATURED_SLUGS.map((slug) =>
+    COLLECTIONS.find((col) => col.slug === slug)
+  ).filter((col): col is (typeof COLLECTIONS)[number] => Boolean(col));
+
+  const productsByCollection: Record<string, any[]> = {};
+  for (const col of featuredCollections) {
+    productsByCollection[col.slug] = await getPreviewProducts(col.tag);
+  }
 
   return (
     <section className="bg-white px-6 py-16 md:px-14">
       <div className="mx-auto max-w-[1700px]">
         {/* Header */}
-        <Reveal className="mb-8 flex items-center justify-between">
+        <Reveal className="mb-10">
           <h2 className="flex items-center gap-1 text-2xl font-black uppercase text-black">
             Explore Collections
             <span className="text-violet-600">+</span>
           </h2>
-
-          <Link
-            href="/collections"
-            className="text-sm font-semibold text-violet-600 hover:underline"
-          >
-            VIEW ALL →
-          </Link>
         </Reveal>
 
-        {/* Grid */}
-        <StaggerGroup gap={0.05} className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {preview.map((col) => (
-            <StaggerItem key={col.slug}>
-              <Link
-                href={`/collections/${col.slug}`}
-                className="group relative flex h-[380px] items-end overflow-hidden rounded-2xl bg-zinc-900"
-              >
-                <Image
-                  src={col.image}
-                  alt={`${col.name} collection`}
-                  fill
-                  sizes="(max-width: 768px) 100vw, 33vw"
-                  className="object-cover transition duration-700 group-hover:scale-105"
-                />
+        {/* Each collection is its own full-width row */}
+        <div className="space-y-16">
+          {featuredCollections.map((col) => (
+            <div key={col.slug}>
+              <h3 className="mb-6 text-xl font-black uppercase text-black">
+                {col.name}
+              </h3>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent transition-opacity duration-500 group-hover:from-black/95" />
-
-                <div className="relative z-10 p-7">
-                  <h3 className="text-2xl font-black uppercase leading-tight text-white transition-transform duration-500 group-hover:-translate-y-1">
-                    {col.name}
-                    <br />
-                    <span className="font-semibold tracking-[0.15em]">
-                      {col.subtitle}
-                    </span>
-                  </h3>
-
-                  <span className="mt-3 inline-flex items-center gap-2 text-sm font-semibold uppercase tracking-[0.1em] text-violet-400 transition group-hover:gap-3">
-                    Shop Now →
-                  </span>
+              {productsByCollection[col.slug]?.length > 0 ? (
+                <div className="grid grid-cols-2 gap-5 sm:grid-cols-4">
+                  {productsByCollection[col.slug].map((product) => (
+                    <Link
+                      key={product._id}
+                      href={`/products/${product.basicInfo.slug}`}
+                      className="group block"
+                    >
+                      <div className="relative aspect-square overflow-hidden rounded-2xl bg-zinc-100 shadow-sm transition-shadow duration-300 group-hover:shadow-xl">
+                        <Image
+                          src={product.images?.[0]?.url || "/placeholder.png"}
+                          alt={product.images?.[0]?.alt || product.basicInfo.title}
+                          fill
+                          sizes="(max-width: 640px) 45vw, 22vw"
+                          className="object-cover transition duration-500 group-hover:scale-105"
+                        />
+                      </div>
+                      <div className="mt-3.5">
+                        <h4 className="line-clamp-1 text-sm font-semibold uppercase tracking-wide text-black">
+                          {product.basicInfo.title}
+                        </h4>
+                        <p className="mt-1.5 text-base font-bold text-violet-600">
+                          ₹{product.pricing.sellingPrice}
+                        </p>
+                        {(product.reviewCount ?? 0) > 0 && (
+                          <div className="mt-1 flex items-center gap-1">
+                            <div className="flex text-violet-500">
+                              {Array.from({ length: 5 }).map((_, i) => (
+                                <Star
+                                  key={i}
+                                  className={`h-3 w-3 ${
+                                    i < Math.round(product.averageRating ?? 0)
+                                      ? "fill-violet-500"
+                                      : "fill-none"
+                                  }`}
+                                />
+                              ))}
+                            </div>
+                            <span className="text-xs text-zinc-400">
+                              ({product.reviewCount})
+                            </span>
+                          </div>
+                        )}
+                      </div>
+                    </Link>
+                  ))}
                 </div>
-              </Link>
-            </StaggerItem>
+              ) : (
+                <p className="text-sm text-zinc-500">
+                  No products in this collection yet.
+                </p>
+              )}
+
+              <div className="mt-6">
+                <Link
+                  href={`/collections/${col.slug}`}
+                  className="inline-flex items-center gap-2 rounded-xl border border-zinc-300 px-8 py-3 text-sm font-semibold uppercase tracking-[0.08em] text-black transition hover:bg-black hover:text-white"
+                >
+                  View More →
+                </Link>
+              </div>
+            </div>
           ))}
-        </StaggerGroup>
+        </div>
+
+        {/* Link to the full collections page, after all featured rows */}
+        <div className="mt-16 text-center">
+          <Link
+            href="/collections"
+            className="inline-flex items-center gap-2 rounded-xl bg-black px-10 py-3.5 text-sm font-semibold uppercase tracking-[0.08em] text-white transition hover:bg-zinc-800"
+          >
+            View All Collections →
+          </Link>
+        </div>
       </div>
     </section>
   );

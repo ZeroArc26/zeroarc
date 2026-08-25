@@ -202,6 +202,21 @@ export default function ProductInfo({
 
       <p className="mt-1 text-zinc-500">{product.basicInfo.category}</p>
 
+      {(product.basicInfo.audience || product.basicInfo.fitType) && (
+        <div className="mt-2 flex flex-wrap gap-2">
+          {product.basicInfo.audience && (
+            <span className="inline-block rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-700">
+              {product.basicInfo.audience}
+            </span>
+          )}
+          {product.basicInfo.fitType && (
+            <span className="inline-block rounded-full border border-zinc-200 bg-zinc-50 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-zinc-700">
+              {product.basicInfo.fitType} Fit
+            </span>
+          )}
+        </div>
+      )}
+
       {reviewCount > 0 && (
         <div className="mt-3 flex items-center gap-2">
           <div className="flex text-yellow-400">

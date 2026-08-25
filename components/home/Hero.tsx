@@ -62,7 +62,7 @@ export default function Hero() {
   return (
     <section
       ref={sectionRef}
-      className="relative min-h-[650px] h-[calc(100vh-140px)] overflow-hidden bg-black text-white"
+      className="relative h-[85vh] min-h-[520px] overflow-hidden bg-black text-white lg:h-[calc(100vh-140px)] lg:min-h-[650px]"
     >
       {/* Background */}
       <div className="absolute inset-0">
@@ -146,27 +146,6 @@ export default function Hero() {
               <br />
               culture and limitless imagination.
             </p>
-          </Reveal>
-
-          <Reveal trigger="mount" delay={1.05}>
-            <div className="mt-8 flex gap-5">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ duration: DURATION.micro }}
-                className="rounded-xl bg-violet-600 px-8 py-4 text-sm font-semibold tracking-[0.08em] transition-colors hover:bg-violet-500"
-              >
-                SHOP MEN →
-              </motion.button>
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                transition={{ duration: DURATION.micro }}
-                className="rounded-xl border border-zinc-600 px-8 py-4 text-sm font-semibold tracking-[0.08em] transition-colors hover:bg-white hover:text-black"
-              >
-                SHOP WOMEN →
-              </motion.button>
-            </div>
           </Reveal>
         </div>
       </motion.div>

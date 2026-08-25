@@ -44,7 +44,7 @@ const FOOTER_LINKS = {
     { label: "Women", href: "/women" },
     { label: "Collections", href: "/collections" },
     { label: "New Arrivals", href: "/new-arrivals" },
-    { label: "Best Sellers", href: "/best-sellers" },
+    { label: "Best Sellers", href: "/collections/bestsellers" },
   ],
   help: [
     { label: "Track Order", href: "/account/orders" },
