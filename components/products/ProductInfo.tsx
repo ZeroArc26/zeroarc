@@ -32,6 +32,8 @@ interface ProductInfoProps {
       description: string;
       brand: string;
       category: string;
+      audience?: string;
+      fitType?: string;
     };
     pricing: {
       sellingPrice: number;
