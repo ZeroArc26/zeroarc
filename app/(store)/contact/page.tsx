@@ -73,8 +73,9 @@ export default function ContactPage() {
     subject: "",
     message: "",
   });
+  const [sending, setSending] = useState(false);
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     if (!form.name || !form.email || !form.message) {
@@ -82,10 +83,28 @@ export default function ContactPage() {
       return;
     }
 
-    // TODO (before launch): wire this up to a real /api/contact route
-    // that emails or stores the message.
-    toast.success("Message sent! We'll get back to you soon.");
-    setForm({ name: "", email: "", subject: "", message: "" });
+    setSending(true);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+
+      const data = await res.json();
+
+      if (!res.ok || !data.success) {
+        throw new Error(data.message || "Failed to send your message.");
+      }
+
+      toast.success("Message sent! We'll get back to you soon.");
+      setForm({ name: "", email: "", subject: "", message: "" });
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Something went wrong. Please try again.");
+    } finally {
+      setSending(false);
+    }
   }
 
   return (
@@ -203,9 +222,10 @@ export default function ContactPage() {
 
               <button
                 type="submit"
-                className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 text-sm font-semibold text-white transition hover:bg-violet-500"
+                disabled={sending}
+                className="flex w-full items-center justify-center gap-2 rounded-xl bg-violet-600 py-4 text-sm font-semibold text-white transition hover:bg-violet-500 disabled:opacity-60"
               >
-                Send Message
+                {sending ? "Sending..." : "Send Message"}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </form>

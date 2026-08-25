@@ -94,3 +94,94 @@ export async function sendPasswordResetEmail(
     `,
   });
 }
+export async function sendContactFormEmail({
+  name,
+  email,
+  subject,
+  message,
+}: {
+  name: string;
+  email: string;
+  subject?: string;
+  message: string;
+}) {
+  const subjectLabels: Record<string, string> = {
+    order: "Order Support",
+    returns: "Returns & Exchanges",
+    general: "General Inquiry",
+    partnership: "Partnership",
+  };
+
+  const subjectLabel = subject ? subjectLabels[subject] || subject : "General Inquiry";
+
+  await resend.emails.send({
+    from: "ZeroArc Website <support@zeroarc.in>",
+    to: "support@zeroarc.in",
+    replyTo: email,
+    subject: `[Contact Form] ${subjectLabel} — ${name}`,
+    html: `
+<!DOCTYPE html>
+<html>
+  <body style="margin:0; padding:0; background-color:#f4f4f5; font-family: 'Helvetica Neue', Arial, sans-serif;">
+    <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5; padding: 40px 16px;">
+      <tr>
+        <td align="center">
+          <table role="presentation" width="520" cellpadding="0" cellspacing="0" style="max-width:520px; width:100%; background-color:#ffffff; border-radius:20px; overflow:hidden; box-shadow: 0 4px 24px rgba(0,0,0,0.06);">
+
+            <tr>
+              <td style="background-color:#ffffff; padding: 32px 40px; text-align:center; border-bottom:1px solid #f0f0f2;">
+                <img src="https://zeroarc.in/images/logo/zeroarc-logo1.png" alt="ZeroArc" width="130" style="display:block; margin:0 auto; height:auto;" />
+              </td>
+            </tr>
+
+            <tr>
+              <td style="height:4px; background:linear-gradient(90deg, #7c3aed, #a855f7, #d946ef);"></td>
+            </tr>
+
+            <tr>
+              <td style="padding: 40px;">
+                <p style="margin:0 0 6px; font-size:12px; font-weight:700; letter-spacing:0.14em; color:#7c3aed; text-transform:uppercase;">
+                  New Contact Form Submission
+                </p>
+
+                <h1 style="margin:0 0 20px; font-size:22px; font-weight:800; color:#0a0a0a; line-height:1.3;">
+                  ${subjectLabel}
+                </h1>
+
+                <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin: 0 0 24px;">
+                  <tr>
+                    <td style="padding: 4px 0; font-size:12px; color:#a1a1aa; width: 90px;">Name</td>
+                    <td style="padding: 4px 0; font-size:14px; color:#0a0a0a; font-weight:600;">${name}</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 4px 0; font-size:12px; color:#a1a1aa;">Email</td>
+                    <td style="padding: 4px 0; font-size:14px; color:#7c3aed;">${email}</td>
+                  </tr>
+                </table>
+
+                <div style="height:1px; background-color:#f0f0f2; margin: 0 0 20px;"></div>
+
+                <p style="margin:0 0 8px; font-size:12px; font-weight:700; letter-spacing:0.1em; color:#0a0a0a; text-transform:uppercase;">
+                  Message
+                </p>
+                <p style="margin:0; font-size:14px; line-height:1.7; color:#3f3f46; white-space:pre-wrap;">${message}</p>
+              </td>
+            </tr>
+
+            <tr>
+              <td style="background-color:#fafafa; padding: 20px 40px; text-align:center; border-top:1px solid #f0f0f2;">
+                <p style="margin:0; font-size:11px; color:#a1a1aa;">
+                  Reply directly to this email to respond to ${name}.
+                </p>
+              </td>
+            </tr>
+
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
+</html>
+    `,
+  });
+}
