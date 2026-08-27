@@ -11,6 +11,17 @@ import SizeGuideModal from "@/components/products/SizeGuideModal";
 import DeliveryEstimate from "@/components/products/DeliveryEstimate";
 import { parseProductDescription } from "@/lib/utils/parseDescription";
 
+// Same chest measurements shown on the /size-guide page — kept in sync
+// so the quick reference here always matches the full size chart.
+const CHEST_BY_SIZE: Record<string, number> = {
+  S: 38,
+  M: 40,
+  L: 42,
+  XL: 44,
+  XXL: 46,
+  XXXL: 48,
+};
+
 interface Variant {
   id: string;
   color: string;
@@ -321,9 +332,24 @@ export default function ProductInfo({
       {sizesForColor.length > 0 && (
         <div className="mt-7">
           <div className="mb-3 flex items-center justify-between">
-            <p className="text-sm font-semibold text-black">
-              Size: <span className="font-normal text-zinc-500">Select your size</span>
-            </p>
+            <div className="text-base">
+              <p className="font-semibold text-black">
+                {selectedSize ? (
+                  <>
+                    Selected Size: <span className="font-bold text-violet-600">{selectedSize}</span>
+                  </>
+                ) : (
+                  <>
+                    Size: <span className="font-normal text-zinc-500">Select your size</span>
+                  </>
+                )}
+              </p>
+              {selectedSize && CHEST_BY_SIZE[selectedSize] && (
+                <p className="mt-1 text-sm text-zinc-500">
+                  Chest/Bust {CHEST_BY_SIZE[selectedSize]} inch
+                </p>
+              )}
+            </div>
             <button
               onClick={() => setSizeGuideOpen(true)}
               className="flex items-center gap-1 text-xs font-semibold text-violet-600 hover:underline"
