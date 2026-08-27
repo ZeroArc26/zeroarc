@@ -24,6 +24,7 @@ const DEFAULT_COLORS = [
   { name: "Pink", hex: "#EC4899" },
   { name: "Dusky Pink", hex: "#C48A8A" },
   { name: "Maroon", hex: "#800000" },
+  { name: "Cream", hex: "#FFFDD0" },
 ];
 
 const DEFAULT_SIZES = [

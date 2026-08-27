@@ -81,6 +81,11 @@ export const adminNavItems: AdminNavItem[] = [
         href: "/admin/dashboard/pos",
         icon: ScanBarcode,
       },
+      {
+        title: "Manual Order (WhatsApp/Insta)",
+        href: "/admin/dashboard/orders/manual",
+        icon: ShoppingCart,
+      },
     ],
   },
 
