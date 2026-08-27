@@ -10,17 +10,7 @@ import { useWishlistStore } from "@/stores/wishlistStore";
 import SizeGuideModal from "@/components/products/SizeGuideModal";
 import DeliveryEstimate from "@/components/products/DeliveryEstimate";
 import { parseProductDescription } from "@/lib/utils/parseDescription";
-
-// Same chest measurements shown on the /size-guide page — kept in sync
-// so the quick reference here always matches the full size chart.
-const CHEST_BY_SIZE: Record<string, number> = {
-  S: 38,
-  M: 40,
-  L: 42,
-  XL: 44,
-  XXL: 46,
-  XXXL: 48,
-};
+import { getChestForSize } from "@/lib/constants/sizeCharts";
 
 interface Variant {
   id: string;
@@ -344,9 +334,9 @@ export default function ProductInfo({
                   </>
                 )}
               </p>
-              {selectedSize && CHEST_BY_SIZE[selectedSize] && (
+              {selectedSize && getChestForSize(selectedSize, product.basicInfo.fitType) && (
                 <p className="mt-1 text-sm text-zinc-500">
-                  Chest/Bust {CHEST_BY_SIZE[selectedSize]} inch
+                  Chest/Bust {getChestForSize(selectedSize, product.basicInfo.fitType)} inch
                 </p>
               )}
             </div>
@@ -491,7 +481,11 @@ export default function ProductInfo({
         <p className="mt-4 text-xs text-zinc-400">SKU: {activeVariant.sku}</p>
       )}
 
-      <SizeGuideModal open={sizeGuideOpen} onOpenChange={setSizeGuideOpen} />
+      <SizeGuideModal
+        open={sizeGuideOpen}
+        onOpenChange={setSizeGuideOpen}
+        defaultFit={product.basicInfo.fitType === "oversized" ? "Oversized" : "Regular"}
+      />
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import Image from "next/image";
 import { ChevronLeft, ChevronRight, Maximize2, X } from "lucide-react";
 
@@ -71,6 +72,11 @@ export default function ProductGallery({
 
   // Click-to-fullscreen (desktop + mobile)
   const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
     <div className="flex gap-5">
@@ -155,58 +161,66 @@ export default function ProductGallery({
         </div>
       </div>
 
-      {/* Fullscreen lightbox */}
-      {lightboxOpen && active && (
-        <div
-          onClick={() => setLightboxOpen(false)}
-          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-6"
-        >
-          <button
-            onClick={() => setLightboxOpen(false)}
-            aria-label="Close zoom"
-            className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-          >
-            <X className="h-5 w-5" />
-          </button>
-
-          {sorted.length > 1 && (
-            <>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goTo("prev");
-                }}
-                className="absolute left-6 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  goTo("next");
-                }}
-                className="absolute right-6 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
-            </>
-          )}
-
+      {/* Fullscreen lightbox — rendered via portal so it always paints
+          above everything, regardless of the sticky gallery wrapper's
+          stacking context (position:sticky creates its own stacking
+          context, which was letting the sibling color/size panel show
+          through on top of this modal). */}
+      {mounted &&
+        lightboxOpen &&
+        active &&
+        createPortal(
           <div
-            onClick={(e) => e.stopPropagation()}
-            className="relative h-full max-h-[85vh] w-full max-w-3xl"
+            onClick={() => setLightboxOpen(false)}
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 p-6"
           >
-            <Image
-              src={active.url}
-              alt={active.alt || "Product"}
-              fill
-              sizes="100vw"
-              className="object-contain"
-            />
-          </div>
-        </div>
-      )}
+            <button
+              onClick={() => setLightboxOpen(false)}
+              aria-label="Close zoom"
+              className="absolute right-6 top-6 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+            >
+              <X className="h-5 w-5" />
+            </button>
+
+            {sorted.length > 1 && (
+              <>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goTo("prev");
+                  }}
+                  className="absolute left-6 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                >
+                  <ChevronLeft className="h-6 w-6" />
+                </button>
+
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    goTo("next");
+                  }}
+                  className="absolute right-6 top-1/2 flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/10 text-white transition hover:bg-white/20"
+                >
+                  <ChevronRight className="h-6 w-6" />
+                </button>
+              </>
+            )}
+
+            <div
+              onClick={(e) => e.stopPropagation()}
+              className="relative h-full max-h-[85vh] w-full max-w-3xl"
+            >
+              <Image
+                src={active.url}
+                alt={active.alt || "Product"}
+                fill
+                sizes="100vw"
+                className="object-contain"
+              />
+            </div>
+          </div>,
+          document.body
+        )}
     </div>
   );
 }

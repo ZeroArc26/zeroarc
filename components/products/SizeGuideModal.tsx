@@ -10,20 +10,12 @@ import {
   DialogHeader,
   DialogTitle,
 } from "@/components/ui/dialog";
-
-const SIZE_CHART = [
-  { size: "S", chest: 38, length: 27, shoulder: 17, sleeve: 8, weight: "55-65 kg" },
-  { size: "M", chest: 40, length: 28, shoulder: 18, sleeve: 8.5, weight: "65-75 kg" },
-  { size: "L", chest: 42, length: 29, shoulder: 19, sleeve: 9, weight: "75-85 kg" },
-  { size: "XL", chest: 44, length: 30, shoulder: 20, sleeve: 9.5, weight: "85-95 kg" },
-  { size: "XXL", chest: 46, length: 31, shoulder: 21, sleeve: 10, weight: "95-110 kg" },
-  { size: "XXXL", chest: 48, length: 32, shoulder: 22, sleeve: 10.5, weight: "110-125 kg" },
-];
+import { SIZE_CHARTS } from "@/lib/constants/sizeCharts";
 
 // Same calculation as /size-guide's full calculator, kept in sync
 // intentionally — this modal is a quick in-context version of it.
 const WEIGHT_MIDPOINTS = [50, 60, 70, 80, 90, 102.5, 117.5];
-const SIZES = ["S", "M", "L", "XL", "XXL", "XXXL"];
+const SIZES = ["S", "M", "L", "XL", "XXL"];
 const HEIGHTS = [
   "4'10\"", "4'11\"", "5'0\"", "5'1\"", "5'2\"", "5'3\"", "5'4\"", "5'5\"",
   "5'6\"", "5'7\"", "5'8\"", "5'9\"", "5'10\"", "5'11\"", "6'0\"", "6'1\"",
@@ -74,20 +66,26 @@ function calculateSize(h: string, w: string, fit: string) {
 interface SizeGuideModalProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
+  defaultFit?: "Oversized" | "Regular";
 }
 
 export default function SizeGuideModal({
   open,
   onOpenChange,
+  defaultFit = "Oversized",
 }: SizeGuideModalProps) {
   const [height, setHeight] = useState("");
   const [weight, setWeight] = useState("");
-  const [fitPref, setFitPref] = useState("Oversized");
+  const [fitPref, setFitPref] = useState<string>(defaultFit);
   const [result, setResult] = useState<string | null>(null);
 
   useEffect(() => {
     setResult(calculateSize(height, weight, fitPref));
   }, [height, weight, fitPref]);
+
+  // The "Slim" calculator preference has no dedicated chart data yet —
+  // fall back to showing the Regular chart alongside it for now.
+  const activeChart = fitPref === "Oversized" ? SIZE_CHARTS.oversized : SIZE_CHARTS.regular;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -96,25 +94,28 @@ export default function SizeGuideModal({
           <DialogTitle className="text-black">Size Guide</DialogTitle>
         </DialogHeader>
 
+        <p className="text-xs font-semibold uppercase tracking-wide text-zinc-500">
+          Showing: {fitPref === "Oversized" ? "Oversized" : "Regular"} Fit chart
+          {" "}— change this in the calculator below.
+        </p>
+
         <div className="overflow-x-auto rounded-xl border border-zinc-200">
-          <table className="w-full min-w-[560px] text-sm">
+          <table className="w-full min-w-[420px] text-sm">
             <thead>
               <tr className="border-b border-zinc-200 bg-violet-50 text-left">
                 <th className="px-3 py-2.5 font-bold text-black">Size</th>
                 <th className="px-3 py-2.5 font-bold text-black">Chest (in)</th>
                 <th className="px-3 py-2.5 font-bold text-black">Length (in)</th>
                 <th className="px-3 py-2.5 font-bold text-black">Shoulder (in)</th>
-                <th className="px-3 py-2.5 font-bold text-black">Weight</th>
               </tr>
             </thead>
             <tbody>
-              {SIZE_CHART.map((row) => (
+              {activeChart.map((row) => (
                 <tr key={row.size} className="border-b border-zinc-100 last:border-0">
                   <td className="px-3 py-2.5 font-bold text-black">{row.size}</td>
                   <td className="px-3 py-2.5 text-zinc-600">{row.chest}</td>
                   <td className="px-3 py-2.5 text-zinc-600">{row.length}</td>
                   <td className="px-3 py-2.5 text-zinc-600">{row.shoulder}</td>
-                  <td className="px-3 py-2.5 text-zinc-600">{row.weight}</td>
                 </tr>
               ))}
             </tbody>

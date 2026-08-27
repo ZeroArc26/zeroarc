@@ -18,15 +18,7 @@ import AnnouncementBar from "@/components/home/AnnouncementBar";
 import Navbar from "@/components/home/Navbar";
 import Newsletter from "@/components/home/Newsletter";
 import Footer from "@/components/layout/Footer";
-
-const SIZE_CHART = [
-  { size: "S", chest: 38, length: 27, shoulder: 17, sleeve: 8, weight: "55-65 kg" },
-  { size: "M", chest: 40, length: 28, shoulder: 18, sleeve: 8.5, weight: "65-75 kg" },
-  { size: "L", chest: 42, length: 29, shoulder: 19, sleeve: 9, weight: "75-85 kg" },
-  { size: "XL", chest: 44, length: 30, shoulder: 20, sleeve: 9.5, weight: "85-95 kg" },
-  { size: "XXL", chest: 46, length: 31, shoulder: 21, sleeve: 10, weight: "95-110 kg" },
-  { size: "XXXL", chest: 48, length: 32, shoulder: 22, sleeve: 10.5, weight: "110-125 kg" },
-];
+import { SIZE_CHARTS } from "@/lib/constants/sizeCharts";
 
 // Midpoint of each size's weight band, used for nearest-match calculation.
 const WEIGHT_MIDPOINTS = [50, 60, 70, 80, 90, 102.5, 117.5];
@@ -215,34 +207,36 @@ export default function SizeGuidePage() {
 
         {/* Size Chart */}
         <div className="mb-10 rounded-2xl border border-zinc-200 p-6">
-          <h2 className="mb-5 flex items-center gap-2 font-bold text-black">
+          <h2 className="mb-1 flex items-center gap-2 font-bold text-black">
             <Layers className="h-4 w-4 text-violet-600" />
             Size Chart (In Inches)
           </h2>
+          <p className="mb-5 text-xs font-semibold uppercase tracking-wide text-zinc-500">
+            Showing: {fitPref === "Oversized" ? "Oversized" : "Regular"} Fit
+            {" "}— change this in the calculator below.
+          </p>
 
           <div className="overflow-x-auto">
-            <table className="w-full min-w-[600px] text-sm">
+            <table className="w-full min-w-[420px] text-sm">
               <thead>
                 <tr className="border-b border-zinc-200 bg-violet-50 text-left">
                   <th className="px-4 py-3 font-bold text-black">Size</th>
                   <th className="px-4 py-3 font-bold text-black">Chest (in)</th>
                   <th className="px-4 py-3 font-bold text-black">Length (in)</th>
                   <th className="px-4 py-3 font-bold text-black">Shoulder (in)</th>
-                  <th className="px-4 py-3 font-bold text-black">Sleeve Length (in)</th>
-                  <th className="px-4 py-3 font-bold text-black">Recommended Weight</th>
                 </tr>
               </thead>
               <tbody>
-                {SIZE_CHART.map((row) => (
-                  <tr key={row.size} className="border-b border-zinc-100 last:border-0">
-                    <td className="px-4 py-3 font-bold text-black">{row.size}</td>
-                    <td className="px-4 py-3 text-zinc-600">{row.chest}</td>
-                    <td className="px-4 py-3 text-zinc-600">{row.length}</td>
-                    <td className="px-4 py-3 text-zinc-600">{row.shoulder}</td>
-                    <td className="px-4 py-3 text-zinc-600">{row.sleeve}</td>
-                    <td className="px-4 py-3 text-zinc-600">{row.weight}</td>
-                  </tr>
-                ))}
+                {(fitPref === "Oversized" ? SIZE_CHARTS.oversized : SIZE_CHARTS.regular).map(
+                  (row) => (
+                    <tr key={row.size} className="border-b border-zinc-100 last:border-0">
+                      <td className="px-4 py-3 font-bold text-black">{row.size}</td>
+                      <td className="px-4 py-3 text-zinc-600">{row.chest}</td>
+                      <td className="px-4 py-3 text-zinc-600">{row.length}</td>
+                      <td className="px-4 py-3 text-zinc-600">{row.shoulder}</td>
+                    </tr>
+                  )
+                )}
               </tbody>
             </table>
           </div>
