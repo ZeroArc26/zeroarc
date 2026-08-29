@@ -11,7 +11,16 @@ import Reveal from "@/components/motion/Reveal";
 // images, laid out side by side in one row, in this exact order.
 const FEATURED_SLUGS = ["arc-graphics", "arc-anime", "arc-gaming"];
 
-async function getPreviewProducts(tag: string) {
+interface PreviewProduct {
+  _id: string;
+  basicInfo: { title: string; slug: string };
+  pricing: { sellingPrice: number };
+  images?: { url: string; alt?: string }[];
+  reviewCount?: number;
+  averageRating?: number;
+}
+
+async function getPreviewProducts(tag: string): Promise<PreviewProduct[]> {
   await connectDB();
 
   const raw = await Product.find({
@@ -31,7 +40,7 @@ export default async function ExploreCollections() {
     COLLECTIONS.find((col) => col.slug === slug)
   ).filter((col): col is (typeof COLLECTIONS)[number] => Boolean(col));
 
-  const productsByCollection: Record<string, any[]> = {};
+  const productsByCollection: Record<string, Awaited<ReturnType<typeof getPreviewProducts>>> = {};
   for (const col of featuredCollections) {
     productsByCollection[col.slug] = await getPreviewProducts(col.tag);
   }

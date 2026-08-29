@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
 import { Search, Upload, Trash2, Loader2, X } from "lucide-react";
@@ -39,6 +39,9 @@ export default function ManualOrderForm() {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [results, setResults] = useState<SearchProduct[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const searchWrapperRef = useRef<HTMLDivElement>(null);
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const [lines, setLines] = useState<OrderLine[]>([]);
 
@@ -54,29 +57,68 @@ export default function ManualOrderForm() {
   const [notes, setNotes] = useState("");
   const [submitting, setSubmitting] = useState(false);
 
-  async function searchProducts() {
+  async function searchProducts(showErrors: boolean) {
+    if (!query.trim()) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
     setSearching(true);
     try {
       const res = await fetch(`/api/admin/manual-order/search-products?q=${encodeURIComponent(query)}`);
       const data = await res.json();
       if (data.success) {
         setResults(data.products);
-        if (data.products.length === 0) {
+        setShowDropdown(true);
+        if (showErrors && data.products.length === 0) {
           toast.error("No active product found matching that name.");
         }
-      } else {
+      } else if (showErrors) {
         toast.error(data.message || "Search failed.");
       }
     } catch {
-      toast.error("Search failed. Check your connection.");
+      if (showErrors) toast.error("Search failed. Check your connection.");
     } finally {
       setSearching(false);
     }
   }
 
+  // Live search: re-search automatically as the admin types, with a short
+  // debounce so it doesn't fire on every keystroke.
+  useEffect(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+
+    if (!query.trim()) {
+      setResults([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    debounceRef.current = setTimeout(() => {
+      searchProducts(false); // silent — no toasts while the admin is still typing
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) clearTimeout(debounceRef.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [query]);
+
+  // Close the dropdown when clicking outside it.
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (searchWrapperRef.current && !searchWrapperRef.current.contains(e.target as Node)) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   function addLine(product: SearchProduct) {
     const firstVariant = product.variants[0];
-    const key = `${product._id}-${Date.now()}`;
+    const key = `${product._id}-${crypto.randomUUID()}`;
     setLines((prev) => [
       ...prev,
       {
@@ -92,6 +134,7 @@ export default function ManualOrderForm() {
     ]);
     setResults([]);
     setQuery("");
+    setShowDropdown(false);
   }
 
   function updateLine(key: string, patch: Partial<OrderLine>) {
@@ -181,43 +224,58 @@ export default function ManualOrderForm() {
         {/* Product search */}
         <div className="rounded-2xl border border-zinc-800 bg-zinc-900 p-5">
           <h3 className="mb-3 font-bold text-white">Add Product</h3>
-          <div className="flex gap-2">
-            <input
-              value={query}
-              onChange={(e) => setQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && searchProducts()}
-              placeholder="Search product by name..."
-              className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none focus:border-violet-500"
-            />
-            <button
-              onClick={searchProducts}
-              disabled={searching}
-              className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-500"
-            >
-              {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
-              Search
-            </button>
-          </div>
-
-          {results.length > 0 && (
-            <div className="mt-3 space-y-2">
-              {results.map((p) => (
-                <button
-                  key={p._id}
-                  onClick={() => addLine(p)}
-                  className="flex w-full items-center gap-3 rounded-xl border border-zinc-800 p-2.5 text-left hover:bg-zinc-800"
-                >
-                  {p.image && (
-                    <img src={p.image} alt={p.title} className="h-12 w-12 rounded-lg object-cover" />
-                  )}
-                  <div>
-                    <p className="text-sm font-semibold text-white">{p.title}</p>
-                    <p className="text-xs text-zinc-400">₹{p.sellingPrice}</p>
-                  </div>
-                </button>
-              ))}
+          <div ref={searchWrapperRef} className="relative">
+            <div className="flex gap-2">
+              <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                onFocus={() => query.trim() && setShowDropdown(true)}
+                onKeyDown={(e) => e.key === "Enter" && searchProducts(true)}
+                placeholder="Search product by name..."
+                className="flex-1 rounded-xl border border-zinc-800 bg-zinc-950 px-4 py-2.5 text-sm text-white placeholder-zinc-500 outline-none focus:border-violet-500"
+              />
+              <button
+                onClick={() => searchProducts(true)}
+                disabled={searching}
+                className="flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-500"
+              >
+                {searching ? <Loader2 className="h-4 w-4 animate-spin" /> : <Search className="h-4 w-4" />}
+                Search
+              </button>
             </div>
-          )}
+
+            {showDropdown && (
+              <div className="absolute left-0 right-0 top-full z-20 mt-2 max-h-72 overflow-y-auto rounded-xl border border-zinc-800 bg-zinc-950 p-2 shadow-2xl">
+                {searching ? (
+                  <div className="flex items-center justify-center gap-2 py-4 text-sm text-zinc-400">
+                    <Loader2 className="h-4 w-4 animate-spin" /> Searching...
+                  </div>
+                ) : results.length > 0 ? (
+                  <div className="space-y-1">
+                    {results.map((p) => (
+                      <button
+                        key={p._id}
+                        onClick={() => addLine(p)}
+                        className="flex w-full items-center gap-3 rounded-xl p-2.5 text-left hover:bg-zinc-800"
+                      >
+                        {p.image && (
+                          <img src={p.image} alt={p.title} className="h-12 w-12 rounded-lg object-cover" />
+                        )}
+                        <div>
+                          <p className="text-sm font-semibold text-white">{p.title}</p>
+                          <p className="text-xs text-zinc-400">₹{p.sellingPrice}</p>
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="py-4 text-center text-sm text-zinc-500">
+                    No active product found matching that name.
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Order lines */}
@@ -427,7 +485,7 @@ export default function ManualOrderForm() {
 
         <p className="text-[11px] text-zinc-400">
           Stock is decremented immediately. Invoice and shipping label can be
-          generated from the order's detail page after it's created — same
+          generated from the order&apos;s detail page after it&apos;s created — same
           as any online order.
         </p>
       </div>

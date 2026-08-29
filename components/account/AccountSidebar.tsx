@@ -16,6 +16,7 @@ import {
   Gift,
   HelpCircle,
   LogOut,
+  Ticket,
 } from "lucide-react";
 
 const MAIN_LINKS = [
@@ -29,6 +30,7 @@ const MAIN_LINKS = [
 ];
 
 const MORE_LINKS = [
+  { label: "My Tickets", href: "/account/tickets", icon: Ticket },
   { label: "Refer & Earn", href: "/account/refer", icon: Gift },
   { label: "Help & Support", href: "/contact", icon: HelpCircle },
 ];

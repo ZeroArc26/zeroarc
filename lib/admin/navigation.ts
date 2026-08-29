@@ -97,6 +97,20 @@ export const adminNavItems: AdminNavItem[] = [
   },
 
   {
+    title: "Live Chat",
+    href: "/admin/dashboard/chat",
+    icon: MessageSquare,
+    section: "INSIGHTS",
+  },
+
+  {
+    title: "Support Tickets",
+    href: "/admin/dashboard/tickets",
+    icon: Ticket,
+    section: "INSIGHTS",
+  },
+
+  {
     title: "Testimonials",
     href: "/admin/dashboard/testimonials",
     icon: MessageSquare,
