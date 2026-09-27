@@ -6,6 +6,7 @@ import Product from "@/models/Product";
 import Customer from "@/models/Customer";
 import { requireAdmin } from "@/lib/auth/admin";
 import { getStoreSettings } from "@/lib/settings";
+import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
 
 function generateOrderNumber() {
   const timestamp = Date.now().toString().slice(-8);
@@ -127,8 +128,19 @@ export async function POST(request: Request) {
       const variant = productDoc.variants.find(
         (v: any) => v.color === item.color && v.size === item.size
       );
+      const previousStock = variant.stock;
       variant.stock = Math.max(variant.stock - item.quantity, 0);
       await productDoc.save();
+
+      const threshold = productDoc.inventory?.lowStockThreshold ?? 5;
+      if (previousStock > threshold && variant.stock <= threshold) {
+        await createAdminNotification({
+          type: "low_stock",
+          title: "Low Stock",
+          message: `${productDoc.basicInfo?.title} (${item.color}/${item.size}) — only ${variant.stock} left`,
+          link: `/admin/dashboard/products/${productDoc._id}/edit`,
+        });
+      }
     }
 
     const orderItems = items.map((item, i) => {

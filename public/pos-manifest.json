@@ -1,0 +1,25 @@
+{
+  "name": "ZeroArc POS",
+  "short_name": "ZA POS",
+  "description": "Scan a barcode, complete a sale, print the invoice.",
+  "start_url": "/admin/pos-mobile",
+  "scope": "/admin/pos-mobile",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#09090b",
+  "theme_color": "#7c3aed",
+  "icons": [
+    {
+      "src": "/icons/pos-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/pos-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

@@ -7,6 +7,7 @@ import { getCurrentUser } from "@/lib/auth";
 import { pusherServer } from "@/lib/pusher/server";
 import { generateAutoReply } from "@/lib/ai/ruleBasedChatBot";
 import { raiseSupportTicket } from "@/lib/chat/raiseSupportTicket";
+import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
 
 export async function POST(request: Request) {
   try {
@@ -42,12 +43,29 @@ export async function POST(request: Request) {
       );
     }
 
+    // Was this the customer's first real message in this conversation?
+    // (the auto-greeting doesn't count, it's sender "ai".) Check before
+    // creating this message so the count doesn't include itself.
+    const priorCustomerMessageCount = await ChatMessage.countDocuments({
+      conversationId,
+      sender: "customer",
+    });
+
     const message = await ChatMessage.create({
       conversationId,
       sender: "customer",
       senderName: currentUser.fullName || "Customer",
       text: text.trim(),
     });
+
+    if (priorCustomerMessageCount === 0) {
+      await createAdminNotification({
+        type: "chat",
+        title: "New Live Chat",
+        message: `${currentUser.fullName || "A customer"}: "${text.trim().slice(0, 60)}"`,
+        link: `/admin/dashboard/chat`,
+      });
+    }
 
     conversation.lastMessage = text.trim();
     conversation.lastMessageAt = new Date();

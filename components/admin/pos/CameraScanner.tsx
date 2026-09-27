@@ -18,8 +18,24 @@ export default function CameraScanner({ onScan, onClose }: CameraScannerProps) {
     let stopped = false;
     let controls: { stop: () => void } | null = null;
 
+    // Explicitly request the REAR camera (mobile browsers otherwise
+    // often default to the front/selfie camera, which obviously can't
+    // focus on a barcode) plus a decent resolution + continuous
+    // autofocus, since low-res/front-camera streams are the #1 reason
+    // barcode scanning "doesn't work" on phones.
+    const constraints: MediaStreamConstraints = {
+      video: {
+        facingMode: { ideal: "environment" },
+        width: { ideal: 1280 },
+        height: { ideal: 720 },
+        // Not all browsers support this, but Chrome on Android does —
+        // harmless no-op elsewhere.
+        advanced: [{ focusMode: "continuous" } as unknown as MediaTrackConstraintSet],
+      },
+    };
+
     codeReader
-      .decodeFromVideoDevice(undefined, videoRef.current!, (result, err, ctrls) => {
+      .decodeFromConstraints(constraints, videoRef.current!, (result, err, ctrls) => {
         controls = ctrls;
         if (result && !stopped) {
           stopped = true;
@@ -29,7 +45,7 @@ export default function CameraScanner({ onScan, onClose }: CameraScannerProps) {
       })
       .catch((err) => {
         console.error("Camera scan error:", err);
-        setError("Could not access the camera. Check browser permissions.");
+        setError("Could not access the rear camera. Check browser permissions.");
       });
 
     return () => {

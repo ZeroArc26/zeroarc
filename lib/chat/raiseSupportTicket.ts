@@ -2,6 +2,7 @@ import Conversation from "@/models/Conversation";
 import ChatMessage from "@/models/ChatMessage";
 import SupportTicket from "@/models/SupportTicket";
 import { pusherServer } from "@/lib/pusher/server";
+import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
 
 function generateTicketNumber() {
   const timestamp = Date.now().toString().slice(-6);
@@ -153,6 +154,13 @@ export async function raiseSupportTicket(
       text: m.text,
       createdAt: m.createdAt,
     })),
+  });
+
+  await createAdminNotification({
+    type: "ticket",
+    title: "New Support Ticket",
+    message: `#${ticket.ticketNumber} — ${mainProblem}`,
+    link: `/admin/dashboard/tickets`,
   });
 
   const confirmationText = `Got it! I've raised support ticket #${ticket.ticketNumber} for you — our team will follow up on the ticket. You can reference this number anytime. Starting a new chat here will begin a fresh conversation.`;

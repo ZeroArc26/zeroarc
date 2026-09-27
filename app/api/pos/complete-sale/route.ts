@@ -5,6 +5,7 @@ import Order from "@/models/Order";
 import Product from "@/models/Product";
 import Customer from "@/models/Customer";
 import { requireAdmin } from "@/lib/auth/admin";
+import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
 
 function generateOrderNumber() {
   const timestamp = Date.now().toString().slice(-8);
@@ -98,7 +99,8 @@ export async function POST(request: Request) {
     }
 
     // ------------------------------------------------------------
-    // Decrement stock for every line item.
+    // Decrement stock for every line item, and flag anything that
+    // just crossed below its low-stock threshold for the first time.
     // ------------------------------------------------------------
     for (let i = 0; i < items.length; i++) {
       const item = items[i];
@@ -108,8 +110,19 @@ export async function POST(request: Request) {
         (v: { color: string; size: string }) => v.color === item.color && v.size === item.size
       );
 
+      const previousStock = variant.stock;
       variant.stock = Math.max(variant.stock - item.quantity, 0);
       await productDoc.save();
+
+      const threshold = productDoc.inventory?.lowStockThreshold ?? 5;
+      if (previousStock > threshold && variant.stock <= threshold) {
+        await createAdminNotification({
+          type: "low_stock",
+          title: "Low Stock",
+          message: `${productDoc.basicInfo?.title} (${item.color}/${item.size}) — only ${variant.stock} left`,
+          link: `/admin/dashboard/products/${productDoc._id}/edit`,
+        });
+      }
     }
 
     // ------------------------------------------------------------
@@ -203,6 +216,13 @@ export async function POST(request: Request) {
     };
 
     const order = await Order.create(orderDoc);
+
+    await createAdminNotification({
+      type: "order",
+      title: "New Order (POS)",
+      message: `Order ${order.orderInfo.orderNumber} — in-store sale, ₹${order.pricing.grandTotal}`,
+      link: `/admin/dashboard/orders/${order._id}`,
+    });
 
     // Best-effort Customer sync (mirrors the online checkout route) —
     // never blocks the sale if it fails.

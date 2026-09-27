@@ -1,4 +1,5 @@
 import LiveChatWidget from "@/components/chat/LiveChatWidget";
+import TicketNotifier from "@/components/chat/TicketNotifier";
 
 export default function StoreLayout({
   children,
@@ -9,6 +10,7 @@ export default function StoreLayout({
     <>
       {children}
       <LiveChatWidget />
+      <TicketNotifier />
     </>
   );
 }

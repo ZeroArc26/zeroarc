@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Dropdown from "@/components/ui/dropdown/Dropdown";
-import NotificationDropdown from "@/components/admin/NotificationDropdown";
+import NotificationBell from "@/components/admin/NotificationBell";
 import ProfileDropdown from "@/components/admin/ProfileDropdown";
 import useCurrentAdmin from "@/hooks/useCurrentAdmin";
 
@@ -179,19 +179,7 @@ useEffect(() => {
 
   </div>
 
-  <Dropdown
-  trigger={
-    <div className="relative rounded-2xl border border-zinc-700 bg-zinc-900 p-3 transition hover:border-violet-500">
-      🔔
-
-      <span className="absolute -right-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-[10px] font-bold text-white">
-        4
-      </span>
-    </div>
-  }
->
-  <NotificationDropdown />
-</Dropdown>
+  <NotificationBell />
 
   <Dropdown
   trigger={

@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import SupportTicket from "@/models/SupportTicket";
 import { getCurrentUser } from "@/lib/auth";
 import { pusherServer } from "@/lib/pusher/server";
+import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -55,6 +56,13 @@ export async function POST(request: Request, { params }: RouteParams) {
     await pusherServer.trigger("admin-tickets", "ticket-followup", {
       ticketId: id,
       ticketNumber: ticket.ticketNumber,
+    });
+
+    await createAdminNotification({
+      type: "ticket",
+      title: "Ticket Follow-up",
+      message: `#${ticket.ticketNumber} — ${currentUser.fullName || "Customer"} added: "${text.trim().slice(0, 60)}"`,
+      link: `/admin/dashboard/tickets`,
     });
 
     return NextResponse.json({ success: true, reply });

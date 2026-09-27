@@ -45,9 +45,18 @@ export async function POST(request: Request, { params }: RouteParams) {
     if (ticket.status === "open") {
       ticket.status = "in_progress";
     }
+    ticket.hasUnreadReply = true;
     await ticket.save();
 
     await pusherServer.trigger(`ticket-${id}`, "new-reply", reply);
+    // Also notify this specific customer on a channel they're always
+    // subscribed to (regardless of which page they're on), so they
+    // see a toast even if they're not on the tickets page right now.
+    await pusherServer.trigger(`customer-${ticket.userId}`, "ticket-reply", {
+      ticketId: id,
+      ticketNumber: ticket.ticketNumber,
+      text: reply.text,
+    });
 
     return NextResponse.json({ success: true, reply });
   } catch (error: unknown) {

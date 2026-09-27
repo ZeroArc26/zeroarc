@@ -7,6 +7,7 @@ import Customer from "@/models/Customer";
 import { getCurrentUser } from "@/lib/auth";
 import mongoose from "mongoose";
 import { getStoreSettings } from "@/lib/settings";
+import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
 
 // ======================
 // Helpers
@@ -196,6 +197,13 @@ export async function POST(req: Request) {
     };
 
     const order = await Order.create(orderDoc);
+
+    await createAdminNotification({
+      type: "order",
+      title: "New Order",
+      message: `Order ${order.orderInfo.orderNumber} received — ₹${order.pricing.grandTotal}`,
+      link: `/admin/dashboard/orders/${order._id}`,
+    });
 
     // ------------------------------------------------------------
     // Sync the Customer collection. If the shopper is logged in,

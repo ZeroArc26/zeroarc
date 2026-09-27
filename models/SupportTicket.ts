@@ -66,6 +66,15 @@ const SupportTicketSchema = new Schema(
       enum: ["open", "in_progress", "resolved"],
       default: "open",
     },
+
+    // Set true whenever admin adds a reply, cleared once the customer
+    // has been shown/notified about it (even if they weren't on the
+    // site at the time — this lets a "you have a new reply" toast
+    // surface the next time they visit, not just in real-time).
+    hasUnreadReply: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     timestamps: true,

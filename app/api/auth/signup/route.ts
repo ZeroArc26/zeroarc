@@ -6,6 +6,7 @@ import User from "@/models/User";
 import { hashPassword } from "@/lib/auth/password";
 import { signUserToken } from "@/lib/auth/jwt";
 import { setUserCookie } from "@/lib/auth/cookies";
+import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
 
 export async function POST(req: Request) {
   try {
@@ -37,6 +38,13 @@ export async function POST(req: Request) {
       fullName,
       email: email.toLowerCase(),
       password: hashedPassword,
+    });
+
+    await createAdminNotification({
+      type: "customer",
+      title: "New Customer",
+      message: `${user.fullName} joined ZeroArc`,
+      link: `/admin/dashboard/customers`,
     });
 
     const token = signUserToken({
