@@ -80,6 +80,7 @@ export default function MobilePOS({ adminName }: { adminName?: string }) {
   const [completedSale, setCompletedSale] = useState<CompletedSale | null>(null);
 
   const barcodeInputRef = useRef<HTMLInputElement>(null);
+  const autoScanTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if ("serviceWorker" in navigator) {
@@ -87,6 +88,26 @@ export default function MobilePOS({ adminName }: { adminName?: string }) {
     }
     barcodeInputRef.current?.focus();
   }, []);
+
+  // Auto-detect safety net: most Bluetooth/USB scanners send an Enter
+  // keystroke after the barcode (already handled by onKeyDown below),
+  // but some budget ones don't. Since a scanner "types" a full
+  // barcode near-instantly (unlike a human), if the field goes quiet
+  // for 300ms right after being filled, treat that as "done scanning"
+  // and look it up automatically — no Enter required.
+  useEffect(() => {
+    if (autoScanTimer.current) clearTimeout(autoScanTimer.current);
+    if (!barcodeInput.trim()) return;
+
+    autoScanTimer.current = setTimeout(() => {
+      lookupBarcode(barcodeInput);
+    }, 300);
+
+    return () => {
+      if (autoScanTimer.current) clearTimeout(autoScanTimer.current);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [barcodeInput]);
 
   async function lookupBarcode(code: string) {
     const trimmed = code.trim();
@@ -152,6 +173,11 @@ export default function MobilePOS({ adminName }: { adminName?: string }) {
 
     setPendingProduct(null);
     toast.success(`Added ${pendingProduct.title}`);
+    // Refocus the barcode field so a Bluetooth/USB scanner (which
+    // just "types" into whatever has focus) can keep scanning the
+    // next item back-to-back, without the cashier needing to tap
+    // the field again after the color/size buttons stole focus.
+    setTimeout(() => barcodeInputRef.current?.focus(), 50);
   }
 
   function removeLine(key: string) {
@@ -498,7 +524,10 @@ export default function MobilePOS({ adminName }: { adminName?: string }) {
 
             <div className="flex gap-2">
               <button
-                onClick={() => setPendingProduct(null)}
+                onClick={() => {
+                  setPendingProduct(null);
+                  setTimeout(() => barcodeInputRef.current?.focus(), 50);
+                }}
                 className="flex-1 rounded-2xl border border-zinc-700 py-3.5 font-bold"
               >
                 Cancel
