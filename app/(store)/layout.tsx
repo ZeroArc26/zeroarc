@@ -1,5 +1,7 @@
 import LiveChatWidget from "@/components/chat/LiveChatWidget";
+import WhatsAppFloatButton from "@/components/layout/WhatsAppFloatButton";
 import TicketNotifier from "@/components/chat/TicketNotifier";
+
 
 export default function StoreLayout({
   children,
@@ -10,6 +12,7 @@ export default function StoreLayout({
     <>
       {children}
       <LiveChatWidget />
+      <WhatsAppFloatButton />
       <TicketNotifier />
     </>
   );

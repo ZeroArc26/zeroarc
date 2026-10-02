@@ -11,6 +11,7 @@ export async function GET() {
       store: {
         name: settings.store?.name,
         tagline: settings.store?.tagline,
+        phone: settings.store?.phone,
       },
     });
   } catch (error) {
