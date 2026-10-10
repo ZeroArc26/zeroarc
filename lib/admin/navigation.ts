@@ -10,6 +10,7 @@ import {
   MessageSquare,
   Settings,
   ScanBarcode,
+  RotateCcw,
   type LucideIcon,
 } from "lucide-react";
 
@@ -93,6 +94,13 @@ export const adminNavItems: AdminNavItem[] = [
     title: "Analytics",
     href: "/admin/dashboard/analytics",
     icon: BarChart3,
+    section: "INSIGHTS",
+  },
+
+  {
+    title: "Returns",
+    href: "/admin/dashboard/returns",
+    icon: RotateCcw,
     section: "INSIGHTS",
   },
 
