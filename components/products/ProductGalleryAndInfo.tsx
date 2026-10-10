@@ -5,6 +5,7 @@ import { useState } from "react";
 import ProductGallery from "@/components/products/ProductGallery";
 import ProductFeatures from "@/components/products/ProductFeatures";
 import ProductInfo from "@/components/products/ProductInfo";
+import Reveal from "@/components/motion/Reveal";
 
 interface ProductGalleryAndInfoProps {
   product: any;
@@ -30,18 +31,20 @@ export default function ProductGalleryAndInfo({
 
   return (
     <>
-      <div className="sticky top-20">
+      <Reveal trigger="mount" className="sticky top-20">
         <ProductGallery images={product.images} selectedColor={selectedColor} />
         <ProductFeatures />
-      </div>
+      </Reveal>
 
-      <ProductInfo
-        product={product}
-        selectedColor={selectedColor}
-        onColorChange={setSelectedColor}
-        recentPurchaseCount={recentPurchaseCount}
-        lowestPriceLast30Days={lowestPriceLast30Days}
-      />
+      <Reveal trigger="mount" delay={0.1}>
+        <ProductInfo
+          product={product}
+          selectedColor={selectedColor}
+          onColorChange={setSelectedColor}
+          recentPurchaseCount={recentPurchaseCount}
+          lowestPriceLast30Days={lowestPriceLast30Days}
+        />
+      </Reveal>
     </>
   );
 }

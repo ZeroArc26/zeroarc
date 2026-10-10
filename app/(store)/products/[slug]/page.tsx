@@ -11,6 +11,7 @@ import ProductTabs from "@/components/products/ProductTabs";
 import ProductPromoBanner from "@/components/products/ProductPromoBanner";
 import ProductReviews from "@/components/products/ProductReviews";
 import RelatedProducts from "@/components/products/RelatedProducts";
+import Reveal from "@/components/motion/Reveal";
 
 import connectDB from "@/lib/mongodb";
 import Product from "@/models/Product";
@@ -120,14 +121,18 @@ export default async function ProductPage({ params }: ProductPageProps) {
           />
         </div>
 
-        <div className="mt-16 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px]">
+        <Reveal className="mt-16 grid grid-cols-1 items-start gap-8 lg:grid-cols-[1fr_320px]">
           <ProductTabs description={product.basicInfo.description} />
           <ProductPromoBanner />
-        </div>
+        </Reveal>
 
-        <ProductReviews productId={product._id} />
+        <Reveal>
+          <ProductReviews productId={product._id} />
+        </Reveal>
 
-        <RelatedProducts products={relatedProducts} />
+        <Reveal>
+          <RelatedProducts products={relatedProducts} />
+        </Reveal>
       </div>
 
       <Newsletter />
