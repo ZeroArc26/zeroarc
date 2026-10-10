@@ -7,7 +7,7 @@ import Customer from "@/models/Customer";
 import { getCurrentUser } from "@/lib/auth";
 import mongoose from "mongoose";
 import { getStoreSettings } from "@/lib/settings";
-import { createAdminNotification } from "@/lib/notifications/createAdminNotification";
+import { sendOrderConfirmationEmail } from "@/lib/email";
 
 // ======================
 // Helpers
@@ -198,12 +198,33 @@ export async function POST(req: Request) {
 
     const order = await Order.create(orderDoc);
 
-    await createAdminNotification({
-      type: "order",
-      title: "New Order",
-      message: `Order ${order.orderInfo.orderNumber} received — ₹${order.pricing.grandTotal}`,
-      link: `/admin/dashboard/orders/${order._id}`,
-    });
+    // Order confirmation email — never blocks order creation if it
+    // fails (e.g. guest checkout with no email, or Resend hiccup).
+    try {
+      if (customer?.email) {
+        await sendOrderConfirmationEmail({
+          to: customer.email,
+          customerName: fullName || "Customer",
+          orderNumber: order.orderInfo.orderNumber,
+          orderId: order._id.toString(),
+          items: items.map((item: { name: string; image?: string; color?: string; size?: string; quantity: number; totalAmount: number }) => ({
+            name: item.name,
+            image: item.image,
+            color: item.color,
+            size: item.size,
+            quantity: item.quantity,
+            totalAmount: item.totalAmount,
+          })),
+          subtotal,
+          shippingCharge: 0,
+          grandTotal,
+          shippingAddress: orderDoc.customer.shippingAddress,
+          paymentMethod: orderDoc.payment.method,
+        });
+      }
+    } catch (emailError) {
+      console.error("ORDER CONFIRMATION EMAIL ERROR:", emailError);
+    }
 
     // ------------------------------------------------------------
     // Sync the Customer collection. If the shopper is logged in,
