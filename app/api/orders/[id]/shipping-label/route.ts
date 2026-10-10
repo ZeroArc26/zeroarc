@@ -8,6 +8,7 @@ import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import ShippingLabelDocument from "@/lib/pdf/ShippingLabelDocument";
 import { getStoreSettings } from "@/lib/settings";
+import { requireAdmin } from "@/lib/auth/admin";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -49,6 +50,7 @@ function loadDelhiveryLogoDataUrl() {
 
 export async function GET(request: Request, { params }: RouteParams) {
   try {
+    await requireAdmin();
     await connectDB();
 
     const { id } = await params;
@@ -141,7 +143,10 @@ export async function GET(request: Request, { params }: RouteParams) {
       },
     });
   } catch (error) {
-    console.error(error);
+  if (error instanceof Error && error.message === "Unauthorized") {
+    return NextResponse.json({ success: false, message: "Unauthorized." }, { status: 401 });
+  }
+  console.error(error);
 
     return NextResponse.json(
       { success: false, message: "Failed to generate shipping label." },

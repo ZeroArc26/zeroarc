@@ -4,6 +4,7 @@ import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import { getStoreSettings } from "@/lib/settings";
 import { createDelhiveryShipment } from "@/lib/delhivery";
+import { requireAdmin } from "@/lib/auth/admin";
 
 interface RouteParams {
   params: Promise<{ id: string }>;
@@ -50,6 +51,7 @@ function estimatePackage(itemCount: number) {
 
 export async function POST(request: Request, { params }: RouteParams) {
   try {
+    await requireAdmin();
     await connectDB();
 
     const { id } = await params;
@@ -61,6 +63,15 @@ export async function POST(request: Request, { params }: RouteParams) {
         { success: false, message: "Order not found." },
         { status: 404 }
       );
+    }
+
+    // Don't create a duplicate shipment at Delhivery if a real AWB exists.
+    if (
+      order.shippingLabel?.awbNumber &&
+      !order.shippingLabel?.isProvisionalAwb &&
+      order.shippingLabel?.courierPartner === "Delhivery"
+    ) {
+      return NextResponse.json({ success: true, order });
     }
 
     const settings = await getStoreSettings();
@@ -158,6 +169,12 @@ export async function POST(request: Request, { params }: RouteParams) {
         : undefined,
     });
   } catch (error) {
+    if (error instanceof Error && error.message === "Unauthorized") {
+      return NextResponse.json(
+        { success: false, message: "Unauthorized." },
+        { status: 401 }
+      );
+    }
     console.error(error);
 
     return NextResponse.json(

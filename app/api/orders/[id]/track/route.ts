@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
 import { trackDelhiveryShipment } from "@/lib/delhivery";
+import { syncOrderWithDelhivery } from "@/lib/delhiverySync";
 import { getCurrentUser } from "@/lib/auth";
 import { getAdminCookie } from "@/lib/auth/cookies";
 import { verifyAdminToken } from "@/lib/auth/jwt";
@@ -62,6 +63,16 @@ export async function GET(request: Request, { params }: RouteParams) {
     }
 
     const result = await trackDelhiveryShipment(order.shippingLabel.awbNumber);
+
+    // Keep the order status in step with what Delhivery reports.
+    if (result.success) {
+      try {
+        const doc = await Order.findById(id);
+        if (doc) await syncOrderWithDelhivery(doc, result.raw);
+      } catch (syncError) {
+        console.error("Tracking sync error:", syncError);
+      }
+    }
 
     return NextResponse.json(result);
   } catch (error) {

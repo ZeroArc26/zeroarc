@@ -1,0 +1,3 @@
+{
+  "crons": [{ "path": "/api/cron/delhivery-sync", "schedule": "30 2 * * *" }]
+}

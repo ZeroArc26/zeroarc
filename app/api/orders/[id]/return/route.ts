@@ -76,7 +76,7 @@ export async function POST(request: Request, { params }: RouteParams) {
     }
 
     const deliveredEvent = (order.timeline || []).find(
-      (t: any) => t.event?.toLowerCase() === "delivered"
+      (t: any) => t.event?.toLowerCase().includes("delivered")
     );
     if (deliveredEvent?.date) {
       const daysSinceDelivery =

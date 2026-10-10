@@ -2,6 +2,7 @@
 
 import connectDB from "@/lib/mongodb";
 import Order from "@/models/Order";
+import { cancelDelhiveryShipment } from "@/lib/delhivery";
 
 export async function cancelOrder(orderId: string) {
   await connectDB();
@@ -24,6 +25,21 @@ export async function cancelOrder(orderId: string) {
     throw new Error("Delivered orders cannot be cancelled.");
   }
 
+  // If a real Delhivery shipment exists, try to cancel it too (best
+  // effort — Delhivery only allows this before pickup).
+  const label = order.shippingLabel;
+  let courierNote = "";
+  if (
+    label?.courierPartner === "Delhivery" &&
+    label?.awbNumber &&
+    !label?.isProvisionalAwb
+  ) {
+    const result = await cancelDelhiveryShipment(label.awbNumber);
+    courierNote = result.success
+      ? " Delhivery shipment cancelled."
+      : ` Delhivery shipment could NOT be cancelled automatically (${result.message}) - cancel it in the Delhivery panel.`;
+  }
+
   order.orderInfo.status = "cancelled";
 
   order.timeline.push({
@@ -35,6 +51,6 @@ export async function cancelOrder(orderId: string) {
 
   return {
     success: true,
-    message: "Order cancelled successfully.",
+    message: `Order cancelled successfully.${courierNote}`,
   };
 }

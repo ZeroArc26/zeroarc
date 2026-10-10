@@ -298,3 +298,45 @@ export async function createDelhiveryReversePickup(
     return { success: false, message: "Failed to reach Delhivery API." };
   }
 }
+
+/**
+ * Cancels a forward shipment on Delhivery. Delhivery only allows this
+ * before the package is picked up, so a failure here is expected for
+ * shipments already in transit — callers should treat it as best-effort.
+ */
+export async function cancelDelhiveryShipment(
+  waybill: string
+): Promise<{ success: boolean; message?: string }> {
+  const baseUrl = process.env.DELHIVERY_BASE_URL || "https://track.delhivery.com";
+  const token = process.env.DELHIVERY_API_TOKEN;
+
+  if (!token) {
+    return { success: false, message: "Delhivery API not configured." };
+  }
+
+  try {
+    const res = await fetch(`${baseUrl}/api/p/edit`, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        Authorization: `Token ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ waybill, cancellation: "true" }),
+    });
+
+    const data = await res.json().catch(() => null);
+
+    if (!res.ok || data?.status === false) {
+      return {
+        success: false,
+        message: data?.error || data?.message || "Delhivery refused the cancellation.",
+      };
+    }
+
+    return { success: true };
+  } catch (error) {
+    console.error("Delhivery cancel error:", error);
+    return { success: false, message: "Failed to reach Delhivery API." };
+  }
+}
