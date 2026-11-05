@@ -11,6 +11,8 @@ import {
   Settings,
   ScanBarcode,
   RotateCcw,
+  PhoneCall,
+  Wallet,
   type LucideIcon,
 } from "lucide-react";
 
@@ -91,6 +93,13 @@ export const adminNavItems: AdminNavItem[] = [
   },
 
   {
+    title: "Accounts (Hisaab)",
+    href: "/admin/dashboard/accounts",
+    icon: Wallet,
+    section: "FINANCE",
+  },
+
+  {
     title: "Analytics",
     href: "/admin/dashboard/analytics",
     icon: BarChart3,
@@ -101,6 +110,13 @@ export const adminNavItems: AdminNavItem[] = [
     title: "Returns",
     href: "/admin/dashboard/returns",
     icon: RotateCcw,
+    section: "INSIGHTS",
+  },
+
+  {
+    title: "Voice Calls",
+    href: "/admin/dashboard/voice-calls",
+    icon: PhoneCall,
     section: "INSIGHTS",
   },
 
