@@ -7,11 +7,11 @@ export const PAYMENT_MODES = ["cash", "upi", "bank", "card", "other"] as const;
 export type PaymentMode = (typeof PAYMENT_MODES)[number];
 
 export const TYPE_META: Record<LedgerType, { label: string; hint: string }> = {
-  expense: { label: "Kharcha", hint: "Ads, packaging, courier, salary, rent…" },
-  income: { label: "Aamdani", hint: "Website ke bahar ki sale (Flipkart, DM, offline)" },
-  purchase: { label: "Stock kharidi", hint: "Supplier se liya maal" },
-  receivable: { label: "Milna hai", hint: "Kisi se aapko paisa lena hai (udhaar diya)" },
-  payable: { label: "Dena hai", hint: "Aapko kisi ko paisa dena hai (udhaar liya)" },
+  expense: { label: "Expense", hint: "Ads, packaging, courier, salary, rent…" },
+  income: { label: "Income", hint: "Sales outside the website (Flipkart, DMs, offline)" },
+  purchase: { label: "Stock purchase", hint: "Goods bought from a supplier" },
+  receivable: { label: "To receive", hint: "Money someone owes you (you lent or sold on credit)" },
+  payable: { label: "To pay", hint: "Money you owe someone (you borrowed or bought on credit)" },
 };
 
 export const CATEGORIES: Record<LedgerType, string[]> = {

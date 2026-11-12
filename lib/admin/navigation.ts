@@ -93,7 +93,7 @@ export const adminNavItems: AdminNavItem[] = [
   },
 
   {
-    title: "Accounts (Hisaab)",
+    title: "Accounts",
     href: "/admin/dashboard/accounts",
     icon: Wallet,
     section: "FINANCE",

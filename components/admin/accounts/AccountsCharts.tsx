@@ -31,9 +31,9 @@ export default function AccountsInsights({ summary }: { summary: LedgerSummary }
   return (
     <MotionConfig reducedMotion="user">
       <div className="grid gap-4 lg:grid-cols-2">
-        <Panel title="Paisa kahan jaa raha hai" sub="Kharcha aur stock kharidi, bade se chhote ke order me">
+        <Panel title="Where the money goes" sub="Expenses and stock purchases, largest first">
           {cats.length === 0 ? (
-            <p className="py-12 text-center text-sm text-zinc-500">Is period me koi kharcha nahi.</p>
+            <p className="py-12 text-center text-sm text-zinc-500">No expenses in this period.</p>
           ) : (
             <ul className="space-y-4">
               {cats.map((c) => (
@@ -41,7 +41,7 @@ export default function AccountsInsights({ summary }: { summary: LedgerSummary }
                   <div className="mb-1.5 flex items-baseline justify-between gap-3 text-sm">
                     <span className="truncate text-zinc-200">
                       {c.name}
-                      {c.kind === "purchase" && <span className="ml-2 text-xs text-amber-400">kharidi</span>}
+                      {c.kind === "purchase" && <span className="ml-2 text-xs text-amber-400">purchase</span>}
                     </span>
                     <span className="shrink-0 tabular-nums text-zinc-400">
                       <span className="font-semibold text-white">{inr(c.amount)}</span>
@@ -63,9 +63,9 @@ export default function AccountsInsights({ summary }: { summary: LedgerSummary }
           )}
         </Panel>
 
-        <Panel title="Mahine ka aana-jaana" sub="Aamdani (website + manual) vs jaana (kharcha + kharidi + refund)">
+        <Panel title="Monthly cash flow" sub="Money in (website + manual income) vs money out (expenses + purchases + refunds)">
           {months.length === 0 ? (
-            <p className="py-12 text-center text-sm text-zinc-500">Is period me koi data nahi.</p>
+            <p className="py-12 text-center text-sm text-zinc-500">No data in this period.</p>
           ) : (
             <div className="h-64">
               <ResponsiveContainer width="100%" height="100%">
@@ -75,8 +75,8 @@ export default function AccountsInsights({ summary }: { summary: LedgerSummary }
                   <YAxis tickFormatter={compact} stroke="#71717a" fontSize={11} width={40} tickLine={false} axisLine={false} />
                   <Tooltip formatter={(v) => inr(Number(v))} cursor={{ fill: "rgba(139,92,246,0.08)" }} />
                   <Legend wrapperStyle={{ fontSize: 12 }} iconType="circle" />
-                  <Bar dataKey="income" name="Aamdani" fill="#10b981" radius={[6, 6, 0, 0]} />
-                  <Bar dataKey="outgo" name="Jaana" fill="#f43f5e" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="income" name="Money in" fill="#10b981" radius={[6, 6, 0, 0]} />
+                  <Bar dataKey="outgo" name="Money out" fill="#f43f5e" radius={[6, 6, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>

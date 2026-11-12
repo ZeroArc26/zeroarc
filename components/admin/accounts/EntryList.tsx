@@ -32,8 +32,8 @@ const ICON: Record<LedgerType, { icon: LucideIcon; cls: string }> = {
 function dayLabel(day: string) {
   const today = istToday();
   const yesterday = new Date(Date.parse(`${today}T00:00:00Z`) - 86400000).toISOString().slice(0, 10);
-  if (day === today) return "Aaj";
-  if (day === yesterday) return "Kal";
+  if (day === today) return "Today";
+  if (day === yesterday) return "Yesterday";
   return new Date(`${day}T12:00:00Z`).toLocaleDateString("en-IN", {
     weekday: "short",
     day: "numeric",
@@ -103,7 +103,7 @@ export default function EntryList({
                   e.party && e.party !== primary ? e.party : "",
                   e.quantity ? `Qty ${e.quantity}` : "",
                   !udhaar && e.paymentMode ? e.paymentMode.toUpperCase() : "",
-                  udhaar && !settled && e.dueDate ? `Wapsi ${dayLabel(ist(e.dueDate))}` : "",
+                  udhaar && !settled && e.dueDate ? `Due ${dayLabel(ist(e.dueDate))}` : "",
                   e.note,
                 ].filter(Boolean);
 
@@ -139,7 +139,7 @@ export default function EntryList({
                       </p>
                       {udhaar && (
                         <p className={`text-[11px] font-medium ${settled ? "text-emerald-400" : "text-amber-400"}`}>
-                          {settled ? "Settled" : "Baaki"}
+                          {settled ? "Settled" : "Pending"}
                         </p>
                       )}
                     </div>
@@ -151,8 +151,8 @@ export default function EntryList({
                           disabled={busy}
                           onClick={() => onSettle(e)}
                           className="rounded-lg p-2 text-zinc-400 transition hover:bg-zinc-800 hover:text-white disabled:opacity-50"
-                          aria-label={settled ? "Wapas baaki karo" : "Settle karo"}
-                          title={settled ? "Wapas baaki karo" : "Settle karo"}
+                          aria-label={settled ? "Mark as pending" : "Mark as settled"}
+                          title={settled ? "Mark as pending" : "Mark as settled"}
                         >
                           {settled ? <RotateCcw className="h-4 w-4" /> : <CheckCircle2 className="h-4 w-4" />}
                         </button>

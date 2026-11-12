@@ -8,7 +8,7 @@ export const ledgerEntrySchema = z
   .object({
     type: z.enum(LEDGER_TYPES),
     date: dateStr,
-    amount: z.coerce.number().positive("Amount 0 se zyada hona chahiye").max(100000000),
+    amount: z.coerce.number().positive("Amount must be greater than 0").max(100000000),
     category: z.string().trim().max(60).optional().default(""),
     title: z.string().trim().max(120).optional().default(""),
     party: z.string().trim().max(80).optional().default(""),
@@ -19,10 +19,10 @@ export const ledgerEntrySchema = z
   })
   .superRefine((v, ctx) => {
     if (isUdhaar(v.type) && !v.party) {
-      ctx.addIssue({ code: "custom", path: ["party"], message: "Naam likhna zaroori hai" });
+      ctx.addIssue({ code: "custom", path: ["party"], message: "Enter a name" });
     }
     if (!isUdhaar(v.type) && !v.title && !v.category) {
-      ctx.addIssue({ code: "custom", path: ["title"], message: "Category ya detail likho" });
+      ctx.addIssue({ code: "custom", path: ["title"], message: "Enter a category or a detail" });
     }
   });
 

@@ -5,8 +5,8 @@ export default function AdminAccountsPage() {
   return (
     <div className="space-y-8">
       <PageHeader
-        title="Accounts (Hisaab)"
-        description="Kharcha, aamdani, stock kharidi aur udhaar manually chadhao. Website ki sales apne aap judti hain."
+        title="Accounts"
+        description="Add expenses, income, stock purchases and dues by hand. Website sales are included automatically."
       />
 
       <AccountsClient />

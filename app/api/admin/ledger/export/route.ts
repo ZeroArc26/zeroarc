@@ -75,7 +75,7 @@ export async function GET(request: Request) {
     return new NextResponse(csv, {
       headers: {
         "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="zeroarc-hisaab-${istToday()}.csv"`,
+        "Content-Disposition": `attachment; filename="zeroarc-accounts-${istToday()}.csv"`,
         "Cache-Control": "no-store",
       },
     });

@@ -62,7 +62,7 @@ export default function EntryModal({
 
   const udhaar = isUdhaar(type);
   const partyLabel =
-    type === "purchase" ? "Supplier" : type === "receivable" ? "Kisse milna hai" : type === "payable" ? "Kisko dena hai" : "Party (optional)";
+    type === "purchase" ? "Supplier" : type === "receivable" ? "Who owes you" : type === "payable" ? "Who you owe" : "Party (optional)";
 
   async function submit(e: React.FormEvent) {
     e.preventDefault();
@@ -88,12 +88,12 @@ export default function EntryModal({
       });
       const data = await res.json();
       if (!data.success) {
-        setError(data.message || "Save nahi hua.");
+        setError(data.message || "Could not save the entry.");
         return;
       }
       onSaved();
     } catch {
-      setError("Network error. Dobara try karo.");
+      setError("Network error. Try again.");
     } finally {
       setSaving(false);
     }
@@ -107,7 +107,7 @@ export default function EntryModal({
         className="max-h-[92vh] w-full max-w-lg overflow-y-auto rounded-t-3xl border border-zinc-800 bg-zinc-900 p-5 shadow-2xl sm:rounded-3xl sm:p-6"
       >
         <div className="mb-5 flex items-center justify-between">
-          <h2 className="text-lg font-bold text-white">{editing ? "Entry edit karo" : "Nayi entry"}</h2>
+          <h2 className="text-lg font-bold text-white">{editing ? "Edit entry" : "New entry"}</h2>
           <button type="button" onClick={onClose} className="rounded-lg p-1.5 text-zinc-400 hover:bg-zinc-800 hover:text-white" aria-label="Close">
             <X className="h-5 w-5" />
           </button>
@@ -160,12 +160,12 @@ export default function EntryModal({
 
           <div>
             <label className={label}>{partyLabel}</label>
-            <input className={field} value={party} onChange={(e) => setParty(e.target.value)} placeholder={udhaar ? "Naam" : "—"} required={udhaar} />
+            <input className={field} value={party} onChange={(e) => setParty(e.target.value)} placeholder={udhaar ? "Name" : "—"} required={udhaar} />
           </div>
 
           <div className="sm:col-span-2">
             <label className={label}>Detail</label>
-            <input className={field} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="Jaise: Instagram ads, 50 tees, courier bill…" />
+            <input className={field} value={title} onChange={(e) => setTitle(e.target.value)} placeholder="e.g. Instagram ads, 50 tees, courier bill…" />
           </div>
 
           {type === "purchase" && (
@@ -190,7 +190,7 @@ export default function EntryModal({
 
           {udhaar && (
             <div>
-              <label className={label}>Wapsi ki date (optional)</label>
+              <label className={label}>Due date (optional)</label>
               <input className={field} type="date" value={dueDate} onChange={(e) => setDueDate(e.target.value)} />
             </div>
           )}
@@ -203,7 +203,7 @@ export default function EntryModal({
 
         {udhaar && (
           <p className="mt-3 rounded-xl bg-amber-500/10 px-3 py-2 text-xs text-amber-300">
-            Udhaar profit/loss me nahi judta. Jab paisa mil jaaye ya de do, tab entry ko &quot;Settle&quot; kar dena.
+            Dues are not counted in profit or loss. Mark the entry as settled once the money is received or paid.
           </p>
         )}
 

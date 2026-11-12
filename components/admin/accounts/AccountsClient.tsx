@@ -14,21 +14,21 @@ type Preset = "this_month" | "last_month" | "last_30" | "this_fy" | "this_year" 
 type Tab = "all" | "expense" | "income" | "purchase" | "udhaar";
 
 const PRESETS: { value: Preset; label: string }[] = [
-  { value: "this_month", label: "Is mahine" },
-  { value: "last_month", label: "Pichla mahina" },
-  { value: "last_30", label: "30 din" },
-  { value: "this_fy", label: "Is saal (Apr–Mar)" },
-  { value: "this_year", label: "Calendar year" },
-  { value: "all", label: "Sab" },
+  { value: "this_month", label: "This month" },
+  { value: "last_month", label: "Last month" },
+  { value: "last_30", label: "Last 30 days" },
+  { value: "this_fy", label: "This financial year" },
+  { value: "this_year", label: "This year" },
+  { value: "all", label: "All" },
   { value: "custom", label: "Custom" },
 ];
 
 const TABS: { value: Tab; label: string }[] = [
-  { value: "all", label: "Sab" },
-  { value: "expense", label: "Kharcha" },
-  { value: "income", label: "Aamdani" },
-  { value: "purchase", label: "Stock kharidi" },
-  { value: "udhaar", label: "Udhaar" },
+  { value: "all", label: "All" },
+  { value: "expense", label: "Expenses" },
+  { value: "income", label: "Income" },
+  { value: "purchase", label: "Stock purchases" },
+  { value: "udhaar", label: "Dues" },
 ];
 
 function rangeFor(p: Preset): { from: string; to: string } {
@@ -119,7 +119,7 @@ export default function AccountsClient() {
           key,
           entries: list.success ? list.entries : [],
           summary: sum.success ? sum.summary : null,
-          error: list.success && sum.success ? "" : list.message || sum.message || "Load nahi hua.",
+          error: list.success && sum.success ? "" : list.message || sum.message || "Could not load accounts.",
         });
       } catch {
         if (!cancelled) setData({ key, entries: [], summary: null, error: "Network error." });
@@ -185,7 +185,7 @@ export default function AccountsClient() {
       {preset === "custom" && (
         <div className="flex flex-wrap items-center gap-2 text-sm text-zinc-400">
           <input type="date" value={custom.from} onChange={(e) => setCustom((c) => ({ ...c, from: e.target.value }))} className="rounded-xl border border-zinc-700 bg-zinc-950/60 px-3 py-2 text-white" />
-          <span>se</span>
+          <span>to</span>
           <input type="date" value={custom.to} onChange={(e) => setCustom((c) => ({ ...c, to: e.target.value }))} className="rounded-xl border border-zinc-700 bg-zinc-950/60 px-3 py-2 text-white" />
         </div>
       )}
@@ -224,7 +224,7 @@ export default function AccountsClient() {
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Entries me dhundo"
+              placeholder="Search entries"
               className="w-full rounded-xl border border-zinc-700 bg-zinc-950/60 py-2.5 pl-9 pr-3 text-sm text-white outline-none placeholder:text-zinc-600 focus:border-violet-500"
             />
           </div>
@@ -239,10 +239,10 @@ export default function AccountsClient() {
         ) : entries.length === 0 ? (
           <div className="flex flex-col items-center gap-3 rounded-3xl border border-dashed border-zinc-700 px-6 py-14 text-center">
             <p className="text-sm text-zinc-400">
-              {query || tab !== "all" ? "Is filter me koi entry nahi mili." : "Is period me abhi koi entry nahi hai."}
+              {query || tab !== "all" ? "No entries match this filter." : "No entries in this period yet."}
             </p>
             <button type="button" onClick={openNew} className="inline-flex items-center gap-2 rounded-xl bg-violet-600 px-4 py-2.5 text-sm font-semibold text-white hover:bg-violet-500">
-              <Plus className="h-4 w-4" /> Pehli entry chadhao
+              <Plus className="h-4 w-4" /> Add your first entry
             </button>
           </div>
         ) : (
@@ -264,7 +264,7 @@ export default function AccountsClient() {
         )}
 
         {entries.length >= 500 && (
-          <p className="text-xs text-zinc-500">Pehli 500 entries dikh rahi hain. Range chhoti karo ya CSV export lo.</p>
+          <p className="text-xs text-zinc-500">Showing the first 500 entries. Narrow the date range or export a CSV.</p>
         )}
       </div>
 

@@ -71,7 +71,7 @@ export default function AccountsHero({
     <MotionConfig reducedMotion="user">
       <section className="grid overflow-hidden rounded-3xl border border-zinc-800 bg-zinc-900/40 lg:grid-cols-[1fr_300px]">
         <div className="p-5 sm:p-7">
-          <p className="text-sm text-zinc-400">{loss ? "Is period me ghata" : "Is period me bacha"}</p>
+          <p className="text-sm text-zinc-400">{loss ? "Net loss this period" : "Net profit this period"}</p>
           <p
             className={`mt-1 font-[family:var(--font-space)] text-5xl font-black tabular-nums tracking-tight sm:text-6xl ${
               loss ? "text-rose-400" : "text-white"
@@ -81,14 +81,14 @@ export default function AccountsHero({
             {money(Math.abs(summary.net))}
           </p>
           <p className="mt-2 text-sm text-zinc-500">
-            {margin !== null ? `Aamdani ka ${margin}% ${loss ? "minus me" : "bacha"} · ` : ""}
+            {margin !== null ? `${loss ? "Loss" : "Profit"} margin ${Math.abs(margin)}% of income · ` : ""}
             {summary.website.orders} website orders
           </p>
 
           {scale > 0 ? (
             <div className="mt-7 space-y-6">
               <FlowBar
-                title="Aaya"
+                title="Money in"
                 total={income}
                 scale={scale}
                 segs={[
@@ -97,24 +97,24 @@ export default function AccountsHero({
                 ]}
               />
               <FlowBar
-                title="Gaya"
+                title="Money out"
                 total={outgo}
                 scale={scale}
                 segs={[
-                  { label: "Kharcha", value: summary.manual.expense, color: "#f43f5e" },
-                  { label: "Stock kharidi", value: summary.manual.purchase, color: "#f59e0b" },
+                  { label: "Expenses", value: summary.manual.expense, color: "#f43f5e" },
+                  { label: "Stock purchases", value: summary.manual.purchase, color: "#f59e0b" },
                   { label: "Refund", value: summary.website.refunds, color: "#a1a1aa" },
                 ]}
               />
             </div>
           ) : (
             <p className="mt-7 rounded-2xl border border-dashed border-zinc-700 px-4 py-6 text-sm text-zinc-500">
-              Is period me abhi koi aamdani ya kharcha nahi. Pehli entry chadhao ya range badlo.
+              No income or expenses in this period yet. Add an entry or change the date range.
             </p>
           )}
 
           <p className="mt-6 text-[11px] text-zinc-600">
-            Paisa jis din aaya/gaya usi din ginta hai. Website me sirf paid ya delivered orders judte hain.
+            Counted on the day money moved. Website sales include only paid or delivered orders.
           </p>
         </div>
 
@@ -125,19 +125,19 @@ export default function AccountsHero({
             className="group flex flex-1 flex-col justify-between gap-6 p-5 text-left transition hover:bg-zinc-800/30 sm:p-7"
           >
             <div>
-              <p className="text-sm font-medium text-zinc-300">Udhaar baaki</p>
-              <p className="mt-0.5 text-xs text-zinc-500">Profit me nahi judta</p>
+              <p className="text-sm font-medium text-zinc-300">Dues pending</p>
+              <p className="mt-0.5 text-xs text-zinc-500">Not counted in profit</p>
             </div>
 
             <div className="space-y-4">
               <div>
-                <p className="text-xs text-zinc-500">Mujhe milna hai</p>
+                <p className="text-xs text-zinc-500">To receive</p>
                 <p className="font-[family:var(--font-space)] text-2xl font-bold tabular-nums text-emerald-400">
                   {money(summary.pending.receivable)}
                 </p>
               </div>
               <div>
-                <p className="text-xs text-zinc-500">Mujhe dena hai</p>
+                <p className="text-xs text-zinc-500">To pay</p>
                 <p className="font-[family:var(--font-space)] text-2xl font-bold tabular-nums text-amber-400">
                   {money(summary.pending.payable)}
                 </p>
@@ -145,7 +145,7 @@ export default function AccountsHero({
             </div>
 
             <span className="inline-flex items-center gap-1.5 text-xs font-medium text-violet-400">
-              Udhaar entries dekho
+              View dues
               <ArrowRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
             </span>
           </button>
